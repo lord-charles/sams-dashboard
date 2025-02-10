@@ -372,7 +372,7 @@ export default function RolesManagement() {
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
                   This action cannot be undone. This will permanently delete the role
-                  "{roleToDelete?.name}" and remove it from the system.
+                  &apos;{roleToDelete?.name}&apos; and remove it from the system.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

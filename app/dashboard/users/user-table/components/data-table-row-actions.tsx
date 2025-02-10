@@ -232,7 +232,7 @@ export function DataTableRowActions<TData>({
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-gray-900">User Profile</DialogTitle>
             <DialogDescription className="text-sm text-gray-500">
-              Comprehensive details about the user's account and role.
+              Comprehensive details about the user&apos;s account and role.
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
