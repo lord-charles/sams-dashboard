@@ -3,6 +3,11 @@ import UserModule from "./components/UserModule";
 import axios from "axios";
 import { base_url } from "@/app/utils/baseUrl";
 
+// Disable caching for this page
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+
 const getUsers = async () => {
   const users = await axios.get(`${base_url}user/users/get-all`);
   return users.data;
