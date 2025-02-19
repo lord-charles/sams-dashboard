@@ -297,12 +297,19 @@ export default function UsersTable({
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="admin">Admin</SelectItem>
-                                <SelectItem value="superadmin">Super Admin</SelectItem>
-                                <SelectItem value="user">User</SelectItem>
-                                <SelectItem value="enumalator">Enumalator</SelectItem>
-
-                              </SelectContent>
+  <SelectItem value="admin">Admin</SelectItem>
+  <SelectItem value="superadmin">Super Admin</SelectItem>
+  <SelectItem value="user">User</SelectItem>
+  <SelectItem value="enumerator">Enumerator</SelectItem>
+  <SelectItem value="school-officer">School Officer</SelectItem>
+  <SelectItem value="mogei-official">MoGEI Official</SelectItem>
+  <SelectItem value="data-supervisor">Data Supervisor</SelectItem>
+  <SelectItem value="sa-team-leader">SA Team Leader</SelectItem>
+  <SelectItem value="deputy-team-leader">Deputy Team Leader</SelectItem>
+  <SelectItem value="disability-champion">Disability Champion</SelectItem>
+  <SelectItem value="donor">Donor</SelectItem>
+  <SelectItem value="gess-secretariate">GESS Secretariate</SelectItem>
+</SelectContent>
                             </Select>
                             <FormMessage />
                           </FormItem>
