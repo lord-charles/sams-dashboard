@@ -2,6 +2,11 @@ import axios from 'axios';
 import { base_url } from "@/app/utils/baseUrl";
 import TeacherModuleClient from './components/teacher-module-client';
 
+// Disable caching for this page
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+
 async function getInitialData() {
   try {
     const [

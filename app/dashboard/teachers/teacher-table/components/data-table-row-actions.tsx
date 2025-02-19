@@ -42,7 +42,7 @@ export function DataTableRowActions<TData>({
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem>
           <Link
-            href={`/dashboard/learners/${item._id}`}
+            href={`/dashboard/teachers/${item._id}`}
             target="_blank"
             rel="noopener noreferrer"
           >

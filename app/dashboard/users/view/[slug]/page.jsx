@@ -3,6 +3,7 @@ import { Card, CardBody } from "@nextui-org/card";
 import { Spinner } from "@nextui-org/react";
 import React from "react";
 import useSWR from "swr";
+
 const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 const Page = ({ params }) => {
