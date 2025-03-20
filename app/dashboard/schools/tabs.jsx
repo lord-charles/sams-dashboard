@@ -12,9 +12,7 @@ const OverviewGraphs = dynamic(() => import("./overview-graphs"), {
     loading: () => <LazyLoader />,
 });
 
-// const GenderGraph = dynamic(() => import("./components/gender-graph"), {
-//     loading: () => <LazyLoader />,
-// });
+
 
 const SchoolsTabs = ({ genderData, schools }) => {
     const searchParams = useSearchParams();
