@@ -110,7 +110,6 @@ export default function Community({
   school,
   education,
   schoolData,
-  enrollmentData,
 }: {
   code: string;
   state10: string;
@@ -119,7 +118,6 @@ export default function Community({
   school: string;
   education: string;
   schoolData: any;
-  enrollmentData: any;
 }) {
   const [students, setStudents] = useState<any[]>([]);
   const [isLoading, setIsloading] = useState<boolean>(false);
@@ -267,7 +265,6 @@ export default function Community({
               icon={<UserCheck className="h-4 w-4 text-muted-foreground" />}
               description="Last 30 days"
             />
-            ;
           </div>
 
           <div>
@@ -368,7 +365,7 @@ export default function Community({
                   <p className="text-sm text-muted-foreground">Teachers</p>
 
                   <p className="text-2xl font-bold">
-                    {schoolData.staffing.teachers}
+                    {dummySchoolData.staffing.teachers}
                   </p>
                 </div>
 
@@ -376,7 +373,7 @@ export default function Community({
                   <p className="text-sm text-muted-foreground">Admin Staff</p>
 
                   <p className="text-2xl font-bold">
-                    {schoolData.staffing.adminStaff}
+                    {dummySchoolData.staffing.adminStaff}
                   </p>
                 </div>
 
@@ -384,7 +381,7 @@ export default function Community({
                   <p className="text-sm text-muted-foreground">Support Staff</p>
 
                   <p className="text-2xl font-bold">
-                    {schoolData.staffing.supportStaff}
+                    {dummySchoolData.staffing.supportStaff}
                   </p>
                 </div>
 
@@ -394,7 +391,7 @@ export default function Community({
                   </p>
 
                   <p className="text-2xl font-bold">
-                    1:{schoolData.staffing.studentTeacherRatio}
+                    1:{dummySchoolData.staffing.supportStaff}
                   </p>
                 </div>
               </div>
@@ -407,51 +404,30 @@ export default function Community({
             </CardHeader>
 
             <CardContent className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={[
-                      {
-                        name: "Teachers",
-
-                        value: schoolData.staffing.teachers,
-                      },
-
-                      {
-                        name: "Admin",
-
-                        value: schoolData.staffing.adminStaff,
-                      },
-
-                      {
-                        name: "Support",
-
-                        value: schoolData.staffing.supportStaff,
-                      },
-                    ]}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) =>
-                      `${name} ${(percent * 100).toFixed(0)}%`
-                    }
-                  >
-                    {enrollmentData.map((entry: any, index: any) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-
-                  <Tooltip />
-
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height="100%">
+      <PieChart>
+        <Pie
+          data={[
+            { name: "Teachers", value: dummySchoolData.staffing.teachers },
+            { name: "Admin", value: dummySchoolData.staffing.adminStaff },
+            { name: "Support", value: dummySchoolData.staffing.supportStaff },
+          ]}
+          cx="50%"
+          cy="50%"
+          labelLine={false}
+          outerRadius={80}
+          fill="#8884d8"
+          dataKey="value"
+          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+        >
+          {Object.values(dummySchoolData.staffing).map((_, index) => (
+            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          ))}
+        </Pie>
+        <Tooltip />
+        <Legend />
+      </PieChart>
+    </ResponsiveContainer>
             </CardContent>
           </Card>
         </TabsContent>
@@ -459,3 +435,11 @@ export default function Community({
     </div>
   );
 }
+
+const dummySchoolData = {
+  staffing: {
+    teachers: 50,
+    adminStaff: 20,
+    supportStaff: 30,
+  },
+};

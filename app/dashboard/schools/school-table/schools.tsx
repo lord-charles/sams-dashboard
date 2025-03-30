@@ -1,10 +1,11 @@
-
 import { columns } from "./components/columns";
 import { DataTable } from "./components/data-table";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, RefreshCw } from "lucide-react";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export type schoolInterface = {
   payam28: string;
@@ -104,17 +105,19 @@ export type schoolDataInterface = {
   updatedAt: {
     $date: string;
   };
+  _id: string;
 };
 
-export default  function SchoolsTable({
+export default function SchoolsTable({
   schools,
 }: {
   schools: schoolInterface[];
 }) {
- const { data: session, status } = useSession()
- console.log(session , status)
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
- 
+  const {toast} = useToast();
+
   return (
     <Card className="p-4 ">
       <div className="hidden h-full flex-1 flex-col space-y-8 md:flex">
@@ -126,6 +129,17 @@ export default  function SchoolsTable({
           <div className="flex items-center space-x-2">
             <Button
               className={`text-white font-semibold`}
+              onClick={() => {
+                status === "authenticated" &&
+                session?.user?.userType === "SuperAdmin"
+                  ? router.push("/dashboard/schools/new")
+                  : toast({
+                      title: "Error",
+                      description:
+                        "You do not have permission to add a new school",
+                      variant: "destructive",
+                    });
+              }}
             >
               <PlusCircle className="mr-2 h-4 w-4" />
               New School

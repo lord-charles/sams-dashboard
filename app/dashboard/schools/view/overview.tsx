@@ -7,14 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ResponsiveContainer,
@@ -28,6 +21,28 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+
+interface EnrollmentComplete {
+  year: number;
+  isComplete: boolean;
+  completedBy: string;
+  comments: string;
+  percentageComplete: number;
+  _id: string;
+}
+
+interface schoolDataInterface {
+  _id: string;
+  name: string;
+  code: string;
+  location: string;
+  type: string;
+  level: string;
+  category: string;
+  isEnrollmentComplete?: EnrollmentComplete[];
+}
 
 interface HeadTeacher {
   name: string;
@@ -135,7 +150,7 @@ const enrollmentData = [
   { name: "Female", value: 280 },
 ];
 
-export function Overview() {
+export function Overview({ schoolInfo }: { schoolInfo: schoolDataInterface }) {
   const [schoolData, setSchoolData] = useState<SchoolData>(initialSchoolData);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -269,104 +284,6 @@ export function Overview() {
     </Card>
   );
 
-  const renderRadioCoverage = () => (
-    <Card>
-      <CardHeader>
-        <CardTitle>Radio Coverage</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="radio-stations">Radio Stations</Label>
-            <Input
-              id="radio-stations"
-              value={schoolData.radioCoverage.stations.join(", ")}
-              onChange={(e) =>
-                handleInputChange(
-                  "radioCoverage",
-                  "stations",
-                  e.target.value.split(", ")
-                )
-              }
-              disabled={!isEditing}
-            />
-          </div>
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="radio-programme"
-              checked={schoolData.radioCoverage.programme}
-              onCheckedChange={(checked) =>
-                handleInputChange("radioCoverage", "programme", checked)
-              }
-              disabled={!isEditing}
-            />
-            <Label htmlFor="radio-programme">Has Radio Programme</Label>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="programme-group">Programme Group</Label>
-            <Input
-              id="programme-group"
-              value={schoolData.radioCoverage.programmeGroup}
-              onChange={(e) =>
-                handleInputChange(
-                  "radioCoverage",
-                  "programmeGroup",
-                  e.target.value
-                )
-              }
-              disabled={!isEditing}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="broadcast-hours">Weekly Broadcast Hours</Label>
-            <Input
-              id="broadcast-hours"
-              type="number"
-              value={schoolData.radioCoverage.weeklyBroadcastHours}
-              onChange={(e) =>
-                handleInputChange(
-                  "radioCoverage",
-                  "weeklyBroadcastHours",
-                  parseInt(e.target.value)
-                )
-              }
-              disabled={!isEditing}
-            />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const renderCellphoneCoverage = () => (
-    <Card>
-      <CardHeader>
-        <CardTitle>Cellphone Coverage</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 gap-4">
-          {Object.entries(schoolData.cellphoneCoverage).map(
-            ([provider, covered]) => (
-              <div key={provider} className="flex items-center space-x-2">
-                <Switch
-                  id={`cellphone-${provider}`}
-                  checked={covered}
-                  onCheckedChange={(checked) =>
-                    handleInputChange("cellphoneCoverage", provider, checked)
-                  }
-                  disabled={!isEditing}
-                />
-                <Label htmlFor={`cellphone-${provider}`}>
-                  {provider.charAt(0).toUpperCase() + provider.slice(1)}
-                </Label>
-              </div>
-            )
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-
   const renderSchoolOperation = () => (
     <Card>
       <CardHeader>
@@ -409,120 +326,6 @@ export function Overview() {
               }
               disabled={!isEditing}
             />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const renderSchoolCalendar = () => (
-    <Card>
-      <CardHeader>
-        <CardTitle>School Calendar</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="calendar-year">Year</Label>
-            <Input
-              id="calendar-year"
-              type="number"
-              value={schoolData.calendar.year}
-              onChange={(e) =>
-                handleInputChange("calendar", "year", parseInt(e.target.value))
-              }
-              disabled={!isEditing}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Terms</Label>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Term</TableHead>
-                  <TableHead>Start Date</TableHead>
-                  <TableHead>End Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {schoolData.calendar.terms.map((term, index) => (
-                  <TableRow key={index}>
-                    <TableCell>Term {index + 1}</TableCell>
-                    <TableCell>
-                      <Input
-                        type="date"
-                        value={term.startDate}
-                        onChange={(e) => {
-                          const newTerms = [...schoolData.calendar.terms];
-                          newTerms[index].startDate = e.target.value;
-                        }}
-                        disabled={!isEditing}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        type="date"
-                        value={term.endDate}
-                        onChange={(e) => {
-                          const newTerms = [...schoolData.calendar.terms];
-                          newTerms[index].endDate = e.target.value;
-                          handleInputChange("calendar", "terms", newTerms);
-                        }}
-                        disabled={!isEditing}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-          <div className="space-y-2">
-            <Label>Holidays</Label>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Holiday Name</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {schoolData.calendar.holidays.map((holiday, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <Input
-                        type="date"
-                        value={holiday.date}
-                        onChange={(e) => {
-                          const newHolidays = [...schoolData.calendar.holidays];
-                          newHolidays[index].date = e.target.value;
-                          handleInputChange(
-                            "calendar",
-                            "holidays",
-                            newHolidays
-                          );
-                        }}
-                        disabled={!isEditing}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        value={holiday.name}
-                        onChange={(e) => {
-                          const newHolidays = [...schoolData.calendar.holidays];
-                          newHolidays[index].name = e.target.value;
-                          handleInputChange(
-                            "calendar",
-                            "holidays",
-                            newHolidays
-                          );
-                        }}
-                        disabled={!isEditing}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
           </div>
         </div>
       </CardContent>
@@ -593,10 +396,11 @@ export function Overview() {
       </div>
 
       <Tabs defaultValue="academic" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="academic">Academic</TabsTrigger>
           <TabsTrigger value="general">General Info</TabsTrigger>
           <TabsTrigger value="bank">Bank Details</TabsTrigger>
+          <TabsTrigger value="enrollment">Enrollment History</TabsTrigger>
         </TabsList>
         <TabsContent value="general" className="space-y-4">
           {renderHeadTeacherInfo()}
@@ -662,6 +466,93 @@ export function Overview() {
         </TabsContent>
         <TabsContent value="bank" className="space-y-4">
           {renderBankDetails()}
+        </TabsContent>
+        <TabsContent value="enrollment" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Enrollment Completion History</span>
+                <Badge
+                  variant={
+                    schoolInfo?.isEnrollmentComplete?.some(
+                      (e: EnrollmentComplete) =>
+                        e.year === new Date().getFullYear() && e.isComplete
+                    )
+                      ? "default"
+                      : "destructive"
+                  }
+                >
+                  {schoolInfo?.isEnrollmentComplete?.some(
+                    (e: EnrollmentComplete) =>
+                      e.year === new Date().getFullYear() && e.isComplete
+                  )
+                    ? "Current Year Complete"
+                    : "Current Year Incomplete"}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-8">
+                {schoolInfo?.isEnrollmentComplete
+                  ?.sort(
+                    (a: EnrollmentComplete, b: EnrollmentComplete) =>
+                      b.year - a.year
+                  )
+                  .map((enrollment: EnrollmentComplete, index: number) => (
+                    <div key={enrollment._id} className="relative flex">
+                      {/* Timeline connector */}
+                      {index !== (schoolInfo?.isEnrollmentComplete?.length || 0) - 1 && (
+                        <div className="absolute top-8 left-4 h-full w-0.5 bg-muted" />
+                      )}
+                      {/* Timeline dot */}
+                      <div
+                        className={`absolute left-0 w-8 h-8 rounded-full border-4 ${
+                          enrollment.isComplete
+                            ? "bg-green-100 border-green-500"
+                            : "bg-red-100 border-red-500"
+                        } flex items-center justify-center`}
+                      >
+                        {enrollment.isComplete ? "✓" : "×"}
+                      </div>
+                      {/* Content */}
+                      <div className="ml-12 pb-8 w-full">
+                        <div className="bg-card w-full rounded-lg border p-4 shadow-sm">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="text-lg font-semibold">
+                              Year {enrollment.year}
+                            </h4>
+                            <div className="flex items-center gap-2">
+                              <Progress
+                                value={enrollment.percentageComplete}
+                                className="w-24"
+                              />
+                              <span className="text-sm text-muted-foreground">
+                                {enrollment.percentageComplete}%
+                              </span>
+                            </div>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            Completed by: {enrollment.completedBy}
+                          </p>
+                          {enrollment.comments && (
+                            <div className="mt-2 text-sm bg-muted p-2 rounded">
+                              <span className="font-medium">Comments:</span>{" "}
+                              {enrollment.comments}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                {(!schoolInfo?.isEnrollmentComplete ||
+                  schoolInfo.isEnrollmentComplete.length === 0) && (
+                  <div className="text-center text-muted-foreground py-8">
+                    No enrollment completion records found
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

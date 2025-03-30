@@ -340,7 +340,7 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
         fetchStatistics({ code: value, enrollmentYear: selectedYear });
     };
 
-    const ComboboxSelect = ({ options, value, onChange, placeholder }) => {
+     const ComboboxSelect = ({ options, value, onChange, placeholder }) => {
         const [open, setOpen] = React.useState(false)
 
         return (

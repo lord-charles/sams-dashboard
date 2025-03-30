@@ -21,6 +21,7 @@ export default function RootLayout({
         <SessionProvider>
           <NextTopLoader showSpinner={false} color="#57BEBB" />
           <Toaster />
+          
           <AuthContext>{children}</AuthContext>
         </SessionProvider>
       </body>

@@ -927,7 +927,7 @@ export function RegisterLearnerComponent() {
           <Card>
             <CardHeader>
               <CardTitle>EiE Status</CardTitle>
-              <CardDescription>Emergency in Education Status</CardDescription>
+              <CardDescription>Education in Emergency Status</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">

@@ -13,7 +13,6 @@ async function getSchoolInfo(school: string) {
     const response = await axios.get(
       `${base_url}school-data/school${isMongoId ? "" : "/code"}/${school}`
     );
-    console.log(response.data);
 
     return response.data.data;
   } catch (error) {
@@ -41,8 +40,9 @@ export default async function ViewSchool({
 }: {
   params: { slug: string; school: string };
 }) {
-  const schoolInfo = await getSchoolInfo(params.school);
-  // console.log(schoolInfo);
+  const schoolInfo = await getSchoolInfo(params.school.toString());
+  console.log(JSON.stringify(schoolInfo, null, 2));
+
   return (
     <Suspense fallback={<SkeletonDashboardCard />}>
       <SingleSchoolView schoolInfo={schoolInfo} />

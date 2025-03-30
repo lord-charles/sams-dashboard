@@ -4,7 +4,8 @@ import { base_url } from "../../utils/baseUrl";
 
 // Disable caching for this page
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 7200;
+
 
 async function getInitialData() {
   try {
@@ -90,6 +91,7 @@ async function getInitialData() {
 
 export default async function LearnerModule() {
   const { states, initialStatistics } = await getInitialData();
+  console.log(states)
   return (
     <LearnerModuleClient
       initialStates={states}
