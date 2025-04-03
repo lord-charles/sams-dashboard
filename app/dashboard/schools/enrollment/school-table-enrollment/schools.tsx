@@ -27,7 +27,7 @@ export type School = {
 export default function SchoolEnrollmentTable({
   schools,
 }: {
-  schools: School[];
+  schools: any[];
 }) {
   return (
     <Card className="p-4 ">
