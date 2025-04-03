@@ -14,25 +14,28 @@ export const revalidate = 0;
 const Schools = async () => {
   const fetchData = async () => {
     try {
-      const [genderResponse, schoolsResponse] = await Promise.all([
+      const [genderResponse, schoolsResponse, enrollmentResponse] = await Promise.all([
         axios.post(`${base_url}data-set/state/gender`),
-        axios.get(`${base_url}school-data/schools`)
+        axios.get(`${base_url}school-data/schools`),
+        axios.get(`${base_url}school-data/enrollment/completed`)
       ]);
 
       return {
         genderData: genderResponse.data,
-        schools: schoolsResponse.data
+        schools: schoolsResponse.data,
+        enrollmentData: enrollmentResponse
       };
     } catch (error) {
       console.log(error);
       return {
         genderData: null,
-        schools: null
+        schools: null,
+        enrollmentData: null
       };
     }
   };
 
-  const { genderData, schools } = await fetchData();
+  const { genderData, schools, enrollmentData } = await fetchData();
   return (
     <Suspense fallback={<SkeletonDashboardCard />}>
       <div className="bg-gradient-to-b from-primary/20 to-background p-4">
@@ -40,7 +43,7 @@ const Schools = async () => {
           <SchoolBreadcrumb />
         </div>
         <AdvancedStatCards />
-        <SchoolsTabs genderData={genderData} schools={schools?.data} />
+        <SchoolsTabs genderData={genderData} schools={schools?.data} enrollmentData={enrollmentData?.data} />
       </div>
     </Suspense>
   );
