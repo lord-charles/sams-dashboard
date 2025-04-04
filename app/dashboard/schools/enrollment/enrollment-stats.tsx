@@ -81,439 +81,6 @@ const gradeLevelExplanations = {
   ECD: "Early Childhood Development",
 }
 
-// Sample data for demonstration
-const sampleSchoolData: SchoolData[] = [
-  {
-    _id: "66f4627ac05d0df7b0061e30",
-    code: "STV",
-    payam28: "Rubkona",
-    state10: "UTY",
-    county28: "Rubkona",
-    schoolName: "St Mary Primary",
-    schoolOwnerShip: "Faith-Based",
-    schoolType: "PRI",
-    emisId: "PRI-100147",
-    isEnrollmentComplete: [
-      {
-        year: 2025,
-        isComplete: false,
-        completedBy: " (anthony.otieno)",
-        comments: "test comments",
-        percentageComplete: 17,
-        _id: "67ee7a0c008cfaba22333edd",
-      },
-    ],
-    learnerStats: {
-      P1: {
-        total: 21,
-        male: 6,
-        female: 15,
-        withDisability: 0,
-        currentYear: {
-          total: 21,
-          male: 6,
-          female: 15,
-          withDisability: 0,
-        },
-      },
-      P9: {
-        total: 34,
-        male: 7,
-        female: 27,
-        withDisability: 0,
-        currentYear: {
-          total: 0,
-          male: 0,
-          female: 0,
-          withDisability: 0,
-        },
-      },
-      S4: {
-        total: 1,
-        male: 1,
-        female: 0,
-        withDisability: 0,
-        currentYear: {
-          total: 1,
-          male: 1,
-          female: 0,
-          withDisability: 0,
-        },
-      },
-      P7: {
-        total: 103,
-        male: 36,
-        female: 67,
-        withDisability: 0,
-        currentYear: {
-          total: 41,
-          male: 18,
-          female: 23,
-          withDisability: 0,
-        },
-      },
-      P8: {
-        total: 57,
-        male: 8,
-        female: 49,
-        withDisability: 0,
-        currentYear: {
-          total: 0,
-          male: 0,
-          female: 0,
-          withDisability: 0,
-        },
-      },
-      P6: {
-        total: 88,
-        male: 27,
-        female: 61,
-        withDisability: 0,
-        currentYear: {
-          total: 21,
-          male: 10,
-          female: 11,
-          withDisability: 0,
-        },
-      },
-      P5: {
-        total: 82,
-        male: 27,
-        female: 55,
-        withDisability: 0,
-        currentYear: {
-          total: 14,
-          male: 4,
-          female: 10,
-          withDisability: 0,
-        },
-      },
-      P2: {
-        total: 23,
-        male: 7,
-        female: 16,
-        withDisability: 0,
-        currentYear: {
-          total: 9,
-          male: 2,
-          female: 7,
-          withDisability: 0,
-        },
-      },
-      P3: {
-        total: 53,
-        male: 26,
-        female: 27,
-        withDisability: 0,
-        currentYear: {
-          total: 9,
-          male: 5,
-          female: 4,
-          withDisability: 0,
-        },
-      },
-      P4: {
-        total: 70,
-        male: 34,
-        female: 36,
-        withDisability: 0,
-        currentYear: {
-          total: 13,
-          male: 9,
-          female: 4,
-          withDisability: 0,
-        },
-      },
-    },
-  },
-  // Add more sample data with different states, counties, payams
-  {
-    _id: "66f4627ac05d0df7b0061e31",
-    code: "KNS",
-    payam28: "Juba",
-    state10: "CEQ",
-    county28: "Juba",
-    schoolName: "Kator North Secondary",
-    schoolOwnerShip: "Public",
-    schoolType: "SEC",
-    emisId: "SEC-200147",
-    isEnrollmentComplete: [
-      {
-        year: 2025,
-        isComplete: true,
-        completedBy: "john.doe",
-        comments: "Completed on time",
-        percentageComplete: 100,
-        _id: "67ee7a0c008cfaba22333ede",
-      },
-    ],
-    learnerStats: {
-      S1: {
-        total: 120,
-        male: 65,
-        female: 55,
-        withDisability: 3,
-        currentYear: {
-          total: 120,
-          male: 65,
-          female: 55,
-          withDisability: 3,
-        },
-      },
-      S2: {
-        total: 105,
-        male: 58,
-        female: 47,
-        withDisability: 2,
-        currentYear: {
-          total: 105,
-          male: 58,
-          female: 47,
-          withDisability: 2,
-        },
-      },
-      S3: {
-        total: 95,
-        male: 50,
-        female: 45,
-        withDisability: 1,
-        currentYear: {
-          total: 95,
-          male: 50,
-          female: 45,
-          withDisability: 1,
-        },
-      },
-      S4: {
-        total: 85,
-        male: 45,
-        female: 40,
-        withDisability: 2,
-        currentYear: {
-          total: 85,
-          male: 45,
-          female: 40,
-          withDisability: 2,
-        },
-      },
-    },
-  },
-  {
-    _id: "66f4627ac05d0df7b0061e32",
-    code: "WPS",
-    payam28: "Wau",
-    state10: "WBG",
-    county28: "Wau",
-    schoolName: "Wau Primary School",
-    schoolOwnerShip: "Community",
-    schoolType: "PRI",
-    emisId: "PRI-300147",
-    isEnrollmentComplete: [
-      {
-        year: 2025,
-        isComplete: false,
-        completedBy: "sarah.james",
-        comments: "In progress",
-        percentageComplete: 75,
-        _id: "67ee7a0c008cfaba22333edf",
-      },
-    ],
-    learnerStats: {
-      P1: {
-        total: 110,
-        male: 50,
-        female: 60,
-        withDisability: 5,
-        currentYear: {
-          total: 110,
-          male: 50,
-          female: 60,
-          withDisability: 5,
-        },
-      },
-      P2: {
-        total: 95,
-        male: 45,
-        female: 50,
-        withDisability: 4,
-        currentYear: {
-          total: 95,
-          male: 45,
-          female: 50,
-          withDisability: 4,
-        },
-      },
-      P3: {
-        total: 85,
-        male: 40,
-        female: 45,
-        withDisability: 3,
-        currentYear: {
-          total: 85,
-          male: 40,
-          female: 45,
-          withDisability: 3,
-        },
-      },
-    },
-  },
-  {
-    _id: "66f4627ac05d0df7b0061e33",
-    code: "MPS",
-    payam28: "Malakal",
-    state10: "UNL",
-    county28: "Malakal",
-    schoolName: "Malakal Private School",
-    schoolOwnerShip: "Private",
-    schoolType: "PRI",
-    emisId: "PRI-400147",
-    isEnrollmentComplete: [
-      {
-        year: 2025,
-        isComplete: true,
-        completedBy: "peter.lual",
-        comments: "Completed",
-        percentageComplete: 100,
-        _id: "67ee7a0c008cfaba22333ee0",
-      },
-    ],
-    learnerStats: {
-      P1: {
-        total: 75,
-        male: 35,
-        female: 40,
-        withDisability: 2,
-        currentYear: {
-          total: 75,
-          male: 35,
-          female: 40,
-          withDisability: 2,
-        },
-      },
-      P2: {
-        total: 70,
-        male: 32,
-        female: 38,
-        withDisability: 1,
-        currentYear: {
-          total: 70,
-          male: 32,
-          female: 38,
-          withDisability: 1,
-        },
-      },
-    },
-  },
-  {
-    _id: "66f4627ac05d0df7b0061e34",
-    code: "ALP",
-    payam28: "Torit",
-    state10: "EEQ",
-    county28: "Torit",
-    schoolName: "Torit ALP Center",
-    schoolOwnerShip: "Public",
-    schoolType: "ALP",
-    emisId: "ALP-500147",
-    isEnrollmentComplete: [
-      {
-        year: 2025,
-        isComplete: true,
-        completedBy: "james.deng",
-        comments: "Completed",
-        percentageComplete: 100,
-        _id: "67ee7a0c008cfaba22333ee1",
-      },
-    ],
-    learnerStats: {
-      ALP1: {
-        total: 45,
-        male: 25,
-        female: 20,
-        withDisability: 1,
-        currentYear: {
-          total: 45,
-          male: 25,
-          female: 20,
-          withDisability: 1,
-        },
-      },
-      ALP2: {
-        total: 38,
-        male: 20,
-        female: 18,
-        withDisability: 0,
-        currentYear: {
-          total: 38,
-          male: 20,
-          female: 18,
-          withDisability: 0,
-        },
-      },
-    },
-  },
-  {
-    _id: "66f4627ac05d0df7b0061e35",
-    code: "ECD",
-    payam28: "Bor",
-    state10: "JGL",
-    county28: "Bor",
-    schoolName: "Bor ECD Center",
-    schoolOwnerShip: "Faith-Based",
-    schoolType: "ECD",
-    emisId: "ECD-600147",
-    isEnrollmentComplete: [
-      {
-        year: 2025,
-        isComplete: false,
-        completedBy: "mary.akol",
-        comments: "In progress",
-        percentageComplete: 60,
-        _id: "67ee7a0c008cfaba22333ee2",
-      },
-    ],
-    learnerStats: {
-      ECD1: {
-        total: 65,
-        male: 30,
-        female: 35,
-        withDisability: 2,
-        currentYear: {
-          total: 65,
-          male: 30,
-          female: 35,
-          withDisability: 2,
-        },
-      },
-      ECD2: {
-        total: 55,
-        male: 25,
-        female: 30,
-        withDisability: 1,
-        currentYear: {
-          total: 55,
-          male: 25,
-          female: 30,
-          withDisability: 1,
-        },
-      },
-      ECD3: {
-        total: 50,
-        male: 22,
-        female: 28,
-        withDisability: 1,
-        currentYear: {
-          total: 50,
-          male: 22,
-          female: 28,
-          withDisability: 1,
-        },
-      },
-    },
-  },
-]
-
-
-
 // Combobox component for filters
 interface ComboboxProps {
   options: { value: string; label: string }[]
@@ -585,8 +152,8 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
   const [payam, setPayam] = useState<string | null>(null)
   const [schoolType, setSchoolType] = useState<string | null>(null)
   const [schoolOwnership, setSchoolOwnership] = useState<string | null>(null)
+  const [selectedSchool, setSelectedSchool] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState("enrollment")
-
 
   // Current year for filtering
   const currentYear = new Date().getFullYear()
@@ -606,6 +173,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
     }
     return acc;
   }, {} as Record<string, number>);
+
   // Extract unique values for filters from the data
   const uniqueStates = useMemo(
     () => Array.from(new Set(allSchools.map((school) => school.state10))).sort(),
@@ -637,6 +205,23 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
     () => Array.from(new Set(allSchools.map((school) => school.schoolOwnerShip))).sort(),
     [allSchools],
   )
+
+  const uniqueSchools = useMemo(() => {
+    const schools = allSchools
+      .filter(
+        (school) =>
+          (!state || school.state10 === state) &&
+          (!county || school.county28 === county) &&
+          (!payam || school.payam28 === payam) &&
+          (!schoolType || school.schoolType === schoolType) &&
+          (!schoolOwnership || school.schoolOwnerShip === schoolOwnership)
+      )
+      .map((school) => ({
+        value: school._id,
+        label: `${school.schoolName} (${school.emisId || 'No EMIS'})`,
+      }))
+    return schools.sort((a, b) => a.label.localeCompare(b.label))
+  }, [allSchools, state, county, payam, schoolType, schoolOwnership])
 
   // Format options for comboboxes
   const stateOptions = useMemo(() => uniqueStates.map((state) => ({ value: state, label: state })), [uniqueStates])
@@ -671,9 +256,10 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
           (!county || school.county28 === county) &&
           (!payam || school.payam28 === payam) &&
           (!schoolType || school.schoolType === schoolType) &&
-          (!schoolOwnership || school.schoolOwnerShip === schoolOwnership),
+          (!schoolOwnership || school.schoolOwnerShip === schoolOwnership) &&
+          (!selectedSchool || school._id === selectedSchool),
       ),
-    [allSchools, state, county, payam, schoolType, schoolOwnership],
+    [allSchools, state, county, payam, schoolType, schoolOwnership, selectedSchool],
   )
 
   // Filter schools that have started enrollment for the current year
@@ -724,7 +310,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
   const startedPercentOfTotal = Math.round((totalStartedEnrollment / totalSchoolsInCountry) * 100)
   const completedPercentOfTotal = Math.round((completedEnrollment / totalSchoolsInCountry) * 100)
 
- 
+  // Ownership stats
   const ownershipStats = uniqueSchoolOwnerships.map((ownerType) => {
     const schoolsOfType = schoolsWithStartedEnrollment.filter((school) => school.schoolOwnerShip === ownerType)
 
@@ -900,6 +486,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
     setPayam(null)
     setSchoolType(null)
     setSchoolOwnership(null)
+    setSelectedSchool(null)
   }
 
   // Helper function to get grade level explanation
@@ -944,7 +531,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
               <Filter className="h-4 w-4 mr-2" />
               Filters
             </CardTitle>
-            {(state || county || payam || schoolType || schoolOwnership) && (
+            {(state || county || payam || schoolType || schoolOwnership || selectedSchool) && (
               <Button variant="ghost" size="sm" onClick={resetFilters} className="h-8 px-2">
                 <X className="h-4 w-4 mr-1" /> Clear All
               </Button>
@@ -953,7 +540,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
           <CardDescription>Filter data by location, school type, and ownership</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
               <FilterCombobox
                 options={stateOptions}
@@ -1005,10 +592,20 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
                 className="h-9"
               />
             </div>
+
+            <div>
+              <FilterCombobox
+                options={uniqueSchools}
+                value={selectedSchool}
+                onChange={setSelectedSchool}
+                placeholder="School"
+                className="h-9"
+              />
+            </div>
           </div>
 
           {/* Active Filters */}
-          {(state || county || payam || schoolType || schoolOwnership) && (
+          {(state || county || payam || schoolType || schoolOwnership || selectedSchool) && (
             <div className="flex flex-wrap gap-2 mt-4">
               {state && (
                 <Badge variant="secondary" className="flex items-center gap-1">
@@ -1051,6 +648,12 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
                 <Badge variant="secondary" className="flex items-center gap-1">
                   Ownership: {schoolOwnership}
                   <X className="h-3 w-3 cursor-pointer ml-1" onClick={() => setSchoolOwnership(null)} />
+                </Badge>
+              )}
+              {selectedSchool && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  School: {uniqueSchools.find(s => s.value === selectedSchool)?.label}
+                  <X className="h-3 w-3 cursor-pointer ml-1" onClick={() => setSelectedSchool(null)} />
                 </Badge>
               )}
             </div>
@@ -1240,9 +843,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
                             <div className={`h-3 w-3 rounded-full ${ownershipColors[stat.type]} mr-2`}></div>
                             <span className="text-sm font-medium">{stat.type}</span>
                           </div>
-                          <span className="text-sm font-medium">
-                            {stat.totalInCountry.toLocaleString()} schools total
-                          </span>
+                          <span className="text-sm font-medium">{stat.totalInCountry.toLocaleString()} schools total</span>
                         </div>
 
                         <div className="grid grid-cols-2 gap-2">
