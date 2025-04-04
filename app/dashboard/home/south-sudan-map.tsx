@@ -114,8 +114,8 @@ export default function SouthSudanMap() {
   const [selectedState, setSelectedState] = useState<StateData | null>(null);
 
   return (
-    <div className="z-0">
-      <h2 className="text-4xl font-bold text-center mb-8 text-primary">
+    <div className="z-0 relative top-10">
+      <h2 className="text-4xl font-bold text-center mb-10 text-primary">
         South Sudan Education Map
       </h2>
       <Card className="mx-4">

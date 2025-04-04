@@ -4,7 +4,7 @@ import Image from "next/image";
 
 const ImageBackground = () => {
   return (
-    <div className="relative h-[60vh] overflow-hidden rounded-lg">
+    <div className="relative h-[40vh] overflow-hidden rounded-lg">
       <Image
         src="/img/banners/banner4.jpg"
         alt="Ana Fii Inni"
@@ -26,7 +26,7 @@ const ImageBackground = () => {
 
 export default function HeroSection() {
   return (
-    <section className="relative bg-gradient-to-b from-primary/20 to-background pt-5 overflow-hidden">
+    <section className="relative bg-gradient-to-b from-primary/20 to-background pt-4 overflow-hidden">
       <div className="mx-auto px-3">
         <ImageBackground />
       </div>

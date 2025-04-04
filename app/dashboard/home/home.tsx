@@ -4,19 +4,19 @@ import HeroSection from "./components/HeroSection";
 import Footer from "./components/footer";
 import Testimonials from "./testimonials";
 import SouthSudanMap from "./south-sudan-map";
-import { EducationStats } from "./statcards";
+import EducationStatsDashboard from "./statcards";
 
-const Home = () => {
+const Home = ({ learnerStats, schoolStats }: { learnerStats: any; schoolStats: any }) => {
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 ">
       <HeroSection />
       {/* <DirectGrantsSection />
       <PupilAgeDistribution />
       <ProjectStatus /> */}
-      <EducationStats />
-      <SouthSudanMap />
-      <Testimonials />
+      <EducationStatsDashboard learnersData={learnerStats} schoolsData={schoolStats} />
+      <Testimonials schoolsData={schoolStats}/>
 
+      <SouthSudanMap />
       <Footer />
     </div>
   );
