@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowRight, Quote } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { useEffect } from "react"
 
 export default function Testimonials({ schoolsData }: { schoolsData: any }) {
   const calculateSchoolTotals = () => {
@@ -36,6 +37,11 @@ export default function Testimonials({ schoolsData }: { schoolsData: any }) {
   }
   
   const { totalSchools } = calculateSchoolTotals()
+
+  useEffect(() => {
+    localStorage.setItem('totalSchools', totalSchools.toString())
+  }, [totalSchools])
+
   return (
     <section className="relative py-4  overflow-hidden mb-8">
       {/* Background decorative elements */}
@@ -225,4 +231,3 @@ export default function Testimonials({ schoolsData }: { schoolsData: any }) {
     </section>
   )
 }
-

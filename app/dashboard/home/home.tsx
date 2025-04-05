@@ -8,7 +8,7 @@ import EducationStatsDashboard from "./statcards";
 
 const Home = ({ learnerStats, schoolStats }: { learnerStats: any; schoolStats: any }) => {
   return (
-    <div className="space-y-10 ">
+    <div className="space-y-0">
       <HeroSection />
       {/* <DirectGrantsSection />
       <PupilAgeDistribution />

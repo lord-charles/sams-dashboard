@@ -178,37 +178,37 @@ export default function EducationStatsDashboard({ learnersData, schoolsData }: {
 
         <Tabs defaultValue="overview" className="w-full"> 
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 mb-8">
-            <TabsTrigger value="overview" className="text-base">
+            <TabsTrigger value="overview"  className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none">
               <span className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
                 <span className="hidden sm:inline">Overview</span>
               </span>
             </TabsTrigger>
-            <TabsTrigger value="schools" className="text-base">
+            <TabsTrigger value="schools"  className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none">
               <span className="flex items-center gap-2">
                 <School className="h-4 w-4" />
                 <span className="hidden sm:inline">Schools</span>
               </span>
             </TabsTrigger>
-            <TabsTrigger value="learners" className="text-base">
+            <TabsTrigger value="learners"  className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none">
               <span className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
                 <span className="hidden sm:inline">Learners</span>
               </span>
             </TabsTrigger>
-            <TabsTrigger value="classrooms" className="text-base">
+            <TabsTrigger value="classrooms"  className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none">
               <span className="flex items-center gap-2">
                 <Building2 className="h-4 w-4" />
                 <span className="hidden sm:inline">Classrooms</span>
               </span>
             </TabsTrigger>
-            <TabsTrigger value="attendance" className="text-base">
+            <TabsTrigger value="attendance"  className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none">
               <span className="flex items-center gap-2">
                 <ClipboardCheck className="h-4 w-4" />
                 <span className="hidden sm:inline">Attendance</span>
               </span>
             </TabsTrigger>
-            <TabsTrigger value="distribution" className="text-base">
+            <TabsTrigger value="distribution"  className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none">
               <span className="flex items-center gap-2">
                 <PieChart className="h-4 w-4" />
                 <span className="hidden sm:inline">Distribution</span>

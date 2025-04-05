@@ -3,26 +3,13 @@ import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Users,
   Radio,
-  CreditCard,
   Calendar,
   Building,
   Utensils,
-  MessageSquare,
   Wifi,
   Droplet,
   Zap,
@@ -34,9 +21,6 @@ import {
   IdCard,
 } from "lucide-react";
 import {
-  PieChart,
-  Pie,
-  Cell,
   ResponsiveContainer,
   BarChart,
   Bar,
@@ -185,6 +169,7 @@ interface SchoolDataInterface {
     completedBy: string;
     comments: string;
     percentageComplete: number;
+    learnerEnrollmentComplete: boolean;
     _id: string;
   }>;
   updatedAt: string;
@@ -221,7 +206,7 @@ export default function SingleSchoolView({
     typeof schoolInfo?.location?.gpsLng === "number";
 
   return (
-    <Card className="bg-gradient-to-b from-primary/20 to-background p-6">
+    <Card className="bg-gradient-to-b from-primary/20 to-background p-2 rounded-none">
       <ViewSchoolBreadcrumb schoolName={schoolInfo?.schoolName} />
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">{schoolInfo?.schoolName}</h1>
@@ -325,15 +310,15 @@ export default function SingleSchoolView({
         onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="community">Community</TabsTrigger>
-          <TabsTrigger value="academics">Academics</TabsTrigger>
-          <TabsTrigger value="facilities">Facilities</TabsTrigger>
-          <TabsTrigger value="programs">Programs</TabsTrigger>
-          <TabsTrigger value="bog">BOG</TabsTrigger>
-          <TabsTrigger value="grants">Grants</TabsTrigger>
-          <TabsTrigger value="geolocation">Geolocation</TabsTrigger>
+        <TabsList className="h-auto -space-x-px bg-background p-0 shadow-sm shadow-black/5 rtl:space-x-reverse">
+          <TabsTrigger className="relative overflow-hidden rounded-none border border-border py-2 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 first:rounded-s last:rounded-e data-[state=active]:bg-muted data-[state=active]:after:bg-primary" value="overview">Overview</TabsTrigger>
+          <TabsTrigger className="relative overflow-hidden rounded-none border border-border py-2 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 first:rounded-s last:rounded-e data-[state=active]:bg-muted data-[state=active]:after:bg-primary" value="community">Community</TabsTrigger>
+          <TabsTrigger className="relative overflow-hidden rounded-none border border-border py-2 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 first:rounded-s last:rounded-e data-[state=active]:bg-muted data-[state=active]:after:bg-primary" value="academics">Academics</TabsTrigger>
+          <TabsTrigger className="relative overflow-hidden rounded-none border border-border py-2 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 first:rounded-s last:rounded-e data-[state=active]:bg-muted data-[state=active]:after:bg-primary" value="facilities">Facilities</TabsTrigger>
+          <TabsTrigger className="relative overflow-hidden rounded-none border border-border py-2 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 first:rounded-s last:rounded-e data-[state=active]:bg-muted data-[state=active]:after:bg-primary" value="programs">Programs</TabsTrigger>
+          <TabsTrigger className="relative overflow-hidden rounded-none border border-border py-2 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 first:rounded-s last:rounded-e data-[state=active]:bg-muted data-[state=active]:after:bg-primary" value="bog">BOG</TabsTrigger>
+          <TabsTrigger className="relative overflow-hidden rounded-none border border-border py-2 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 first:rounded-s last:rounded-e data-[state=active]:bg-muted data-[state=active]:after:bg-primary" value="grants">Grants</TabsTrigger>
+          <TabsTrigger className="relative overflow-hidden rounded-none border border-border py-2 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 first:rounded-s last:rounded-e data-[state=active]:bg-muted data-[state=active]:after:bg-primary" value="geolocation">Geolocation</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
           <Overview schoolInfo={{
@@ -410,7 +395,7 @@ export default function SingleSchoolView({
               <CardTitle>Subjects Offered</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {schoolInfo.subjects.map((subject, index) => (
                   <Badge key={index} variant="secondary">
                     {subject}

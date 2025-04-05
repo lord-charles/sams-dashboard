@@ -35,19 +35,9 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
   Tooltip,
   Legend,
-  LineChart,
-  Line,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
+
 } from "recharts";
 
 interface Stats {
@@ -204,12 +194,12 @@ export default function Community({
   return (
     <div className=" space-y-8">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="learners">Learners</TabsTrigger>
+        <TabsList  className="h-auto gap-2 rounded-none border-b border-border bg-transparent px-0 py-1 text-foreground">
+          <TabsTrigger className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent" value="learners">Learners</TabsTrigger>
 
-          <TabsTrigger value="teachers">Teachers</TabsTrigger>
+          <TabsTrigger className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent" value="teachers">Teachers</TabsTrigger>
 
-          <TabsTrigger value="staff">Staff</TabsTrigger>
+          <TabsTrigger className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent" value="staff">Staff</TabsTrigger>
         </TabsList>
 
         <TabsContent value="learners" className="space-y-6">

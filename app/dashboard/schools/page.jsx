@@ -38,7 +38,7 @@ const Schools = async () => {
   const { genderData, schools, enrollmentData } = await fetchData();
   return (
     <Suspense fallback={<SkeletonDashboardCard />}>
-      <div className="bg-gradient-to-b from-primary/20 to-background p-4">
+      <div className="bg-gradient-to-b from-primary/20 to-background p-2">
         <div className="mb-2 p-1 ">
           <SchoolBreadcrumb />
         </div>

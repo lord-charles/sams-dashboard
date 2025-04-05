@@ -4,13 +4,13 @@ import Image from "next/image";
 
 const ImageBackground = () => {
   return (
-    <div className="relative h-[40vh] overflow-hidden rounded-b-2xl">
+    <div className="relative h-[40vh] overflow-hidden ">
       <Image
         src="/img/banners/banner4.jpg"
         alt="Ana Fii Inni"
         layout="fill"
         objectFit="cover"
-        className="rounded-b-2xl"
+        className=""
       />
       <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
         <div className="text-center text-white">
@@ -27,9 +27,7 @@ const ImageBackground = () => {
 export default function HeroSection() {
   return (
     <section className="relative bg-gradient-to-b from-primary/20 to-background  overflow-hidden">
-      <div className="">
         <ImageBackground />
-      </div>
     </section>
   );
 }

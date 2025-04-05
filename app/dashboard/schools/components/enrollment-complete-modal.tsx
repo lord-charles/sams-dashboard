@@ -19,7 +19,6 @@ import {
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/hooks/use-toast"
-import { useSession } from "next-auth/react"
 import { base_url } from "@/app/utils/baseUrl"
 import axios from "axios"
 
@@ -35,6 +34,7 @@ interface EnrollmentCompleteModalProps {
       completedBy: string
       comments: string
       percentageComplete: number
+      learnerEnrollmentComplete: boolean
       _id: string
     }>
   }
@@ -59,6 +59,7 @@ export function EnrollmentCompleteModal({ isOpen, onClose, schoolId, session, sc
         comments: currentYearData.comments,
         percentageComplete: currentYearData.percentageComplete,
         isComplete: currentYearData.isComplete,
+        learnerEnrollmentComplete: currentYearData.learnerEnrollmentComplete
       }
     }
 
@@ -68,6 +69,7 @@ export function EnrollmentCompleteModal({ isOpen, onClose, schoolId, session, sc
       comments: "",
       percentageComplete: 0,
       isComplete: false,
+      learnerEnrollmentComplete: false
     }
   }
 
@@ -99,6 +101,14 @@ export function EnrollmentCompleteModal({ isOpen, onClose, schoolId, session, sc
       ...prev,
       isComplete: checked,
       percentageComplete: checked ? 100 : prev.percentageComplete,
+      learnerEnrollmentComplete: checked
+    })) 
+  }
+
+  const handleLearnerEnrollmentCompleteChange = (checked: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      learnerEnrollmentComplete: checked
     }))
   }
 
@@ -167,7 +177,7 @@ export function EnrollmentCompleteModal({ isOpen, onClose, schoolId, session, sc
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="percentageComplete">Percentage Complete: {formData.percentageComplete}%</Label>
+              <Label htmlFor="percentageComplete">School Enrollment Percentage Complete: {formData.percentageComplete}%</Label>
               <Slider
                 id="percentageComplete"
                 value={[formData.percentageComplete]}
@@ -181,11 +191,17 @@ export function EnrollmentCompleteModal({ isOpen, onClose, schoolId, session, sc
 
             <div className="grid gap-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="isComplete">Mark as Complete</Label>
+                <Label htmlFor="isComplete">Mark School Enrollment as Complete</Label>
                 <Switch id="isComplete" checked={formData.isComplete} onCheckedChange={handleSwitchChange} />
                 
               </div>
-              <p className="text-xs text-muted-foreground">Estimated completion date: {formData.percentageComplete === 100 ? "Completed" : "Not completed"}</p>
+              <p className="text-xs text-muted-foreground">Status: {formData.percentageComplete === 100 ? "Completed" : "Not completed"}</p>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="learnerEnrollmentComplete">Learner Enrollment Complete</Label>
+              <Switch id="learnerEnrollmentComplete" checked={formData.learnerEnrollmentComplete} onCheckedChange={handleLearnerEnrollmentCompleteChange} />
+              <p className="text-xs text-muted-foreground">Status: {formData.learnerEnrollmentComplete ? "Completed" : "Not completed"}</p>
             </div>
 
             <div className="grid gap-2">
