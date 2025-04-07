@@ -5,8 +5,8 @@ import LearnerModuleClient from "./components/LearnerModuleClient";
 import axios from 'axios';
 import { base_url } from "../../utils/baseUrl";
 import useSWR from 'swr';
-import { Skeleton } from "@/components/ui/skeleton";
 import Loading from "../loading";
+import { FetchErrorDisplay } from "@/components/fetch-error-display";
 
 
 // Fetcher functions with error handling
@@ -84,7 +84,7 @@ const LearnerModule = () => {
 
   if (errors.length > 0) {
     return (
-      <FetchErrorDisplay error={error} retry={() => window.location.reload()} />
+      <FetchErrorDisplay error={errors[0]} retry={() => window.location.reload()} />
 
     );
   }
