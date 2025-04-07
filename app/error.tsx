@@ -31,7 +31,7 @@ export default function Error({
 
       <div className="flex flex-col sm:flex-row gap-4">
         <button
-          onClick={() => reset()}
+          onClick={() => window.location.reload()}
           className="px-5 py-2.5 text-sm font-medium text-white bg-ss-blue hover:bg-ss-blue/90 rounded-md transition-colors"
         >
           Try again
@@ -45,7 +45,7 @@ export default function Error({
         </a>
       </div>
 
-      <div className="mt-8 text-xs text-gray-500 dark:text-gray-500">Error reference: {error?.message || "Unknown"}</div>
+      <div className="mt-8 text-xs text-gray-500 dark:text-gray-500">Error reference: {error?.digest || "Unknown"}</div>
     </div>
   )
 }
