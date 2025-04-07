@@ -21,30 +21,6 @@ const enrollmentStatusColor = (percentage) => {
 
 export const columns = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
     id: "combinedName",
     header: "Name",
     accessorFn: (row) => `${row.schoolName || ''} ${row.code || ''} ${row.emisId || ''}`,
@@ -57,7 +33,7 @@ export const columns = [
   {
     accessorKey: "schoolName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="School Name" />
+      <DataTableColumnHeader column={column} title="School" />
     ),
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
@@ -180,7 +156,7 @@ export const columns = [
     },
   },
   {
-    accessorKey: "actions",
+    accessorKey: "action",
     cell: ({ row }) => <DataTableRowActions row={row} />,
   },
 ];

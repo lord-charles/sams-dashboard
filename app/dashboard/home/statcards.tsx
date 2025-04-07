@@ -3,11 +3,41 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { School, Users, BarChart3, PieChart, Building2, ClipboardCheck } from "lucide-react"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 
-
+type EnrollmentData = {
+  _id: string
+  code: string
+  schoolName: string
+  emisId: string
+  schoolOwnerShip: string
+  schoolType: string
+  payam28: string
+  state10: string
+  county28: string
+  isEnrollmentComplete: {
+    year: number
+    isComplete: boolean
+    learnerEnrollmentComplete: boolean
+    percentageComplete: number
+  }[]
+  learnerStats?: Record<
+    string,
+    {
+      total: number
+      male: number
+      female: number
+      withDisability: number
+      currentYear: {
+        total: number
+        male: number
+        female: number
+        withDisability: number
+      }
+    }
+  >
+}
 
 // Classroom data (realistic dummy data for South Sudan)
 const classroomsData = [
@@ -45,8 +75,6 @@ const attendanceData = [
   { state10: "WRP", average: 79, male: 81, female: 77 },
 ]
 
-
-
 // Simple Stat Card Component
 const StatCard = ({ icon, label, value, color = "bg-primary", description = '' }: { icon: React.ReactNode, label: string, value: string, color?: string, description?: string }) => (
   <Card>
@@ -63,21 +91,30 @@ const StatCard = ({ icon, label, value, color = "bg-primary", description = '' }
   </Card>
 )
 
-export default function EducationStatsDashboard({ learnersData, schoolsData }: { learnersData: any; schoolsData: any }) {
+export default function EducationStatsDashboard({ learnersData, schoolsData, enrollmentData }: { learnersData: any; schoolsData: any; enrollmentData: EnrollmentData[] }) {
+  console.log(enrollmentData)
 
   // Calculate totals
   const calculateLearnerTotals = () => {
-    let totalMale = 0
-    let totalFemale = 0
-    let totalNew = 0
-    let totalWithDisability = 0
+    let totalMale = 0;
+    let totalFemale = 0;
+    let totalNew = 0;
+    let totalWithDisability = 0;
 
-    learnersData.forEach((state: any) => {
-      totalMale += state.male
-      totalFemale += state.female
-      totalNew += state.new
-      totalWithDisability += state.withDisability
-    })
+    // Iterate through each school in the array
+    enrollmentData?.forEach((school) => {
+      // Only process if enrollment is complete
+      if (school?.isEnrollmentComplete?.some((item) => item.learnerEnrollmentComplete === true)) {
+        // Loop through each grade level in learnerStats
+        Object.values(school?.learnerStats || {}).forEach((gradeStats: any) => {
+          totalMale += gradeStats.male || 0;
+          totalFemale += gradeStats.female || 0;
+          totalWithDisability += gradeStats.withDisability || 0;
+          // For new students, we'll use currentYear totals
+          totalNew += gradeStats.currentYear?.total || 0;
+        });
+      }
+    });
 
     return {
       totalLearners: totalMale + totalFemale,
@@ -85,7 +122,7 @@ export default function EducationStatsDashboard({ learnersData, schoolsData }: {
       totalFemale,
       totalNew,
       totalWithDisability,
-    }
+    };
   }
 
   const calculateSchoolTotals = () => {
@@ -340,13 +377,41 @@ export default function EducationStatsDashboard({ learnersData, schoolsData }: {
                 <CardContent className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Top 5 States by Enrollment</h3>
                   <div className="space-y-4">
-                    {learnersData
+                    {enrollmentData
+                      // Group schools by state and calculate totals
+                      .reduce((acc: any[], school) => {
+                        // Only include schools with complete enrollment
+                        if (!school?.isEnrollmentComplete?.some((item) => item.learnerEnrollmentComplete === true)) {
+                          return acc;
+                        }
+
+                        const stateIndex = acc.findIndex(item => item.state10 === school.state10);
+                        const schoolTotals = Object.values(school.learnerStats || {}).reduce(
+                          (total: any, grade: any) => ({
+                            male: (total.male || 0) + (grade.male || 0),
+                            female: (total.female || 0) + (grade.female || 0),
+                          }),
+                          { male: 0, female: 0 }
+                        );
+
+                        if (stateIndex === -1) {
+                          acc.push({
+                            state10: school.state10,
+                            male: schoolTotals.male,
+                            female: schoolTotals.female,
+                          });
+                        } else {
+                          acc[stateIndex].male += schoolTotals.male;
+                          acc[stateIndex].female += schoolTotals.female;
+                        }
+                        return acc;
+                      }, [])
                       .filter((state: any) => state.state10 !== "State X")
-                      .sort((a: any, b: any) => b.male + b.female - (a.male + a.female))
+                      .sort((a: any, b: any) => (b.male + b.female) - (a.male + a.female))
                       .slice(0, 5)
                       .map((state: any, index: any) => {
-                        const total = state.male + state.female
-                        const percentage = (total / learnerTotals.totalLearners) * 100
+                        const total = state.male + state.female;
+                        const percentage = (total / learnerTotals.totalLearners) * 100;
 
                         return (
                           <div key={state.state10} className="space-y-1">
@@ -368,7 +433,7 @@ export default function EducationStatsDashboard({ learnersData, schoolsData }: {
                               <span>Female: {state.female.toLocaleString()}</span>
                             </div>
                           </div>
-                        )
+                        );
                       })}
                   </div>
                 </CardContent>
@@ -487,18 +552,47 @@ export default function EducationStatsDashboard({ learnersData, schoolsData }: {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {learnersData.map((state: any) => {
-                      const total = state.male + state.female
+                    {[
+                      "AAA", "CES", "EES", "JGL", "LKS", "NBG", "PAA", 
+                      "RAA", "UNS", "UTY", "WBG", "WES", "WRP"
+                    ].map((stateCode) => {
+                      // Get all schools for this state with complete enrollment
+                      const stateSchools = enrollmentData.filter(
+                        school => school.state10 === stateCode && 
+                        school.isEnrollmentComplete?.some(item => item.learnerEnrollmentComplete === true)
+                      );
+
+                      // Calculate state totals
+                      const stateTotals = stateSchools.reduce((total, school) => {
+                        const schoolTotals = Object.values(school.learnerStats || {}).reduce(
+                          (gradeTotal: any, grade: any) => ({
+                            male: (gradeTotal.male || 0) + (grade.male || 0),
+                            female: (gradeTotal.female || 0) + (grade.female || 0),
+                            withDisability: (gradeTotal.withDisability || 0) + (grade.withDisability || 0),
+                            new: (gradeTotal.new || 0) + (grade.currentYear?.total || 0),
+                          }),
+                          { male: 0, female: 0, withDisability: 0, new: 0 }
+                        );
+                        return {
+                          male: total.male + schoolTotals.male,
+                          female: total.female + schoolTotals.female,
+                          withDisability: total.withDisability + schoolTotals.withDisability,
+                          new: total.new + schoolTotals.new,
+                        };
+                      }, { male: 0, female: 0, withDisability: 0, new: 0 });
+
+                      const total = stateTotals.male + stateTotals.female;
+
                       return (
-                        <TableRow key={state.state10}>
-                          <TableCell className="font-medium">{state.state10}</TableCell>
-                          <TableCell className="text-right">{state.male.toLocaleString()}</TableCell>
-                          <TableCell className="text-right">{state.female.toLocaleString()}</TableCell>
+                        <TableRow key={stateCode}>
+                          <TableCell className="font-medium">{stateCode}</TableCell>
+                          <TableCell className="text-right">{stateTotals.male.toLocaleString()}</TableCell>
+                          <TableCell className="text-right">{stateTotals.female.toLocaleString()}</TableCell>
                           <TableCell className="text-right font-semibold">{total.toLocaleString()}</TableCell>
-                          <TableCell className="text-right">{state.new.toLocaleString()}</TableCell>
-                          <TableCell className="text-right">{state.withDisability.toLocaleString()}</TableCell>
+                          <TableCell className="text-right">{stateTotals.new.toLocaleString()}</TableCell>
+                          <TableCell className="text-right">{stateTotals.withDisability.toLocaleString()}</TableCell>
                         </TableRow>
-                      )
+                      );
                     })}
                     <TableRow className="bg-muted/50">
                       <TableCell className="font-bold">Total</TableCell>
@@ -691,7 +785,6 @@ export default function EducationStatsDashboard({ learnersData, schoolsData }: {
                     </div>
                   </div>
                 </div>
-
 
                 {/* statcards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 mb-4">
@@ -926,4 +1019,3 @@ export default function EducationStatsDashboard({ learnersData, schoolsData }: {
     </div>
   )
 }
-

@@ -32,6 +32,7 @@ import SchoolEnrollmentTable from "./school-table-enrollment/schools"
 interface EnrollmentStatus {
   year?: number
   isComplete: boolean
+  learnerEnrollmentComplete: boolean
   completedBy: string
   comments?: string
   percentageComplete?: number
@@ -109,7 +110,19 @@ function FilterCombobox({ options, value, onChange, placeholder, disabled = fals
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
-        <Command>
+        <Command shouldFilter={true} filter={(value, search) => {
+          const normalizedSearch = search.toLowerCase()
+          const normalizedValue = value.toLowerCase()
+          const option = options.find(opt => opt.value === value)
+          if (!option) return 0
+          const label = option.label.toLowerCase()
+          
+          // Check if search matches start of school name
+          if (label.startsWith(normalizedSearch)) return 1
+          // Check if search is found anywhere in school name or value
+          if (label.includes(normalizedSearch) || normalizedValue.includes(normalizedSearch)) return 0.5
+          return 0
+        }}>
           <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} />
           <CommandList>
             <CommandEmpty>No {placeholder.toLowerCase()} found.</CommandEmpty>
@@ -152,6 +165,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
   const [payam, setPayam] = useState<string | null>(null)
   const [schoolType, setSchoolType] = useState<string | null>(null)
   const [schoolOwnership, setSchoolOwnership] = useState<string | null>(null)
+  const [code, setCode] = useState<string | null>(null)
   const [selectedSchool, setSelectedSchool] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState("enrollment")
 
@@ -214,14 +228,14 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
           (!county || school.county28 === county) &&
           (!payam || school.payam28 === payam) &&
           (!schoolType || school.schoolType === schoolType) &&
-          (!schoolOwnership || school.schoolOwnerShip === schoolOwnership)
+          (!code || school.code === code)
       )
       .map((school) => ({
         value: school._id,
-        label: `${school.schoolName} (${school.emisId || 'No EMIS'})`,
+        label: `${school.schoolName} (${school.code || 'No Code'})`,
       }))
     return schools.sort((a, b) => a.label.localeCompare(b.label))
-  }, [allSchools, state, county, payam, schoolType, schoolOwnership])
+  }, [allSchools, state, county, payam, schoolType, code])
 
   // Format options for comboboxes
   const stateOptions = useMemo(() => uniqueStates.map((state) => ({ value: state, label: state })), [uniqueStates])
@@ -247,6 +261,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
     [uniqueSchoolOwnerships],
   )
 
+
   // Apply filters to the data
   const filteredSchoolData = useMemo(
     () =>
@@ -256,10 +271,10 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
           (!county || school.county28 === county) &&
           (!payam || school.payam28 === payam) &&
           (!schoolType || school.schoolType === schoolType) &&
-          (!schoolOwnership || school.schoolOwnerShip === schoolOwnership) &&
+          (!code || school.code === code) &&
           (!selectedSchool || school._id === selectedSchool),
       ),
-    [allSchools, state, county, payam, schoolType, schoolOwnership, selectedSchool],
+    [allSchools, state, county, payam, schoolType, code, selectedSchool],
   )
 
   // Filter schools that have started enrollment for the current year
@@ -271,11 +286,12 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
   const totalStartedEnrollment = schoolsWithStartedEnrollment.length
 
   const completedEnrollment = schoolsWithStartedEnrollment.filter((school) =>
-    school.isEnrollmentComplete.some((status) => status.year === currentYear && status.isComplete === true),
+    school.isEnrollmentComplete.some((status) => status.year === currentYear && status.learnerEnrollmentComplete === true),
   ).length
 
+
   const inProgressEnrollment = schoolsWithStartedEnrollment.filter((school) =>
-    school.isEnrollmentComplete.some((status) => status.year === currentYear && status.isComplete === false),
+    school.isEnrollmentComplete.some((status) => status.year === currentYear && status.learnerEnrollmentComplete === false),
   ).length
 
   // Completion rate (percentage of schools that completed enrollment out of those that started)
@@ -299,7 +315,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
 
   const totalPercentage = inProgressSchools.reduce((sum, school) => {
     const status = school.isEnrollmentComplete.find(
-      (s) => s.year === currentYear && s.isComplete === false && s.percentageComplete !== undefined,
+      (s) => s.year === currentYear && s.learnerEnrollmentComplete === false && s.percentageComplete !== undefined,
     )
     return sum + (status?.percentageComplete || 0)
   }, 0)
@@ -317,7 +333,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
     const totalOfType = schoolsOfType.length
 
     const completedOfType = schoolsOfType.filter((school) =>
-      school.isEnrollmentComplete.some((status) => status.year === currentYear && status.isComplete === true),
+      school.isEnrollmentComplete.some((status) => status.year === currentYear && status.learnerEnrollmentComplete === true),
     ).length
 
     const completionPercentage = totalOfType > 0 ? Math.round((completedOfType / totalOfType) * 100) : 0
@@ -391,7 +407,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
     }
 
     // Process each school
-    filteredSchoolData.forEach((school) => {
+    filteredSchoolData.filter((school) => school.isEnrollmentComplete.some((status) => status.year === currentYear && status.learnerEnrollmentComplete === true)).forEach((school) => {
       if (school.learnerStats) {
         // Process each grade
         Object.entries(school.learnerStats).forEach(([grade, data]) => {
@@ -496,27 +512,27 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
   }, [])
 
   return (
-    <div className="w-full p-4 md:p-6 bg-background">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+    <Card className="w-full p-2">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold">Enrollment Progress For {currentYear}</h2>
+          <h2 className="text-xl md:text-2xl font-bold">Enrollment Progress For {currentYear}</h2>
           <p className="text-muted-foreground">Tracking enrollment and learner statistics nationwide</p>
         </div>
 
-        <div className="mt-4 md:mt-0">
+        <div className="mt-4">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-1 md:grid-cols-3">
-              <TabsTrigger value="enrollment" className="flex items-center gap-2">
+            <TabsList className="mb-3 h-auto -space-x-px bg-background p-0 shadow-sm shadow-black/5 rtl:space-x-reverse">
+              <TabsTrigger value="enrollment" className="relative overflow-hidden rounded-none border border-border py-2 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 first:rounded-s last:rounded-e data-[state=active]:bg-muted data-[state=active]:after:bg-primary">
                 <School className="h-4 w-4" />
-                <span>Enrollment By School</span>
+                <span className="ml-2 text-sm">Enrollment By School</span>
               </TabsTrigger>
-              <TabsTrigger value="learners" className="flex items-center gap-2">
+              <TabsTrigger value="learners" className="relative overflow-hidden rounded-none border border-border py-2 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 first:rounded-s last:rounded-e data-[state=active]:bg-muted data-[state=active]:after:bg-primary">
                 <Users className="h-4 w-4" />
-                <span>Enrollment By Learners</span>
+                <span className="ml-2 text-sm">Enrollment By Learners</span>
               </TabsTrigger>
-              <TabsTrigger value="completion" className="flex items-center gap-2">
+              <TabsTrigger value="completion" className="relative overflow-hidden rounded-none border border-border py-2 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 first:rounded-s last:rounded-e data-[state=active]:bg-muted data-[state=active]:after:bg-primary">
                 <Users className="h-4 w-4" />
-                <span>Enrollment Completion By School</span>
+                <span className="ml-2 text-sm">Enrollment Completion By School</span>
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -524,8 +540,8 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
       </div>
 
       {/* Filters Section */}
-      <Card className="mb-6">
-        <CardHeader className="pb-3">
+      <Card className="mb-4">
+        <div className="p-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-md font-medium flex items-center">
               <Filter className="h-4 w-4 mr-2" />
@@ -538,8 +554,8 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
             )}
           </div>
           <CardDescription>Filter data by location, school type, and ownership</CardDescription>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div className="px-3 pb-3">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
               <FilterCombobox
@@ -588,7 +604,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
                 options={schoolOwnershipOptions}
                 value={schoolOwnership}
                 onChange={setSchoolOwnership}
-                placeholder="School Ownership"
+                placeholder="Ownership"
                 className="h-9"
               />
             </div>
@@ -658,7 +674,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
               )}
             </div>
           )}
-        </CardContent>
+        </div>
       </Card>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -758,11 +774,13 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-amber-600 dark:text-amber-500">{averageCompletion}%</div>
-                  <div className="flex items-center mt-2">
-                    <div className="h-2 w-2 rounded-full bg-amber-500 mr-2"></div>
-                    <p className="text-xs text-muted-foreground">
-                      For {inProgressEnrollment.toLocaleString()} in-progress schools
-                    </p>
+                  <div className="flex items-center justify-between mt-2">
+                    <div className="flex items-center">
+                      <div className="h-2 w-2 rounded-full bg-amber-500 mr-2"></div>
+                      <p className="text-xs text-muted-foreground">
+                        For {inProgressEnrollment.toLocaleString()} in-progress schools
+                      </p>
+                    </div>
                   </div>
                   <div className="mt-3 h-2 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                     <div className="h-full bg-amber-500 rounded-full" style={{ width: `${averageCompletion}%` }} />
@@ -777,7 +795,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
               {/* At-Risk Schools Card */}
               <Card className="overflow-hidden border-l-4 border-l-red-500">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">At-Risk Schools</CardTitle>
+                  <CardTitle className="text-sm font-medium">Low Completion</CardTitle>
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -989,11 +1007,11 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
               <div className="flex flex-wrap gap-4 items-center text-sm">
                 <div className="flex items-center">
                   <div className="h-3 w-3 rounded-full bg-blue-500 mr-2"></div>
-                  <span>Total Enrollment: All learners (current + promoted)</span>
+                  <span className="text-muted-foreground text-xs">Total Enrollment: All learners (new + promoted, computed at confirmation of completion)</span>
                 </div>
                 <div className="flex items-center">
                   <div className="h-3 w-3 rounded-full bg-emerald-500 mr-2"></div>
-                  <span>New Enrollment: Newly enrolled learners in {currentYear}</span>
+                  <span className="text-muted-foreground text-xs">New Enrollment: Newly enrolled learners in {currentYear}</span>
                 </div>
                 <TooltipProvider>
                   <Tooltip>
@@ -1329,6 +1347,6 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
 
         </TabsContent>
       </Tabs>
-    </div>
+    </Card>
   )
 }

@@ -2,22 +2,19 @@
 import React, { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import LazyLoader from "@/components/lazy-loader";
-
-import dynamic from "next/dynamic";
 import { Card } from "@/components/ui/card";
 import SchoolsTable from "./school-table/schools";
-import Enrollment from "./enrollment/enrollment";
 import EnrollmentDashboard from "./components/enrollment-dashboard";
 import { BarChart3, GraduationCap, School } from "lucide-react";
+import EnrollmentStats from "./enrollment/enrollment-stats";
 
-const OverviewGraphs = dynamic(() => import("./overview-graphs"), {
-    loading: () => <LazyLoader />,
-});
+// const OverviewGraphs = dynamic(() => import("./overview-graphs"), {
+//     loading: () => <LazyLoader />,
+// });
 
 
 
-const SchoolsTabs = ({ genderData, schools, enrollmentData }) => {
+const SchoolsTabs = ({ genderData, schools, enrollmentData,overallLearnerStats }) => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const initialTab = searchParams.get("tab") || "overview";
@@ -30,7 +27,7 @@ const SchoolsTabs = ({ genderData, schools, enrollmentData }) => {
     };
 
     return (
-        <Card className="p-4 mt-8 bg-gradient-to-b from-primary/20 to-background">
+        <Card className="p-2 mt-4">
             <Tabs
                 defaultValue={selectedTab}
                 className="space-y-4"
@@ -57,13 +54,13 @@ const SchoolsTabs = ({ genderData, schools, enrollmentData }) => {
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value="overview" className="space-y-4">
-                    <EnrollmentDashboard enrollmentData={genderData} />
+                    <EnrollmentDashboard enrollmentData={genderData} overallLearnerStats={overallLearnerStats} />
                 </TabsContent>
                 <TabsContent value="schools" className="space-y-4">
                     <SchoolsTable schools={schools} />
                 </TabsContent>
                 <TabsContent value="enrollment" className="space-y-4">
-                    <Enrollment schools={enrollmentData} allSchools={schools} />
+                    <EnrollmentStats schoolsData={enrollmentData} allSchools={schools} />
                 </TabsContent>
             </Tabs>
         </Card>

@@ -54,8 +54,24 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { motion, AnimatePresence } from "framer-motion"
 import { Tooltip as TooltipUI, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
+type OverallLearnerStats = {
+  overall: {
+    total: number
+    male: number
+    female: number
+    withDisability: number
+  }
+  bySchoolType: Array<{
+    schoolType: string
+    total: number
+    male: number
+    female: number
+    withDisability: number
+  }>
+}
 
-export default function EnrollmentDashboard({enrollmentData}: {enrollmentData: any}) {
+
+export default function EnrollmentDashboard({enrollmentData,overallLearnerStats}: {enrollmentData: any, overallLearnerStats: OverallLearnerStats}) {
   const [sortConfig, setSortConfig] = useState({ key: "totalPupils", direction: "desc" })
   const [activeIndex, setActiveIndex] = useState(0)
   const [expandedState, setExpandedState] = useState(null)
@@ -230,14 +246,7 @@ const renderActiveShape = (props:any) => {
     }, 500)
   }, [])
 
-  const handleRefresh = useCallback(() => {
-    setIsLoading(true)
 
-    // Simulate data refresh
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 800)
-  }, [])
 
   // Calculate gender gap data for visualization
   const genderGapData = useMemo(() => {
@@ -260,30 +269,30 @@ const renderActiveShape = (props:any) => {
 
 
   return (
-      <div>
-    
-
+      <div className="mt-[-50px]">
         <Tabs defaultValue="overview" className="w-full" onValueChange={handleTabChange}>
-          <TabsList  className="h-auto gap-2 rounded-none border-b border-border bg-transparent px-0 py-1 text-foreground">
-            <TabsTrigger value="overview"  className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent">
-              <span className="flex items-center gap-2">
-                <BarChart3 className="h-4 w-4" />
-                <span>Summary</span>
-              </span>
-            </TabsTrigger>
-            <TabsTrigger value="comparison"  className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent">
-              <span className="flex items-center gap-2">
-                <ArrowLeftRight className="h-4 w-4" />
-                <span>Comparison</span>
-              </span>
-            </TabsTrigger>
-            <TabsTrigger value="details"  className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent">
-              <span className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                <span>Details</span>
-              </span>
-            </TabsTrigger>
-          </TabsList>
+          <div className="flex justify-end">
+            <TabsList  className=" h-auto gap-2 rounded-none border-b border-border bg-transparent pb-1 text-foreground">
+              <TabsTrigger value="overview"  className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent">
+                <span className="flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  <span>Summary</span>
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="comparison"  className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent">
+                <span className="flex items-center gap-2">
+                  <ArrowLeftRight className="h-4 w-4" />
+                  <span>Comparison</span>
+                </span>
+              </TabsTrigger>
+              <TabsTrigger value="details"  className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent">
+                <span className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  <span>Details</span>
+                </span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-4">
@@ -317,11 +326,12 @@ const renderActiveShape = (props:any) => {
                           transition={{ delay: 0.2, duration: 0.5 }}
                           className="text-4xl font-bold mt-2 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent"
                         >
-                          {totals.totalPupils.toLocaleString()}
+                          {overallLearnerStats.overall.total.toLocaleString()}
                         </motion.p>
                         <p className="text-muted-foreground">Students across South Sudan</p>
                       </div>
                       <div className="mt-6 md:mt-0 flex items-center gap-6">
+
                         <motion.div
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -330,10 +340,10 @@ const renderActiveShape = (props:any) => {
                         >
                           <div className="flex items-center gap-2 justify-center">
                             <UserRound className="h-5 w-5 text-primary" />
-                            <span className="text-lg font-semibold">{Math.round(totals.malePercentage)}%</span>
+                            <span className="text-lg font-semibold">{Math.round(overallLearnerStats.overall.male/overallLearnerStats.overall.total*100)}%</span>
                           </div>
                           <p className="text-sm text-muted-foreground">Male</p>
-                          <p className="text-lg font-medium">{totals.totalMale.toLocaleString()}</p>
+                          <p className="text-lg font-medium">{overallLearnerStats.overall.male.toLocaleString()}</p>
                         </motion.div>
                         <div className="h-16 w-px bg-border"></div>
                         <motion.div
@@ -344,10 +354,24 @@ const renderActiveShape = (props:any) => {
                         >
                           <div className="flex items-center gap-2 justify-center">
                             <UserRound className="h-5 w-5 text-rose-500" />
-                            <span className="text-lg font-semibold">{Math.round(totals.femalePercentage)}%</span>
+                            <span className="text-lg font-semibold">{Math.round(overallLearnerStats.overall.female/overallLearnerStats.overall.total*100)}%</span>
                           </div>
                           <p className="text-sm text-muted-foreground">Female</p>
-                          <p className="text-lg font-medium">{totals.totalFemale.toLocaleString()}</p>
+                          <p className="text-lg font-medium">{overallLearnerStats.overall.female.toLocaleString()}</p>
+                        </motion.div>
+                        <div className="h-16 w-px bg-border"></div>
+                        <motion.div
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.3, duration: 0.5 }}
+                          className="text-center"
+                        >
+                          <div className="flex items-center gap-2 justify-center">
+                            <UserRound className="h-5 w-5 text-purple-600" />
+                            <span className="text-lg font-semibold">{Math.round(overallLearnerStats.overall.withDisability/overallLearnerStats.overall.total*100)}%</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">With Disability</p>
+                          <p className="text-lg font-medium">{overallLearnerStats.overall.withDisability.toLocaleString()}</p>
                         </motion.div>
                       </div>
                     </div>
@@ -360,16 +384,23 @@ const renderActiveShape = (props:any) => {
                     >
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: `${totals.malePercentage}%` }}
+                        animate={{ width: `${(overallLearnerStats.overall.male/overallLearnerStats.overall.total)*100}%` }}
                         transition={{ delay: 0.8, duration: 1 }}
                         className="h-full bg-primary"
                         style={{ float: "left" }}
                       ></motion.div>
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: `${totals.femalePercentage}%` }}
+                        animate={{ width: `${(overallLearnerStats.overall.female/overallLearnerStats.overall.total)*100}%` }}
                         transition={{ delay: 0.8, duration: 1 }}
                         className="h-full bg-rose-500"
+                        style={{ float: "left" }}
+                      ></motion.div>
+                       <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(overallLearnerStats.overall.withDisability/overallLearnerStats.overall.total)*100 + 10}%` }}
+                        transition={{ delay: 0.8, duration: 1 }}
+                        className="h-full bg-purple-600"
                         style={{ float: "left" }}
                       ></motion.div>
                     </motion.div>
@@ -515,7 +546,7 @@ const renderActiveShape = (props:any) => {
           </TabsContent>
 
           {/* Comparison Tab */}
-          <TabsContent value="comparison" className="space-y-8">
+          <TabsContent value="comparison" className="space-y-4">
             {isLoading ? (
               <Skeleton className="h-[600px] w-full rounded-lg" />
             ) : (

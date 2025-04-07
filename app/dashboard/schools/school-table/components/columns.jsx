@@ -11,30 +11,30 @@ const customIncludesStringFilter = (row, columnId, filterValue) => {
 
 
 export const columns = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
+  // {
+  //   id: "select",
+  //   header: ({ table }) => (
+  //     <Checkbox
+  //       checked={
+  //         table.getIsAllPageRowsSelected() ||
+  //         (table.getIsSomePageRowsSelected() && "indeterminate")
+  //       }
+  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+  //       aria-label="Select all"
+  //       className="translate-y-[2px]"
+  //     />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       checked={row.getIsSelected()}
+  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+  //       aria-label="Select row"
+  //       className="translate-y-[2px]"
+  //     />
+  //   ),
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
   {
     id: "combinedName",
     header: "Name",
@@ -48,7 +48,7 @@ export const columns = [
   {
     accessorKey: "state10",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="State10" />
+      <DataTableColumnHeader column={column} title="State" />
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
@@ -62,14 +62,14 @@ export const columns = [
   {
     accessorKey: "county28",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="County10" />
+      <DataTableColumnHeader column={column} title="County" />
     ),
     cell: ({ row }) => <div>{row.getValue("county28")}</div>,
   },
   {
     accessorKey: "payam28",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Payam10" />
+      <DataTableColumnHeader column={column} title="Payam" />
     ),
     cell: ({ row }) => <div className="w-[80px]">{row.getValue("payam28")}</div>,
     enableSorting: false,
@@ -94,14 +94,14 @@ export const columns = [
   {
     accessorKey: "schoolType",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="School Type" />
+      <DataTableColumnHeader column={column} title="Type" />
     ),
     cell: ({ row }) => <div>{row.getValue("schoolType")}</div>,
   },
   {
     accessorKey: "schoolOwnerShip",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="School OwnerShip" />
+      <DataTableColumnHeader column={column} title="OwnerShip" />
     ),
     cell: ({ row }) => <div>{row.getValue("schoolOwnerShip")}</div>,
   },

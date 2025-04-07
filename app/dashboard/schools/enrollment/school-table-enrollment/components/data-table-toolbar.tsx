@@ -64,26 +64,26 @@ export function DataTableToolbar<TData>({
               combinedColumn.setFilterValue(value);
             }
           }}
-          className="h-8 w-[150px] lg:w-[350px]"
+          className="h-8 w-[150px] lg:w-[230px]"
         />
         {table.getColumn("schoolType") && (
           <DataTableFacetedFilter
             column={table?.getColumn("schoolType")}
-            title="School Type"
+            title="Type"
             options={schoolTypes}
           />
         )}
         {table.getColumn("schoolOwnerShip") && (
           <DataTableFacetedFilter
             column={table?.getColumn("schoolOwnerShip")}
-            title="School OwnerShip"
+            title="Ownership"
             options={schoolOwnership}
           />
         )}
         {table.getColumn("state10") && (
           <DataTableFacetedFilter
             column={table?.getColumn("state10")}
-            title="State10"
+            title="State"
             options={states}
             // onChange={handleStateChange}
           />
@@ -91,14 +91,14 @@ export function DataTableToolbar<TData>({
         {selectedState && table.getColumn("county28") && (
           <DataTableFacetedFilter
             column={table?.getColumn("county28")}
-            title="County10"
+            title="County"
             options={filteredCounties}
           />
         )}
         {selectedCounty && table.getColumn("payam28") && (
           <DataTableFacetedFilter
             column={table?.getColumn("payam28")}
-            title="Payam10"
+            title="Payam"
             options={filteredPayams}
           />
         )}

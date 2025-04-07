@@ -30,8 +30,8 @@ export default function SchoolEnrollmentTable({
   schools: any[];
 }) {
   return (
-    <Card className="p-4 ">
-      <div className="hidden h-full flex-1 flex-col space-y-8 md:flex">
+    <Card className="p-2">
+      <div className="hidden h-full flex-1 flex-col space-y-4 md:flex">
         <div className="flex items-center justify-between space-y-2">
           <div className="space-y-2">
             <CardTitle>Enrollment</CardTitle>

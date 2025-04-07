@@ -69,6 +69,7 @@ interface NavigationItem {
   keywords: string[]
   badge?: any
   children?: NavigationChildItem[]
+  isOpen?: boolean
 }
 
 interface ResourceItem {
@@ -87,6 +88,7 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
   const [isSearching, setIsSearching] = useState(false)
   const [selectedResultIndex, setSelectedResultIndex] = useState(-1)
   const [schoolsCount, setSchoolsCount] = useState("0")
+  const [navigationState, setNavigationState] = useState<{[key: string]: boolean}>({})
   const searchInputRef = useRef<HTMLInputElement>(null)
   const searchResultsRef = useRef<HTMLDivElement>(null)
 
@@ -351,8 +353,10 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
               <Menu className="h-5 w-5" />
             </SidebarTrigger>
           </div>
-          <div className="py-3 px-2 relative">
-            <div className="relative">
+
+
+          {/* <div className="py-1 px-2 relative"> */}
+            {/* <div className="relative">
               <Input
                 ref={searchInputRef}
                 placeholder="Search..."
@@ -365,9 +369,9 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
               <kbd className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 sm:flex">
                 <span className="text-xs">⌘</span>K
               </kbd>
-            </div>
+            </div> */}
 
-            {/* Search Results Dropdown */}
+            {/* Search Results Dropdown
             {isSearching && (
               <div
                 ref={searchResultsRef}
@@ -379,14 +383,16 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
                   onResultClick={handleResultClick}
                 />
               </div>
-            )}
-          </div>
+            )} */}
+          {/* </div> */}
+
+          
         </SidebarHeader>
 
         <SidebarContent className="px-2">
           {/* Main Navigation */}
           <SidebarGroup>
-            <SidebarGroupLabel className="text-sm font-medium text-foreground/70 px-2 py-1.5">
+            <SidebarGroupLabel className="text-sm font-medium text-foreground/70 px-2 py-0">
               Main Navigation
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -397,7 +403,7 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
                       <SidebarMenuButton
                         asChild
                         isActive={pathname === item.path}
-                        className="h-12 font-medium transition-all hover:bg-primary/10 data-[active=true]:bg-primary/20 data-[active=true]:text-primary data-[active=true]:font-semibold rounded-md group"
+                        className="h-11 font-medium transition-all hover:bg-primary/10 data-[active=true]:bg-primary/20 data-[active=true]:text-primary data-[active=true]:font-semibold rounded-md group"
                       >
                           
                         <Link href={item.path || "#"} >
@@ -425,6 +431,7 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
                     ) : (
                       <>
                         <SidebarMenuButton
+                          onClick={() => setNavigationState(prev => ({ ...prev, [item.id]: !prev[item.id] }))}
                           className="relative h-11 font-medium transition-all hover:bg-primary/10 data-[active=true]:bg-primary/15 data-[active=true]:text-primary data-[active=true]:font-semibold rounded-md group"
                           isActive={item.children.some((child) => pathname === child.path)}
                         >
@@ -439,45 +446,51 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
                                 : "text-muted-foreground group-hover:text-foreground",
                             )}
                           >
-                         
                             <item.icon className="h-4 w-4 text-primary" />
                           </div>
                           <span className="truncate text-md">{item.title}</span>
-                          <ChevronDown className="ml-auto h-4 w-4 shrink-0 opacity-50 transition-transform duration-200 ease-in-out group-data-[state=open]:rotate-180" />
+                          <ChevronDown 
+                            className={cn(
+                              "ml-auto h-4 w-4 shrink-0 opacity-50 transition-transform duration-200",
+                              navigationState[item.id] ? "rotate-180" : ""
+                            )} 
+                          />
                         </SidebarMenuButton>
-                        <SidebarMenuSub className="space-y-1 mt-1">
-                          {item.children.map((child, idx) => (
-                            <SidebarMenuSubItem
-                              key={child.id}
-                              className="animate-in fade-in-50 slide-in-from-left-3 duration-300"
-                              style={{ animationDelay: `${idx * 50}ms` }}
-                            >
-                              <SidebarMenuSubButton
-                                asChild
-                                isActive={pathname === child.path}
-                                className="hover:bg-primary/20 bg-primary/10 data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-medium pl-9 relative"
+                        {navigationState[item.id] && (
+                          <SidebarMenuSub className="space-y-1 mt-1">
+                            {item.children.map((child, idx) => (
+                              <SidebarMenuSubItem
+                                key={child.id}
+                                className="animate-in fade-in-50 slide-in-from-left-3 duration-300"
+                                style={{ animationDelay: `${idx * 50}ms` }}
                               >
-                                <Link href={child.path || "#"}>
-                                  {pathname === child.path && (
-                                    <div className="absolute left-0 top-0 bottom-0 w-[5px] bg-primary rounded-l-full" />
-                                  )}
-                                  {child.title}
-                                  {child.badge && (
-                                    <Badge
-                                      variant={child.badge.variant === "success" ? "secondary" : "outline"}
-                                      className={cn(
-                                        "ml-auto text-xs py-0 h-5",
-                                        child.badge.variant === "success" && "bg-green-500/10 text-green-600",
-                                      )}
-                                    >
-                                      {child.badge.text}
-                                    </Badge>
-                                  )}
-                                </Link>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarMenuSub>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  isActive={pathname === child.path}
+                                  className="hover:bg-primary/20 bg-primary/10 data-[active=true]:bg-primary/10 data-[active=true]:text-primary data-[active=true]:font-medium pl-9 relative"
+                                >
+                                  <Link href={child.path || "#"}>
+                                    {pathname === child.path && (
+                                      <div className="absolute left-0 top-0 bottom-0 w-[5px] bg-primary rounded-l-full" />
+                                    )}
+                                    {child.title}
+                                    {child.badge && (
+                                      <Badge
+                                        variant={child.badge.variant === "success" ? "secondary" : "outline"}
+                                        className={cn(
+                                          "ml-auto text-xs py-0 h-5",
+                                          child.badge.variant === "success" && "bg-green-500/10 text-green-600",
+                                        )}
+                                      >
+                                        {child.badge.text}
+                                      </Badge>
+                                    )}
+                                  </Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            ))}
+                          </SidebarMenuSub>
+                        )}
                       </>
                     )}
                   </SidebarMenuItem>
@@ -488,7 +501,7 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
 
           {/* Resources */}
           <SidebarGroup>
-            <SidebarGroupLabel className="text-sm font-medium text-foreground/70 px-2 py-1.5">
+            <SidebarGroupLabel className="text-sm font-medium text-foreground/70 px-2 py-0">
               Resources
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -498,7 +511,7 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
                     <SidebarMenuButton
                       asChild
                       isActive={!item.external && pathname === item.path}
-                      className="h-11 font-medium transition-all hover:bg-primary/10 data-[active=true]:bg-primary/15 data-[active=true]:text-primary data-[active=true]:font-semibold rounded-md group"
+                      className="h-9 font-medium transition-all hover:bg-primary/10 data-[active=true]:bg-primary/15 data-[active=true]:text-primary data-[active=true]:font-semibold rounded-md group"
                     >
                       {item.external ? (
                         <a href={item.path} target="_blank" rel="noopener noreferrer">

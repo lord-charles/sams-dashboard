@@ -119,9 +119,9 @@ export default function SchoolsTable({
   const {toast} = useToast();
 
   return (
-    <Card className="p-4 ">
-      <div className="hidden h-full flex-1 flex-col space-y-8 md:flex">
-        <div className="flex items-center justify-between space-y-2">
+    <Card className="p-2">
+      <div className="hidden h-full flex-1 flex-col space-y-4 md:flex">
+        <div className="flex items-center justify-between">
           <div className="space-y-2">
             <CardTitle>Schools</CardTitle>
             <CardDescription>Here&apos;s a list of schools.</CardDescription>
