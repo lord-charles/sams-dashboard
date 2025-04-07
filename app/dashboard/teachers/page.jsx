@@ -4,7 +4,7 @@ import TeacherModuleClient from './components/teacher-module-client';
 
 // Disable caching for this page
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 600
 
 
 async function getInitialData() {

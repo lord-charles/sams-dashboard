@@ -5,9 +5,8 @@ import axios from "axios";
 import { base_url } from "@/app/utils/baseUrl";
 import { SchoolBreadcrumb } from "./components/school-breadcrumb";
 
-// Disable caching for this page
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 600;
 
 const Schools = async () => {
   const fetchData = async () => {

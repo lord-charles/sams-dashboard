@@ -27,6 +27,12 @@ module.exports = {
           DEFAULT: "rgb(87,190,187)",
         },
         button: "rgb(50,136,124)",
+        // South Sudan flag colors - official colors
+        "ss-black": "#000000",
+        "ss-red": "#BF0A30",
+        "ss-green": "#078930",
+        "ss-blue": "#0F47AF",
+        "ss-white": "#FFFFFF",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -67,10 +73,38 @@ module.exports = {
             height: "0",
           },
         },
+        spin: {
+          to: { transform: "rotate(360deg)" },
+        },
+        shimmer: {
+          "100%": { transform: "translateX(100%)" },
+        },
+        bounce: {
+          "0%, 100%": {
+            transform: "translateY(0)",
+            animationTimingFunction: "cubic-bezier(0.8, 0, 1, 1)",
+          },
+          "50%": {
+            transform: "translateY(-25%)",
+            animationTimingFunction: "cubic-bezier(0, 0, 0.2, 1)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        // spin: "spin 1s linear infinite",
+        // shimmer: "shimmer 1.5s linear infinite",
+        // bounce: "bounce 1.2s ease-in-out infinite",
+        bounce: "bounce 1s infinite",
+        shimmer: "shimmer 2s infinite",
+      },
+      transitionTimingFunction: {
+        "in-expo": "cubic-bezier(0.95, 0.05, 0.795, 0.035)",
+        "out-expo": "cubic-bezier(0.19, 1, 0.22, 1)",
+      },
+      boxShadow: {
+        soft: "0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)",
       },
     },
   },

@@ -91,8 +91,7 @@ const StatCard = ({ icon, label, value, color = "bg-primary", description = '' }
   </Card>
 )
 
-export default function EducationStatsDashboard({ learnersData, schoolsData, enrollmentData }: { learnersData: any; schoolsData: any; enrollmentData: EnrollmentData[] }) {
-  console.log(enrollmentData)
+export default function EducationStatsDashboard({ schoolsData, enrollmentData }: { schoolsData: any; enrollmentData: EnrollmentData[] }) {
 
   // Calculate totals
   const calculateLearnerTotals = () => {
@@ -889,39 +888,60 @@ export default function EducationStatsDashboard({ learnersData, schoolsData, enr
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-6">Gender Distribution by State</h3>
                   <div className="space-y-6">
-                    {learnersData
-                      .filter((state: any) => state.state10 !== "State X")
-                      .sort((a: any, b: any) => b.male + b.female - (a.male + a.female))
-                      .map((state: any) => {
-                        const total = state.male + state.female
-                        const malePercent = total > 0 ? (state.male / total) * 100 : 0
-                        const femalePercent = total > 0 ? (state.female / total) * 100 : 0
+                    {[
+                      "AAA", "CES", "EES", "JGL", "LKS", "NBG", "PAA", 
+                      "RAA", "UNS", "UTY", "WBG", "WES", "WRP"
+                    ].map((stateCode) => {
+                      // Get all schools for this state with complete enrollment
+                      const stateSchools = enrollmentData.filter(
+                        school => school.state10 === stateCode && 
+                        school.isEnrollmentComplete?.some(item => item.learnerEnrollmentComplete === true)
+                      );
 
-                        return (
-                          <div key={state.state10} className="space-y-2">
-                            <div className="flex justify-between items-center">
-                              <span className="font-medium">{state.state10}</span>
-                              <span className="text-sm text-muted-foreground">{total.toLocaleString()} learners</span>
-                            </div>
-                            <div className="flex h-4 rounded-full overflow-hidden">
-                              <div
-                                className="bg-primary"
-                                style={{ width: `${malePercent}%` }}
-                                aria-label={`Male: ${Math.round(malePercent)}%`}
-                              ></div>
-                              <div
-                                className="bg-rose-500"
-                                style={{ width: `${femalePercent}%` }}
-                                aria-label={`Female: ${Math.round(femalePercent)}%`}
-                              ></div>
-                            </div>
-                            <div className="flex justify-between text-xs">
-                              <span>Male: {Math.round(malePercent)}%</span>
-                              <span>Female: {Math.round(femalePercent)}%</span>
-                            </div>
+                      // Calculate state totals
+                      const stateTotals = stateSchools.reduce((total, school) => {
+                        const schoolTotals = Object.values(school.learnerStats || {}).reduce(
+                          (gradeTotal: any, grade: any) => ({
+                            male: (gradeTotal.male || 0) + (grade.male || 0),
+                            female: (gradeTotal.female || 0) + (grade.female || 0),
+                          }),
+                          { male: 0, female: 0 }
+                        );
+                        return {
+                          male: total.male + schoolTotals.male,
+                          female: total.female + schoolTotals.female,
+                        };
+                      }, { male: 0, female: 0 });
+
+                      const total = stateTotals.male + stateTotals.female;
+                      const malePercent = total > 0 ? (stateTotals.male / total) * 100 : 0;
+                      const femalePercent = total > 0 ? (stateTotals.female / total) * 100 : 0;
+
+                      return (
+                        <div key={stateCode} className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium">{stateCode}</span>
+                            <span className="text-sm text-muted-foreground">{total.toLocaleString()} learners</span>
                           </div>
-                        )
-                      })}
+                          <div className="flex h-4 rounded-full overflow-hidden">
+                            <div
+                              className="bg-primary"
+                              style={{ width: `${malePercent}%` }}
+                              aria-label={`Male: ${Math.round(malePercent)}%`}
+                            ></div>
+                            <div
+                              className="bg-rose-500"
+                              style={{ width: `${femalePercent}%` }}
+                              aria-label={`Female: ${Math.round(femalePercent)}%`}
+                            ></div>
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span>Male: {Math.round(malePercent)}%</span>
+                            <span>Female: {Math.round(femalePercent)}%</span>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>
