@@ -1,3 +1,4 @@
+"use client";
 import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 import { Inter } from "next/font/google";
