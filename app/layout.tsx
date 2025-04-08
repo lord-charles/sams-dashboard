@@ -1,6 +1,3 @@
-"use client";
-
-import { type ComponentProps } from "react";
 import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 import { Inter } from "next/font/google";
@@ -16,9 +13,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  if (typeof window !== 'undefined') {
-    registerServiceWorker();
-  }
+  // if (typeof window !== 'undefined') {
+  //   registerServiceWorker();
+  // }
 
   return (
     <html lang="en">
