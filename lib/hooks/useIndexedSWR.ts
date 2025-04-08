@@ -37,8 +37,8 @@ const fetcher = async (key: Key, options: FetcherOptions = {}): Promise<any> => 
 
     return data;
   } catch (error) {
-    // If offline, try to get from cache regardless of expiry
-    if (!navigator.onLine) {
+    // Check if we're in a browser environment
+    if (typeof window !== 'undefined' && !window.navigator.onLine) {
       const cachedData = await getCache(url);
       if (cachedData) {
         return cachedData;
@@ -48,7 +48,8 @@ const fetcher = async (key: Key, options: FetcherOptions = {}): Promise<any> => 
   }
 };
 
-export function useIndexedSWR<T = any>(
+export function 
+useIndexedSWR<T = any>(
   key: string | null,
   options: FetcherOptions = {},
   config: ExtendedSWRConfig = {}

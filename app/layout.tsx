@@ -14,9 +14,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // if (typeof window !== 'undefined') {
-  //   registerServiceWorker();
-  // }
+  if (typeof window !== 'undefined') {
+    registerServiceWorker();
+  }
 
   return (
     <html lang="en">
