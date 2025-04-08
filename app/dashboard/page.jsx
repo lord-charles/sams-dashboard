@@ -44,7 +44,7 @@ const Page = () => {
   const { data, error, isLoading } = useHomeData();
 
   if (error) {
-    return <FetchErrorDisplay error={error} retry={() => window.location.reload()} />;
+    return <FetchErrorDisplay error={error}  />;
   }
 
   if (isLoading) {
