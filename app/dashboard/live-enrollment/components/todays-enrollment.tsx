@@ -88,21 +88,26 @@ export default function TodaysEnrollmentDataDisplay({
     to: undefined,
   })
 
+  // Memoize params to prevent unnecessary re-renders
   const params = useMemo(() => {
-    if (dateMode === "single") {
+    if (dateMode === "single" && isValid(date)) {
       return { date }
     }
     if (dateRange.from && dateRange.to) {
       return { startDate: dateRange.from, endDate: dateRange.to }
     }
-    return {}
-  }, [date, dateRange])
+    return { date: new Date() }
+  }, [date, dateRange.from, dateRange.to, dateMode])
 
-
-
-  // Configure SWR with better caching options
-  const { data: response, isValidating, error } = useSWR(
+  // Memoize the key to prevent unnecessary revalidation
+  const key = useMemo(() => 
     [base_url + 'data-set/fetchSchoolsEnrollmentToday', params] as const,
+    [params]
+  )
+
+  // Configure SWR with optimized caching options
+  const { data: response, isValidating, error } = useSWR(
+    key,
     async ([url, params]) => {
       const response = await axios.post(url, params)
       if (!response.data.success) {
@@ -111,12 +116,22 @@ export default function TodaysEnrollmentDataDisplay({
       return response.data as { success: boolean, data: SchoolData[] }
     },
     {
-      fallbackData: { success: true, data: initialData || [] }
+      fallbackData: { success: true, data: initialData || [] },
+      revalidateOnFocus: false, // Prevent revalidation on window focus
+      revalidateOnReconnect: true,
+      dedupingInterval: 10000, // Dedupe requests within 10 seconds
+      shouldRetryOnError: false, // Don't retry on error automatically
+      keepPreviousData: true, // Keep showing previous data while loading new data
     }
   )
 
   const schoolData = response?.data || []
-  const isLoading = isValidating
+  
+  // Only show loading state on initial load or when explicitly refreshing
+  const isLoading = useMemo(() => 
+    (!response && isValidating) || (isValidating && !schoolData.length),
+    [response, isValidating, schoolData.length]
+  )
 
   const handleDateRangeSelect = (range: DateRange | undefined) => {
     setDateRange({
@@ -814,5 +829,3 @@ function EnumeratorsTab({ schoolData, isLoading }: { schoolData: SchoolData[]; i
     </Card>
   )
 }
-
-

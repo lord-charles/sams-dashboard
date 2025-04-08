@@ -3,66 +3,30 @@
 import React from "react";
 import AdvancedStatCards from "./components/AdvancedStatCards";
 import SchoolsTabs from "./tabs";
-import axios from "axios";
 import { base_url } from "@/app/utils/baseUrl";
 import { SchoolBreadcrumb } from "./components/school-breadcrumb";
-import { Skeleton } from "@/components/ui/skeleton";
 import Loading from "../loading";
 import { FetchErrorDisplay } from "@/components/fetch-error-display";
-import useSWR from 'swr';
+import { useIndexedSWR } from "@/lib/hooks/useIndexedSWR";
 
-// Fetcher functions with error handling
-const fetcher = async (url) => {
-  try {
-    const response = await axios.get(url);
-    return response.data;
-  } catch (error) {
-    throw new Error('Failed to fetch data');
-  }
-};
-
-const postFetcher = async (url) => {
-  try {
-    const response = await axios.post(url);
-    return response.data;
-  } catch (error) {
-    throw new Error('Failed to fetch data');
-  }
-};
-
-// SWR configuration for better performance
-const swrConfig = {
-  revalidateOnFocus: false,
-  revalidateOnReconnect: true,
-  refreshInterval: 300000, // Refresh every 5 minutes
-  shouldRetryOnError: true,
-  retryCount: 3,
-};
 
 const Schools = () => {
-  // SWR hooks with error handling
-  const { data: genderData, error: genderError } = useSWR(
+  // SWR hooks with IndexedDB caching
+  const { data: genderData, error: genderError } = useIndexedSWR(
     `${base_url}data-set/state/gender`,
-    postFetcher,
-    swrConfig
+    { method: 'POST' }
   );
 
-  const { data: schools, error: schoolsError } = useSWR(
-    `${base_url}school-data/schools`,
-    fetcher,
-    swrConfig
+  const { data: schools, error: schoolsError } = useIndexedSWR(
+    `${base_url}school-data/schools`
   );
 
-  const { data: enrollmentData, error: enrollmentError } = useSWR(
-    `${base_url}school-data/enrollment/completed`,
-    fetcher,
-    swrConfig
+  const { data: enrollmentData, error: enrollmentError } = useIndexedSWR(
+    `${base_url}school-data/enrollment/completed`
   );
 
-  const { data: overallLearnerStats, error: statsError } = useSWR(
-    `${base_url}school-data/overall-learner-stats`,
-    fetcher,
-    swrConfig
+  const { data: overallLearnerStats, error: statsError } = useIndexedSWR(
+    `${base_url}school-data/overall-learner-stats`
   );
 
   // Check for any errors

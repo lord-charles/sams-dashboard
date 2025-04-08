@@ -66,7 +66,7 @@ const LearnerModule = () => {
   );
   
   const { data: newLearnersData, error: newLearnersError } = useSWR(
-    [`${base_url}data-set/getLearnerCountByLocation`, currentYear],
+    [`${base_url}data-set/getLearnerCountByLocation`, {year:parseInt(currentYear)}],
     ([url, year]) => postFetcher(url, year),
     swrConfig
   );
