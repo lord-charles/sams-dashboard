@@ -10,6 +10,10 @@ import Loading from "../loading";
 import axios from "axios";
 import { base_url } from "@/app/utils/baseUrl";
 
+interface LearnerCountResponse {
+  count: number;
+}
+
 const LiveEnrollmentPage = () => {
   const currentYear = new Date().getFullYear();
 
@@ -20,7 +24,7 @@ const LiveEnrollmentPage = () => {
     apiEndpoints.learners.total,
     { method: 'POST', body: { enrollmentYear: currentYear } }
   );
-  const [newLearnersData, setNewLearnersData] = useState(null);
+  const [newLearnersData, setNewLearnersData] = useState<LearnerCountResponse | null>(null);
   const [newLearnersError, setNewLearnersError] = useState(null);
 
   useEffect(() => {
@@ -90,7 +94,7 @@ const LiveEnrollmentPage = () => {
     totalLearners: { total: totalLearnersData.count, current: totalLearnersData.count },
     promotedLearners: { total: promotedLearnersData.count, current: promotedLearnersData.count },
     disabledLearners: { total: disabledLearnersData.count, current: disabledLearnersData.count },
-    newLearners: { total: newLearnersData.count, current: newLearnersData.count },
+    newLearners: { total: newLearnersData?.count, current: newLearnersData?.count },
     droppedOutLearners: {
       total: overallMaleFemaleStat.droppedOutMale + overallMaleFemaleStat.droppedOutFemale,
       current: overallMaleFemaleStat.droppedOutMale + overallMaleFemaleStat.droppedOutFemale
