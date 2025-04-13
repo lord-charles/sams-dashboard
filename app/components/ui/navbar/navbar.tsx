@@ -201,8 +201,9 @@ export const NavbarWrapper = ({ children }: { children: React.ReactNode }) => {
           }}
         >
           <div className="flex justify-between w-full items-center">
-            <div className="flex items-center gap-2 px-2 sm:px-4">
-              {isMobileDevice ? (
+            <div className="flex items-center gap-2">
+            <div>
+            {isMobileDevice ? (
                 <Button
                   variant="ghost"
                   size="icon"
@@ -217,9 +218,12 @@ export const NavbarWrapper = ({ children }: { children: React.ReactNode }) => {
                 <SidebarTrigger className="-ml-1" />
               )}
 
-              <Separator orientation="vertical" className="mx-2 h-4 hidden sm:block" />
+            </div>
+            <div className="items-center hidden md:flex">
+            <Separator orientation="vertical" className="mx-2 h-4 hidden sm:block" />
 
-              <DynamicBreadcrumb showVersion={true} version='v1.0' />
+<DynamicBreadcrumb showVersion={true} version='v1.0' />
+            </div>
             </div>
 
             <div className="hidden lg:flex w-[400px]">

@@ -1,19 +1,17 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import axios from "axios";
 import { base_url } from "@/app/utils/baseUrl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Users, UserCheck, UserMinus, UserPlus, School, GraduationCap, CalendarDays, CalendarIcon, PanelsTopLeft, House } from 'lucide-react';
+import { Loader2, Users, UserCheck, UserMinus, UserPlus, School, CalendarIcon, PanelsTopLeft, House } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown } from 'lucide-react';
-import { LearnerBreadcrumb } from "../../learners/components/learner-breadcrumb";
 import { Backdrop } from "@mui/material";
 import { endOfMonth, format, startOfMonth } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
 import TodaysEnrollmentDataDisplay from "./todays-enrollment";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -297,7 +295,7 @@ const LiveEnrollmentModule = ({ initialStates,
                                 {isLoading ? (
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                 ) : (
-                                    <CalendarIcon className="mr-2 relative top-[-5px]  h-4 w-4" />
+                                    <CalendarIcon className="mr-2 relative top-[1.5px]  h-4 w-4" />
                                 )}
                                <h2>{format(Date.now(), "LLL dd, y")}</h2>
                             </Button>

@@ -7,7 +7,6 @@ import { FetchErrorDisplay } from '@/components/fetch-error-display';
 import Loading from '../loading';
 import Home from './home';
 
-// Custom hook for home page data
 const useHomeData = () => {
   const [isMounted, setIsMounted] = useState(false);
 

@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import LiveEnrollmentModule from "./components/live-enrollment";
 import { useIndexedSWR } from "@/lib/hooks/useIndexedSWR";
 import { apiEndpoints } from "@/lib/services/api.service";
 import type { LearnerStatistics } from "@/lib/types/dashboard";
 import { FetchErrorDisplay } from "@/components/fetch-error-display";
 import Loading from "../loading";
+import axios from "axios";
+import { base_url } from "@/app/utils/baseUrl";
 
 const LiveEnrollmentPage = () => {
   const currentYear = new Date().getFullYear();
@@ -18,10 +20,23 @@ const LiveEnrollmentPage = () => {
     apiEndpoints.learners.total,
     { method: 'POST', body: { enrollmentYear: currentYear } }
   );
-  const { data: newLearnersData, error: newLearnersError } = useIndexedSWR(
-    apiEndpoints.learners.total,
-    { method: 'POST', body: { year: currentYear } }
-  );
+  const [newLearnersData, setNewLearnersData] = useState(null);
+  const [newLearnersError, setNewLearnersError] = useState(null);
+
+  useEffect(() => {
+    const fetchNewLearners = async () => {
+      try {
+        const response = await axios.post(`${base_url}data-set/getLearnerCountByLocation`, {
+          year: 2025
+        });
+        setNewLearnersData(response.data);
+      } catch (error: any) {
+        setNewLearnersError(error);
+      }
+    };
+
+    fetchNewLearners();
+  }, []);
   
   const { data: promotedLearnersData, error: promotedLearnersError } = useIndexedSWR(
     apiEndpoints.learners.promoted,

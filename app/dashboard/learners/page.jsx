@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LearnerModuleClient from "./components/LearnerModuleClient";
 import axios from 'axios';
 import { base_url } from "../../utils/baseUrl";
@@ -20,6 +20,15 @@ const fetcher = async (url) => {
 };
 
 const postFetcher = async (url, year) => {
+  try {
+    const response = await axios.post(url, { enrollmentYear: year });
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to fetch data');
+  }
+};
+
+const postFetcher2 = async (url, year) => {
   try {
     const response = await axios.post(url, { enrollmentYear: year });
     return response.data;
@@ -65,18 +74,31 @@ const LearnerModule = () => {
     swrConfig
   );
   
-  const { data: newLearnersData, error: newLearnersError } = useSWR(
-    [`${base_url}data-set/getLearnerCountByLocation`, {year:parseInt(currentYear)}],
-    ([url, year]) => postFetcher(url, year),
-    swrConfig
-  );
+  const [newLearnersData, setNewLearnersData] = useState(null);
+  const [newLearnersError, setNewLearnersError] = useState(null);
+
+  useEffect(() => {
+    const fetchNewLearners = async () => {
+      try {
+        const response = await axios.post(`${base_url}data-set/getLearnerCountByLocation`, {
+          year: 2025
+        });
+        setNewLearnersData(response.data);
+      } catch (error) {
+        setNewLearnersError(error);
+      }
+    };
+
+    fetchNewLearners();
+  }, []);
+
   
   const { data: overallMaleFemaleStat, error: overallStatError } = useSWR(
     [`${base_url}data-set/overallMaleFemaleStat`, currentYear],
     ([url, year]) => postFetcher(url, year),
     swrConfig
   );
-
+// console.log(newLearnersData)
   // Check for any errors
   const errors = [statesError, totalLearnersError, promotedLearnersError, 
                  disabledLearnersError, newLearnersError, overallStatError]

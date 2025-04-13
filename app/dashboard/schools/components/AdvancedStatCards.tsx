@@ -85,6 +85,18 @@ interface SchoolStatCardsProps {
   overallLearnerStats?: OverallLearnerStats
 }
 
+
+  // Map school type codes to readable names
+  const schoolTypeNames: Record<string, string> = {
+    PRI: "PRI",
+    SEC: "SEC",
+    ECD: "ECD",
+    ALP: "ALP",
+    CGS: "CGS",
+    ASP: "ASP",
+    TTI: "TTI",
+  }
+
 export default function SchoolStatCards({ enrollmentData, schools, overallLearnerStats }: SchoolStatCardsProps) {
   const currentYear = new Date().getFullYear()
 
@@ -212,12 +224,17 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
   const schoolTypeData = useMemo(() => {
     if (!overallLearnerStats?.bySchoolType) return []
 
-    // Get top 5 school types by total learners
-    const topSchoolTypes = [...overallLearnerStats.bySchoolType].sort((a, b) => b.total - a.total).slice(0, 6)
+    // Filter only the specified school types
+    const validSchoolTypes = overallLearnerStats.bySchoolType.filter(
+      (type) => schoolTypeNames[type?.schoolType]
+    )
+
+    // Sort by total learners
+    const sortedSchoolTypes = validSchoolTypes.sort((a, b) => b.total - a.total)
 
     // Calculate percentages
     const totalLearners = overallLearnerStats.overall.total || 1
-    return topSchoolTypes.map((type) => ({
+    return sortedSchoolTypes.map((type) => ({
       ...type,
       percentage: (type.total / totalLearners) * 100,
       malePercentage: (type.male / type.total) * 100,
@@ -225,16 +242,6 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
     }))
   }, [overallLearnerStats])
 
-  // Map school type codes to readable names
-  const schoolTypeNames: Record<string, string> = {
-    PRI: "PRI",
-    SEC: "SEC",
-    ECD: "ECD",
-    ALP: "ALP",
-    CGS: "CGS",
-    ASP: "ASP",
-    TTI: "TTI",
-  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2">
@@ -325,7 +332,7 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
           <div className="pb-2 px-3">
           
 
-            <div className="mt-3 space-y-2">
+            <div className="mt-1 space-y-1">
               {schoolTypeData.map((type, index) => (
                 <Tooltip key={index}>
                   <TooltipTrigger asChild>
@@ -336,7 +343,7 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
                           {type.total.toLocaleString()} ({type.percentage.toFixed(1)}%)
                         </span>
                       </div>
-                      <Progress value={type.percentage} className="h-1.5 bg-teal-100" />
+                      <Progress value={type.percentage} className="h-1 bg-teal-100" />
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>

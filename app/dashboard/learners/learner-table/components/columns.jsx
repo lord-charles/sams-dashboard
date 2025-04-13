@@ -10,30 +10,30 @@ const customIncludesStringFilter = (row, columnId, filterValue) => {
 };
 
 export const columns = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
+  // {
+  //   id: "select",
+  //   header: ({ table }) => (
+  //     <Checkbox
+  //       checked={
+  //         table.getIsAllPageRowsSelected() ||
+  //         (table.getIsSomePageRowsSelected() && "indeterminate")
+  //       }
+  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+  //       aria-label="Select all"
+  //       className="translate-y-[2px]"
+  //     />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       checked={row.getIsSelected()}
+  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+  //       aria-label="Select row"
+  //       className="translate-y-[2px]"
+  //     />
+  //   ),
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
   {
     id: "combinedName",
     header: "Name",
@@ -104,7 +104,7 @@ export const columns = [
   {
     accessorKey: "learnerUniqueID",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Learner UniqueID" />
+      <DataTableColumnHeader column={column} title="Unique Id" />
     ),
     cell: ({ row }) => <div>{row.getValue("learnerUniqueID")}</div>,
   },
@@ -157,6 +157,7 @@ export const columns = [
       <DataTableColumnHeader column={column} title="Promoted" />
     ),
     cell: ({ row }) => (
+      
       <Badge variant={row.getValue("isPromoted") === "Yes" ? "default" : "secondary"}>
         {row.getValue("isPromoted")}
       </Badge>

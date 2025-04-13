@@ -182,7 +182,7 @@ export default function StatesDashboard({ data = [] }: { data?: StateData[] }) {
                 </CardContent>
               </Card>
 
-              <Card>
+              {/* <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg font-medium">Total Schools</CardTitle>
                   <CardDescription>Across {data.length} states</CardDescription>
@@ -198,11 +198,46 @@ export default function StatesDashboard({ data = [] }: { data?: StateData[] }) {
                     {(overallTotals.schools / data.length || 0).toFixed(1)} schools per state average
                   </div>
                 </CardContent>
+              </Card> */}
+                <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Top States by Retention</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {topPerformingStates.byRetention.map((state, index) => (
+                      <div key={state.id} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant={index === 0 ? "default" : "outline"}
+                            className="w-6 h-6 flex items-center justify-center p-0"
+                          >
+                            {index + 1}
+                          </Badge>
+                          <span className="font-medium">{state.id}</span>
+                        </div>
+                        <div className="text-right">
+                          <span
+                            className={`font-medium ${
+                              state.retentionRate > 90
+                                ? "text-green-500"
+                                : state.retentionRate > 75
+                                  ? "text-amber-500"
+                                  : "text-destructive"
+                            }`}
+                          >
+                            {state.retentionRate.toFixed(1)}%
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
               </Card>
             </div>
 
             {/* Top Performing States */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Top States by Retention</CardTitle>
@@ -290,7 +325,7 @@ export default function StatesDashboard({ data = [] }: { data?: StateData[] }) {
                   </div>
                 </CardContent>
               </Card>
-            </div>
+            </div> */}
 
             {/* States Comparison Table */}
             <Card>
