@@ -92,7 +92,7 @@ const StatCard = ({ icon, label, value, color = "bg-primary", description = '' }
 )
 
 export default function EducationStatsDashboard({ schoolsData, enrollmentData }: { schoolsData: any; enrollmentData: EnrollmentData[] }) {
-
+console.log(enrollmentData, "jdhsgvjcbsnbvcdsmhh")
   // Calculate totals
   const calculateLearnerTotals = () => {
     let totalMale = 0;
@@ -100,20 +100,26 @@ export default function EducationStatsDashboard({ schoolsData, enrollmentData }:
     let totalNew = 0;
     let totalWithDisability = 0;
 
-    // Iterate through each school in the array
-    enrollmentData?.forEach((school) => {
-      // Only process if enrollment is complete
-      if (school?.isEnrollmentComplete?.some((item) => item.learnerEnrollmentComplete === true)) {
-        // Loop through each grade level in learnerStats
-        Object.values(school?.learnerStats || {}).forEach((gradeStats: any) => {
-          totalMale += gradeStats.male || 0;
-          totalFemale += gradeStats.female || 0;
-          totalWithDisability += gradeStats.withDisability || 0;
-          // For new students, we'll use currentYear totals
-          totalNew += gradeStats.currentYear?.total || 0;
-        });
+    // Ensure enrollmentData is an array before processing
+    if (Array.isArray(enrollmentData)) {
+      // Iterate through each school in the array
+      for (const school of enrollmentData) {
+        // Only process if enrollment is complete
+        if (school?.isEnrollmentComplete?.some((item) => item.learnerEnrollmentComplete === true)) {
+          // Loop through each grade level in learnerStats
+          const gradeStats = Object.values(school?.learnerStats || {});
+          for (const stats of gradeStats) {
+            if (stats) {
+              totalMale += stats.male || 0;
+              totalFemale += stats.female || 0;
+              totalWithDisability += stats.withDisability || 0;
+              // For new students, we'll use currentYear totals
+              totalNew += stats.currentYear?.total || 0;
+            }
+          }
+        }
       }
-    });
+    }
 
     return {
       totalLearners: totalMale + totalFemale,
@@ -132,14 +138,18 @@ export default function EducationStatsDashboard({ schoolsData, enrollmentData }:
     let totalALP = 0
     let totalASP = 0
 
-    schoolsData.forEach((state: any) => {
-      totalPrimary += state.PRI
-      totalSecondary += state.SEC
-      totalECD += state.ECD
-      totalCGS += state.CGS
-      totalALP += state.ALP
-      totalASP += state.ASP
-    })
+    // Ensure schoolsData is an array before processing
+    if (Array.isArray(schoolsData)) {
+      for (const state of schoolsData) {
+        // Add null checks for each property
+        totalPrimary += state?.PRI || 0
+        totalSecondary += state?.SEC || 0
+        totalECD += state?.ECD || 0
+        totalCGS += state?.CGS || 0
+        totalALP += state?.ALP || 0
+        totalASP += state?.ASP || 0
+      }
+    }
 
     const totalSchools = totalPrimary + totalSecondary + totalECD + totalCGS + totalALP + totalASP
 

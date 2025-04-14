@@ -54,15 +54,15 @@ const Schools = () => {
         <SchoolBreadcrumb />
       </div>
       <AdvancedStatCards 
-        enrollmentData={enrollmentData} 
-        schools={schools?.data} 
-        overallLearnerStats={overallLearnerStats}
+        enrollmentData={enrollmentData || []} 
+        schools={schools?.data || []} 
+        overallLearnerStats={overallLearnerStats || []}
       />
       <SchoolsTabs 
         genderData={genderData} 
-        schools={schools?.data} 
-        enrollmentData={enrollmentData} 
-        overallLearnerStats={overallLearnerStats}
+        schools={schools?.data || []} 
+        enrollmentData={enrollmentData || []} 
+        overallLearnerStats={overallLearnerStats || []}
       />
     </div>
   );

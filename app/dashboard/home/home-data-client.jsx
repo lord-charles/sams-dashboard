@@ -48,7 +48,6 @@ const useHomeData = () => {
 
 const HomeDataClient = () => {
   const { data, error, isLoading } = useHomeData();
-
   if (error) {
     return <FetchErrorDisplay error={error} />;
   }
@@ -57,7 +56,7 @@ const HomeDataClient = () => {
     return <Loading />;
   }
 
-  return <Home schoolStats={data.schoolStats} enrollmentData={data.enrollmentData} />;
+  return <Home schoolStats={data.schoolStats === undefined || data.schoolStats === null ? [] : data.schoolStats} enrollmentData={data.enrollmentData === undefined || data.enrollmentData === null ? [] : data.enrollmentData} />;
 };
 
 export default HomeDataClient;
