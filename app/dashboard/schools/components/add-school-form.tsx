@@ -455,11 +455,11 @@ export default function AddSchoolForm({states}: {states: State[]}) {
       })
       form.reset()
       router.back()
-    } catch (error) {
-      console.error("Submission error:", error)
+    } catch (error: any) {
+      console.error("Submission error:", error.response.data)
       toast({
         title: "Error",
-        description: "Failed to submit school data. Please try again.",
+        description: `${error.response?.data?.message} || Failed to submit school data. Please try again.`,
         variant: "destructive",
       })
     } finally {
