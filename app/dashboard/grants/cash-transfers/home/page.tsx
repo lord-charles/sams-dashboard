@@ -6,6 +6,7 @@ import { DashboardHeader } from "../components/dashboard-header";
 import axios from "axios";
 import { base_url } from "@/app/utils/baseUrl";
 import { Metadata } from "next";
+import UnderConstruction from "@/components/under-construction";
 
 export const metadata: Metadata = {
   title: "School Budget Dashboard",
@@ -57,13 +58,13 @@ async function getInitialData(year: number) {
 export default async function DashboardPage({ params }: PageProps) {
   const currentYear = new Date().getFullYear().toString();
   const year = params.year || currentYear;
-  const { states, statCardData, uniqueSchools } = await getInitialData(
-    parseInt(year)
-  );
+  // const { states, statCardData, uniqueSchools } = await getInitialData(
+  //   parseInt(year)
+  // );
 
   return (
     <DashboardProvider initialYear={year} initialSchoolType="PRI">
-      <div className="flex min-h-screen flex-col bg-gradient-to-b from-primary/20 to-background">
+      {/* <div className="flex min-h-screen flex-col bg-gradient-to-b from-primary/20 to-background">
         <div className="flex h-10 items-center px-4">
           <CTBreadcrumb />
         </div>
@@ -75,7 +76,8 @@ export default async function DashboardPage({ params }: PageProps) {
             initialUniqueSchools={uniqueSchools?.data || []}
           />
         </div>
-      </div>
+      </div> */}
+      <UnderConstruction/>
     </DashboardProvider>
   );
 }
