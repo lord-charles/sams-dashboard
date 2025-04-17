@@ -41,7 +41,7 @@ export default function DatabaseConnectionIssue({
           <Alert variant="destructive" className="mb-2">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Connection Error</AlertTitle>
-            <AlertDescription>We're having trouble connecting to our database.</AlertDescription>
+            <AlertDescription>We&apos;re having trouble connecting to our database.</AlertDescription>
           </Alert>
         </CardHeader>
         <CardContent className="space-y-4">
