@@ -311,7 +311,7 @@ export default function UnderConstruction() {
                       <div className="space-y-2">
                         <h3 className="font-semibold">Be the first to know when we launch</h3>
                         <p className="text-sm text-muted-foreground">
-                          We&apos;ll notify you as soon as we're ready. No spam, just important updates.
+                          We&apos;ll notify you as soon as we&lsquo;re ready. No spam, just important updates.
                         </p>
                       </div>
 
