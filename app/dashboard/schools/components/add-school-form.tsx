@@ -443,6 +443,8 @@ export default function AddSchoolForm({states}: {states: State[]}) {
       currentActivities.filter((a) => a !== activity),
     )
   } 
+
+  // Handle submission
   async function onSubmit(data: SchoolFormValues) {
    
     setIsSubmitting(true)
@@ -456,10 +458,9 @@ export default function AddSchoolForm({states}: {states: State[]}) {
       form.reset()
       router.back()
     } catch (error: any) {
-      console.error("Submission error:", error.response.data)
       toast({
         title: "Error",
-        description: `${error.response?.data?.message} || Failed to submit school data. Please try again.`,
+        description: `${error.response?.data?.message || "Failed to submit school data"}`,
         variant: "destructive",
       })
     } finally {
@@ -671,6 +672,8 @@ export default function AddSchoolForm({states}: {states: State[]}) {
                                     <SelectItem value="ECD">ECD</SelectItem>
                                     <SelectItem value="ALP">ALP</SelectItem>
                                     <SelectItem value="ASP">ASP</SelectItem>
+                                    <SelectItem value="TTI">TTI</SelectItem>
+                                    <SelectItem value="CGS">CGS</SelectItem>
                                   </SelectContent>
                                 </Select> 
                                 <FormMessage />

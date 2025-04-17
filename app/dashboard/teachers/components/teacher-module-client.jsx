@@ -15,6 +15,7 @@ import { TeacherBreadcrumb } from "./teacher-breadcrumb";
 import { NoTeachersYet } from "./no-teachers";
 import { Backdrop } from "@mui/material";
 import { useSearchParams } from 'next/navigation';
+import { Spinner } from "@nextui-org/react";
 
 const TeacherModuleClient = ({ initialStates, initialStatistics }) => {
     const searchParams = useSearchParams();
@@ -357,6 +358,12 @@ const TeacherModuleClient = ({ initialStates, initialStatistics }) => {
 
     return (
         <div className="p-4 space-y-6 bg-gradient-to-b from-primary/20 to-background">
+             <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={isLoading}
+      >
+        <Spinner color="primary" size="lg" />
+        </Backdrop>
             <TeacherBreadcrumb />
 
             <div>
@@ -385,7 +392,7 @@ const TeacherModuleClient = ({ initialStates, initialStatistics }) => {
                     )}
                     {selectedPayam && (
                         <ComboboxSelect
-                            options={schools.map(school => ({ value: school.code, label: school.school }))}
+                            options={schools.map(school => ({ value: school.code, label: `${school.school} (${school?.code})` }))}
                             value={selectedSchool}
                             onChange={handleSchoolChange}
                             placeholder="Select School"
@@ -458,12 +465,7 @@ const TeacherModuleClient = ({ initialStates, initialStatistics }) => {
                 )}
             </div>
 
-            <Backdrop open={isLoading} className="bg-black/50">
-                <Button disabled className="bg-white text-blue-600">
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Loading...
-                </Button>
-            </Backdrop>
+    
         </div>
     );
 };

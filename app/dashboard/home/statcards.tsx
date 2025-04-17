@@ -49,7 +49,6 @@ const classroomsData = [
   { state10: "NBG", total: 1840, permanent: 740, temporary: 920, outdoor: 180 },
   { state10: "PAA", total: 240, permanent: 95, temporary: 120, outdoor: 25 },
   { state10: "RAA", total: 320, permanent: 130, temporary: 160, outdoor: 30 },
-  { state10: "State X", total: 5, permanent: 2, temporary: 2, outdoor: 1 },
   { state10: "UNS", total: 1680, permanent: 670, temporary: 840, outdoor: 170 },
   { state10: "UTY", total: 1420, permanent: 570, temporary: 710, outdoor: 140 },
   { state10: "WBG", total: 1560, permanent: 620, temporary: 780, outdoor: 160 },
@@ -67,7 +66,6 @@ const attendanceData = [
   { state10: "NBG", average: 76, male: 78, female: 74 },
   { state10: "PAA", average: 73, male: 75, female: 71 },
   { state10: "RAA", average: 74, male: 76, female: 72 },
-  { state10: "State X", average: 70, male: 72, female: 68 },
   { state10: "UNS", average: 78, male: 80, female: 76 },
   { state10: "UTY", average: 80, male: 82, female: 78 },
   { state10: "WBG", average: 76, male: 78, female: 74 },
@@ -92,7 +90,6 @@ const StatCard = ({ icon, label, value, color = "bg-primary", description = '' }
 )
 
 export default function EducationStatsDashboard({ schoolsData, enrollmentData }: { schoolsData: any; enrollmentData: EnrollmentData[] }) {
-console.log(enrollmentData, "jdhsgvjcbsnbvcdsmhh")
   // Calculate totals
   const calculateLearnerTotals = () => {
     let totalMale = 0;
@@ -137,6 +134,7 @@ console.log(enrollmentData, "jdhsgvjcbsnbvcdsmhh")
     let totalCGS = 0
     let totalALP = 0
     let totalASP = 0
+    let totalTTI = 0
 
     // Ensure schoolsData is an array before processing
     if (Array.isArray(schoolsData)) {
@@ -148,10 +146,11 @@ console.log(enrollmentData, "jdhsgvjcbsnbvcdsmhh")
         totalCGS += state?.CGS || 0
         totalALP += state?.ALP || 0
         totalASP += state?.ASP || 0
+        totalTTI += state?.TTI || 0
       }
     }
 
-    const totalSchools = totalPrimary + totalSecondary + totalECD + totalCGS + totalALP + totalASP
+    const totalSchools = totalPrimary + totalSecondary + totalECD + totalCGS + totalALP + totalASP + totalTTI
 
     return {
       totalSchools,
@@ -161,6 +160,7 @@ console.log(enrollmentData, "jdhsgvjcbsnbvcdsmhh")
       totalCGS,
       totalALP,
       totalASP,
+      totalTTI
     }
   }
 

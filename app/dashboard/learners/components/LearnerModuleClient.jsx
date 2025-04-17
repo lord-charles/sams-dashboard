@@ -22,6 +22,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { Spinner } from "@nextui-org/react";
 
 
 const currentYear = new Date().getFullYear();
@@ -391,7 +392,13 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
     }
 
     return (
-        <div className="p-4 space-y-6 bg-gradient-to-b from-primary/20 to-background">
+        <div className="p-4 space-y-0 bg-gradient-to-b from-primary/20 to-background">
+            <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={isLoading}
+      >
+        <Spinner color="primary" size="lg" />
+        </Backdrop>
             <div className="flex items-center justify-between">
 
                 <LearnerBreadcrumb />
@@ -430,7 +437,7 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
             </div>
 
             <div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
                     <ComboboxSelect
                         options={states.map(state => ({ value: state.state, label: state.state }))}
                         value={selectedState}
@@ -532,13 +539,7 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
 
             </div>
 
-
-            <Backdrop open={isLoading} className="bg-black/50">
-                <Button disabled className="bg-white text-blue-600">
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Loading...
-                </Button>
-            </Backdrop>
+            
         </div>
     );
 };

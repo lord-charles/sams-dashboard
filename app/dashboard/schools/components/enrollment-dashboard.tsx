@@ -71,7 +71,7 @@ type OverallLearnerStats = {
 }
 
 
-export default function EnrollmentDashboard({enrollmentData,overallLearnerStats}: {enrollmentData: any, overallLearnerStats: OverallLearnerStats}) {
+export default function EnrollmentDashboard({enrollmentData,overallLearnerStats,schoolsData}: {enrollmentData: any, overallLearnerStats: OverallLearnerStats, schoolsData: any}) {
   const [sortConfig, setSortConfig] = useState({ key: "totalPupils", direction: "desc" })
   const [activeIndex, setActiveIndex] = useState(0)
   const [expandedState, setExpandedState] = useState(null)
@@ -80,8 +80,6 @@ export default function EnrollmentDashboard({enrollmentData,overallLearnerStats}
   const [comparisonSubTab, setComparisonSubTab] = useState("stateComparison")
   const [showTrends, setShowTrends] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-
-
 
 // Calculate totals
 const calculateTotals = () => {
@@ -319,7 +317,7 @@ const renderActiveShape = (props:any) => {
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                       <div>
-                        <h2 className="text-2xl font-bold">Total Enrollment</h2>
+                        <h2 className="text-2xl font-bold">{new Date().getFullYear()} Enrollment Projection</h2>
                         <motion.p
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}

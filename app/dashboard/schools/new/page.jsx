@@ -3,10 +3,6 @@ import axios from "axios";
 import { base_url } from "@/app/utils/baseUrl";
 import AddSchoolForm from "../components/add-school-form";
 
-// Disable caching for this page
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 const page = async () => {
   const fetchData = async () => {
     try {

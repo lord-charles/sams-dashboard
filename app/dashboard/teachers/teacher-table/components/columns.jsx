@@ -47,7 +47,7 @@ export const columns = [
   {
     accessorKey: "state10",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="State10" />
+      <DataTableColumnHeader column={column} title="State" />
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
@@ -60,7 +60,7 @@ export const columns = [
   {
     accessorKey: "county28",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="County28" />
+      <DataTableColumnHeader column={column} title="County" />
     ),
     cell: ({ row }) => <div>{row.getValue("county28")}</div>,
   },

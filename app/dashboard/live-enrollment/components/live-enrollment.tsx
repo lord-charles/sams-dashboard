@@ -342,7 +342,7 @@ const LiveEnrollmentModule = ({ initialStates,
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
                     <StatCard
-                        title="Total Enrolled Learners"
+                        title={`Learner Projection ${currentYear}`}
                         total={statistics.totalLearners.total}
                         current={statistics.totalLearners.current}
                         icon={<Users className="h-8 w-8 text-blue-500" />}
@@ -360,7 +360,7 @@ const LiveEnrollmentModule = ({ initialStates,
                         icon={<UserMinus className="h-8 w-8 text-yellow-500" />}
                     />
                     <StatCard
-                        title="New Learners"
+                        title={`New Learners ${currentYear}`}
                         total={statistics.newLearners.total}
                         current={statistics.newLearners.current}
                         icon={<UserPlus className="h-8 w-8 text-purple-500" />}

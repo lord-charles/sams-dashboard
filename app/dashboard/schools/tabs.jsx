@@ -54,7 +54,8 @@ const SchoolsTabs = ({ genderData, schools, enrollmentData,overallLearnerStats }
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value="overview" className="space-y-4">
-                    <EnrollmentDashboard enrollmentData={genderData} overallLearnerStats={overallLearnerStats} />
+                    <EnrollmentDashboard enrollmentData={genderData} overallLearnerStats={overallLearnerStats} 
+                    schoolsData={enrollmentData}/>
                 </TabsContent>
                 <TabsContent value="schools" className="space-y-4">
                     <SchoolsTable schools={schools} />

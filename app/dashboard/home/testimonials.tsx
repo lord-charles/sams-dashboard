@@ -13,6 +13,7 @@ export default function Testimonials({ schoolsData }: { schoolsData: any }) {
     let totalCGS = 0
     let totalALP = 0
     let totalASP = 0
+    let totalTTI = 0
 
     schoolsData.forEach((state: any) => {
       totalPrimary += state.PRI
@@ -21,9 +22,10 @@ export default function Testimonials({ schoolsData }: { schoolsData: any }) {
       totalCGS += state.CGS
       totalALP += state.ALP
       totalASP += state.ASP
+      totalTTI += state.TTI
     })
 
-    const totalSchools = totalPrimary + totalSecondary + totalECD + totalCGS + totalALP + totalASP
+    const totalSchools = totalPrimary + totalSecondary + totalECD + totalCGS + totalALP + totalASP + totalTTI
 
     return {
       totalSchools,
@@ -33,6 +35,7 @@ export default function Testimonials({ schoolsData }: { schoolsData: any }) {
       totalCGS,
       totalALP,
       totalASP,
+      totalTTI
     }
   }
   

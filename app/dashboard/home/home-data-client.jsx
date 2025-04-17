@@ -6,6 +6,7 @@ import { apiEndpoints } from '@/lib/services/api.service';
 import { FetchErrorDisplay } from '@/components/fetch-error-display';
 import Loading from '../loading';
 import Home from './home';
+import DatabaseConnectionIssue from '../schools/components/DatabaseConnectionIssue';
 
 const useHomeData = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -54,6 +55,19 @@ const HomeDataClient = () => {
 
   if (isLoading) {
     return <Loading />;
+  }
+
+  // DB connection error check
+  const isDbConnectionIssue = [data.schoolStats, data.enrollmentData].some(
+    (d) =>
+      d &&
+      typeof d === 'object' &&
+      d.error &&
+      typeof d.error === 'string' &&
+      d.error.includes('ECONNREFUSED')
+  );
+  if (isDbConnectionIssue) {
+    return <DatabaseConnectionIssue />;
   }
 
   return <Home schoolStats={data.schoolStats === undefined || data.schoolStats === null ? [] : data.schoolStats} enrollmentData={data.enrollmentData === undefined || data.enrollmentData === null ? [] : data.enrollmentData} />;

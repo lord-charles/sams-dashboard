@@ -2,7 +2,16 @@
 
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { ChevronLeft, Download, File, Share, Sheet } from "lucide-react";
+import {
+  AlertTriangle,
+  Check,
+  ChevronLeft,
+  ChevronsUpDown,
+  Download,
+  File,
+  Share,
+  Sheet as SheetIcon,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -21,11 +30,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BreadcrumbItem, Breadcrumbs, DatePicker, Radio, RadioGroup, Spinner } from "@nextui-org/react";
-import { useState } from "react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { BreadcrumbItem, Breadcrumbs, Spinner } from "@nextui-org/react";
+import React, { useState } from "react";
 import { CountryDropdown } from "react-country-region-selector";
 import { Button } from "@/components/ui/button";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import EducationLevelSelect from "./EducationLevelSelect";
 import LearnerDifficulty from "./learner-difficulty";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,6 +45,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Backdrop } from "@mui/material";
 import { saveAs } from "file-saver";
 import json2csv from "json2csv";
+
 
 import {
   DropdownMenu,
@@ -46,8 +57,24 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { format } from "date-fns";
 
-const UpdateLearnerComponent = ({ learner }) => {
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
+
+
+const UpdateLearnerComponent = ({ learner, states }) => {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -76,11 +103,27 @@ const UpdateLearnerComponent = ({ learner }) => {
   const [femaleWithDisability, setFemaleWithDisability] = useState(learner?.houseHold[0]?.femaleWithDisability);
   const [moreInformation, setMoreInformation] = useState(learner?.pregnantOrNursing?.moredetails);
   const [selectedStatus, setSelectedStatus] = useState('');
-  const [dropout, setDropout] = useState(learner?.isDroppedOut ? 'Yes' : 'No');
-  const [promoted, setPromoted] = useState(learner?.isPromoted ? 'Yes' : 'No');
+
+  const [eieStatus, setEieStatus] = useState(learner?.eieStatus || '');
 
   const [isLoading, setIsloading] = useState(false);
 
+  const getLatestStatus = (progress, statusType) => {
+    if (!progress || progress.length === 0) return "No";
+
+    // Sort progress by createdAt in descending order
+    const sortedProgress = [...progress].sort((a, b) => {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
+    // Find the latest entry with the specified status
+    const latestEntry = sortedProgress.find(entry => entry.status === statusType);
+    return latestEntry ? "Yes" : "No";
+  };
+  const [repeated, setRepeated] = useState(getLatestStatus(learner?.progress, "Repeated"));
+
+  const [dropout, setDropout] = useState(learner?.isDroppedOut ? 'Yes' : 'No');
+  const [promoted, setPromoted] = useState(getLatestStatus(learner?.progress, "Promoted"));
 
   const submitStudentData = {
     year: learner?.year,
@@ -111,7 +154,7 @@ const UpdateLearnerComponent = ({ learner }) => {
       },
     ],
     isPromoted: promoted === "Yes" ? true : false,
-    isDroppedOut: false,
+    isDroppedOut: dropout === "Yes" ? true : false,
     houseHold: [
       {
         guardianPhone: phoneNumber,
@@ -129,9 +172,9 @@ const UpdateLearnerComponent = ({ learner }) => {
       nursing: selectedStatus === "nursing" ? true : false,
       moredetails: moreInformation,
     },
+    eieStatus: eieStatus,
     // modifiedBy: loggedInUser,
   };
-
 
 
   const updateLearner = async () => {
@@ -363,6 +406,23 @@ const UpdateLearnerComponent = ({ learner }) => {
       },
     });
 
+    // EiE Status Information Header
+    doc.setFontSize(sectionFontSize);
+    doc.text("EiE Status", margin, finalY + sectionYOffset + 30);
+
+    // EiE Status Table
+    autoTable(doc, {
+      startY: finalY + sectionYOffset + sectionFontSize + 30,
+      head: [["Field", "Details"]],
+      body: [
+        ["EiE Status", submitStudentData.eieStatus],
+      ],
+      styles: {
+        fontSize: 10,
+        cellPadding: 5,
+      },
+    });
+
     // Footer
     doc.setFontSize(10);
     doc.text(
@@ -400,8 +460,315 @@ const UpdateLearnerComponent = ({ learner }) => {
     }
   };
 
+  const handleStatusUpdate = async (status, value) => {
+    if (isLoading) return;
+    setIsloading(true);
+
+    try {
+      const currentYear = new Date().getFullYear();
+      const currentDate = new Date();
+
+      // Create academic history entry
+      const historyEntry = {
+        year: currentYear,
+        status: {
+          promoted: false,
+          droppedOut: false,
+          repeated: false,
+          absentDuringEnrolment: false,
+        },
+        date: currentDate,
+      };
+
+      let progressEntry = {
+        year: currentYear,
+        educationLevel: learner?.education || '',
+        code: learner?.code || '',
+        school: learner?.school || '',
+        reference: learner?.reference || '',
+        learnerUniqueID: learner?.learnerUniqueID || '',
+        status: 'Enrolled',
+        remarks: 'status updated',
+        isAwaitingTransition: false,
+      };
+      let isDroppedOut = false;
+
+      if (value === 'Yes') {
+        if (status === 'promoted') {
+          historyEntry.status.promoted = true;
+          progressEntry.status = 'Promoted';
+          progressEntry.remarks = 'Learner promoted to next grade';
+        } else if (status === 'repeated') {
+          historyEntry.status.repeated = true;
+          progressEntry.status = 'Repeated';
+          progressEntry.remarks = 'Learner to repeat current grade';
+        } else if (status === 'dropout') {
+          historyEntry.status.droppedOut = true;
+          progressEntry.status = 'DroppedOut';
+          isDroppedOut = true;
+          progressEntry.remarks = 'Learner dropped out';
+        }
+      } else if (value === 'No' && status === 'promoted') {
+        progressEntry.status = 'Demoted';
+        progressEntry.remarks = 'Learner demoted to previous grade';
+      }
+
+      const submitData = {
+        ids: [learner._id],
+        updateFields: {
+          academicHistory: historyEntry,
+          progress: progressEntry,
+          isDroppedOut,
+        },
+      };
+
+      const response = await axios.patch(
+        `${base_url}data-set/2023_data/update/bulk`,
+        submitData,
+      );
+
+      toast({
+        title: "Success",
+        description: `Learner status has been updated to ${progressEntry.status}`,
+      });
+
+      router.refresh();
+    } catch (error) {
+      console.log(error.response?.data);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.response?.data?.message || 'Failed to update status',
+      });
+    } finally {
+      setIsloading(false);
+    }
+  };
+
+  const [transferData, setTransferData] = useState({
+    sourceSchool: learner?.school || '',
+    sourceCode: learner?.code || '',
+    destinationSchool: '',
+    destinationCode: '',
+    reason: '',
+    state: '',
+    county: '',
+    payam: '',
+    currentGrade: learner?.class || '',
+
+  });
+
+  const [counties, setCounties] = useState([]);
+  const [payams, setPayams] = useState([]);
+  const [schools, setSchools] = useState([]);
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedCounty, setSelectedCounty] = useState("");
+  const [selectedPayam, setSelectedPayam] = useState("");
+  const [selectedSchool, setSelectedSchool] = useState("");
+
+
+  // Fetch counties when state is selected
+  const handleStateChange = async (value) => {
+    setSelectedState(value);
+    setSelectedCounty("");
+    setSelectedPayam("");
+    setSelectedSchool("");
+    setTransferData(prev => ({ ...prev, state: value }));
+
+    try {
+      setIsloading(true);
+      const response = await axios.post(`${base_url}data-set/get/2023_data/county`, { state: value });
+      setCounties(response.data);
+    } catch (error) {
+      console.error("Error fetching counties:", error);
+    }
+    finally {
+      setIsloading(false);
+    }
+  };
+
+  // Fetch payams when county is selected
+  const handleCountyChange = async (value) => {
+    setSelectedCounty(value);
+    setSelectedPayam("");
+    setSelectedSchool("");
+    setTransferData(prev => ({ ...prev, county: value }));
+
+    try {
+      setIsloading(true);
+      const response = await axios.post(`${base_url}data-set/get/2023_data/county/payam`, { county28: value });
+      setPayams(response.data);
+    } catch (error) {
+      console.error("Error fetching payams:", error);
+    }
+    finally {
+      setIsloading(false);
+    }
+  };
+
+  // Fetch schools when payam is selected
+  const handlePayamChange = async (value) => {
+    setSelectedPayam(value);
+    setSelectedSchool("");
+    setTransferData(prev => ({ ...prev, payam: value }));
+
+    try {
+      setIsloading(true);
+
+      const response = await axios.post(`${base_url}data-set/get/2023_data/county/payam/schools`, { payam28: value });
+      setSchools(response.data);
+    } catch (error) {
+      console.error("Error fetching schools:", error);
+    }
+    finally {
+      setIsloading(false);
+    }
+  };
+
+  // Update transfer data when school is selected
+  const handleSchoolChange = (value) => {
+    setSelectedSchool(value);
+    const selectedSchoolData = schools.find(school => school.code === value);
+    if (selectedSchoolData) {
+      setTransferData(prev => ({
+        ...prev,
+        destinationSchool: selectedSchoolData.school,
+        destinationCode: selectedSchoolData.code
+      }));
+    }
+  };
+
+  const handleTransfer = async () => {
+    try {
+      // Validate required fields
+      const requiredFields = [
+        'destinationSchool',
+        'destinationCode',
+        'reason',
+        'state',
+        'county',
+        'payam',
+        'currentGrade'
+      ];
+
+      const missingFields = requiredFields.filter(field => !transferData[field]);
+
+      if (missingFields.length > 0) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: `Please fill in all required fields: ${missingFields.join(', ')}`,
+        });
+        return;
+      }
+
+      setIsloading(true);
+      const response = await axios.patch(
+        `${base_url}data-set/2023_data/update/bulk`,
+        {
+          ids: [learner._id],
+          updateFields: {
+            progress: {
+              status: "Transferred",
+              year: new Date().getFullYear(),
+              educationLevel: learner?.education || '',
+              code: learner?.code || '',
+              school: learner?.school || '',
+              "reference": learner?.reference || '',
+              "learnerUniqueID": learner?.learnerUniqueID || '',
+            },
+            transfer: transferData
+          },
+        }
+      );
+
+      toast({
+        title: "Success",
+        description: "Learner transferred successfully",
+      });
+      setTransferData({
+        sourceSchool: '',
+        sourceCode: '',
+        destinationSchool: '',
+        destinationCode: '',
+        reason: '',
+        state: '',
+        county: '',
+        payam: '',
+        currentGrade: '',
+      })
+      setCounties([])
+      setPayams([])
+      setSchools([])
+      setSelectedState('')
+      setSelectedCounty('')
+      setSelectedPayam('')
+      setSelectedSchool('')
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.response?.data?.message || "Failed to transfer learner",
+      });
+    } finally {
+      setIsloading(false);
+    }
+  };
+
+  const ComboboxSelect = ({ options, value, onChange, placeholder }) => {
+    const [open, setOpen] = React.useState(false)
+
+    return (
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between bg-white dark:bg-gray-800"
+          >
+            {value
+              ? options.find((option) => option.value === value)?.label
+              : placeholder}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0">
+          <Command>
+            <CommandInput placeholder={`Search ${placeholder.toLowerCase()}...`} />
+            <CommandList>
+              <CommandEmpty>No {placeholder.toLowerCase()} found.</CommandEmpty>
+              <CommandGroup>
+                {options.map((option) => (
+                  <CommandItem
+                    key={option.value}
+                    value={option.value}
+                    onSelect={(currentValue) => {
+                      onChange(currentValue === value ? "" : currentValue)
+                      setOpen(false)
+                    }}
+                  >
+                    {option.label}
+                    <Check
+                      className={cn(
+                        "ml-auto h-4 w-4",
+                        value === option.value ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    )
+  }
+
   return (
-    <div className="p-6 flex min-h-screen w-screen bg-card  flex-col md:w-[87%] lg:w-full md:ml-[80px] lg:ml-0 sm:ml-0 overflow-x-hidden rounded-md ">
+    <div className="p-6 flex min-h-screen w-screen bg-gradient-to-b from-primary/20 to-background flex-col md:w-[87%] lg:w-full md:ml-[80px] lg:ml-0 sm:ml-0 overflow-x-hidden rounded-md ">
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={isLoading}
@@ -409,11 +776,19 @@ const UpdateLearnerComponent = ({ learner }) => {
         <Spinner color="primary" size="lg" />
       </Backdrop>
 
-      <Breadcrumbs size='lg'>
-        <BreadcrumbItem href="/dashboard">Dashboard</BreadcrumbItem>
-        <BreadcrumbItem href="/dashboard/learners">Learners</BreadcrumbItem>
-        <BreadcrumbItem>{learner?.firstName} {learner?.lastName}</BreadcrumbItem>
-      </Breadcrumbs>
+      <div >
+        <Breadcrumbs size='lg'>
+          <BreadcrumbItem href="/dashboard">Dashboard</BreadcrumbItem>
+          <BreadcrumbItem href="/dashboard/learners">Learners</BreadcrumbItem>
+          <BreadcrumbItem href="/dashboard/learners"> {learner?.school} (
+            {learner?.code}
+
+            )</BreadcrumbItem>
+
+          <BreadcrumbItem>{learner?.firstName} {learner?.lastName}</BreadcrumbItem>
+        </Breadcrumbs>
+
+      </div>
 
       {/* section1  */}
 
@@ -443,13 +818,134 @@ const UpdateLearnerComponent = ({ learner }) => {
                 </span>
               </Button>
             </DropdownMenuTrigger>
-            <Button variant="outline"
-              className="gap-x-[2.3px] hidden lg:flex">
-              <Share className="h-4 w-4" />
-              <span className="text-sm leading-5 text-[#0F3659] dark:text-gray-400">
-                Transfer
-              </span>
-            </Button>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" className="gap-x-2 hidden lg:flex items-center text-primary hover:bg-primary/10 transition-colors">
+                  <Share className="h-4 w-4" />
+                  <span className="text-sm font-medium">Transfer</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="sm:max-w-md">
+                <SheetHeader className="space-y-2 mb-6">
+                  <SheetTitle className="text-2xl font-bold text-primary">Transfer Learner</SheetTitle>
+                  <SheetDescription className="text-muted-foreground">
+                    Transfer a learner to a different educational institution
+                  </SheetDescription>
+                </SheetHeader>
+                <Separator className="my-4" />
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">Current School</Label>
+                    <Input
+                      value={transferData.sourceSchool}
+                      disabled
+                      className="bg-muted"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">Current School Code</Label>
+                    <Input
+                      value={transferData.sourceCode}
+                      disabled
+                      className="bg-muted"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">Select New State</Label>
+                    <ComboboxSelect
+                      options={states.map(state => ({ value: state.state, label: state.state }))}
+                      value={selectedState}
+                      onChange={handleStateChange}
+                      placeholder="Select State"
+                      className="w-full"
+                    />
+                  </div>
+                  {selectedState && (
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-muted-foreground">Select New County</Label>
+                      <ComboboxSelect
+                        options={counties.map(county => ({ value: county._id, label: county._id }))}
+                        value={selectedCounty}
+                        onChange={handleCountyChange}
+                        placeholder="Select County"
+                        className="w-full"
+                      />
+                    </div>
+                  )}
+                  {selectedCounty && (
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-muted-foreground">Select New Payam</Label>
+                      <ComboboxSelect
+                        options={payams.map(payam => ({ value: payam._id, label: payam._id }))}
+                        value={selectedPayam}
+                        onChange={handlePayamChange}
+                        placeholder="Select Payam"
+                        className="w-full"
+                      />
+                    </div>
+                  )}
+                  {selectedPayam && (
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-muted-foreground">Select New School</Label>
+                      <ComboboxSelect
+                        options={schools.map(school => ({ value: school.code, label: `${school.school} (${school.code})` }))}
+                        value={selectedSchool}
+                        onChange={handleSchoolChange}
+                        placeholder="Select School"
+                        className="w-full"
+                      />
+                    </div>
+                  )}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-muted-foreground">Transfer Justification</Label>
+                    <Textarea
+                      value={transferData.reason}
+                      onChange={(e) =>
+                        setTransferData((prev) => ({
+                          ...prev,
+                          reason: e.target.value,
+                        }))
+                      }
+                      placeholder="Please provide the reason for this transfer request"
+                      className="min-h-[100px] resize-none"
+                    />
+                  </div>
+                  <Button
+                    onClick={handleTransfer}
+                    disabled={isLoading}
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground transition-colors"
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center justify-center space-x-2">
+                        <Spinner className="h-4 w-4 animate-spin" />
+                        <span>Processing...</span>
+                      </div>
+                    ) : (
+                      "Transfer Learner"
+                    )}
+                  </Button>
+
+                  {!transferData.sourceSchool && (
+                    <div className="mt-6">
+                      <Alert variant="destructive" className="bg-destructive/10 text-destructive">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle className="font-semibold">Source School Data Missing</AlertTitle>
+                        <AlertDescription className="mt-2">
+                          Unable to load source school information. Please reload the page to continue with the transfer.
+                        </AlertDescription>
+                        <Button
+                          variant="outline"
+                          className="mt-4 w-full border-destructive text-destructive hover:bg-destructive/10"
+                          onClick={() => window.location.reload()}
+                        >
+                          Reload Page
+                        </Button>
+                      </Alert>
+                    </div>
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
             <DropdownMenuContent className="w-56">
               <DropdownMenuLabel>Export Options</DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -457,7 +953,7 @@ const UpdateLearnerComponent = ({ learner }) => {
                 <DropdownMenuItem
                   onClick={() => downloadCSV(submitStudentData)}
                 >
-                  <Sheet className="mr-2 h-4 w-4" />
+                  <SheetIcon className="mr-2 h-4 w-4" />
 
                   <span>CSV</span>
                   <DropdownMenuShortcut>⌘C</DropdownMenuShortcut>
@@ -486,7 +982,7 @@ const UpdateLearnerComponent = ({ learner }) => {
 
       {/* section2   */}
       <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-3 lg:gap-8">
-        <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-6">
+        <div className="grid auto-rows-max items-start gap-3 lg:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle>Learner Information</CardTitle>
@@ -531,12 +1027,25 @@ const UpdateLearnerComponent = ({ learner }) => {
                 </div>
                 <div className="grid lg:grid-cols-3 sm:grid-cols-1 gap-2">
                   <div className="space-y-2">
-                    <Label htmlFor="dob">Date of Birth</Label>
-                    <DatePicker
-                      className="max-w-[284px]"
-                      variant="underlined"
-                      onChange={(date) => setDob(date?.toString())}
-                    />
+                    <div>
+                      <Label htmlFor="dob">Date of Birth</Label>
+
+                      <input
+                        type="date"
+                        value={dob}
+                        max={format(
+                          new Date(new Date().setFullYear(new Date().getFullYear() - 2)),
+                          'yyyy-MM-dd'
+                        )}
+                        onChange={(e) => {
+                          const date = new Date(e.target.value);
+                          setDob(format(date, 'dd/MM/yyyy'));
+                        }}
+                      />
+                      <div className="mt-2 text-sm text-gray-500 border border-gray-300 p-2 rounded-md ">
+                        {dob ? dob : 'DD/MM/YYYY'}
+                      </div>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="gender">Gender</Label>
@@ -554,22 +1063,22 @@ const UpdateLearnerComponent = ({ learner }) => {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="school">School</Label>
+                    <Label htmlFor="reference">Reference</Label>
                     <Input
-                      id="school"
+                      id="reference"
                       type="text"
                       className="w-full"
-                      value={learner?.school?.toString()}
+                      value={learner?.reference?.toString()}
                       disabled
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="school-code">School Code</Label>
+                    <Label htmlFor="learner-id">Learner Unique Id</Label>
                     <Input
-                      id="school-code"
+                      id="learner-id"
                       type="text"
                       className="w-full"
-                      value={learner?.code?.toString()}
+                      value={learner?.learnerUniqueID?.toString() || "Not assigned"}
                       disabled
                     />
                   </div>
@@ -596,47 +1105,30 @@ const UpdateLearnerComponent = ({ learner }) => {
             </CardContent>
           </Card>
 
-          {/* Learner Location Information */}
+
+
           <Card>
             <CardHeader>
-              <CardTitle>Learner Location Information</CardTitle>
-              <CardDescription>Learner Location Information</CardDescription>
+              <CardTitle>Learner Disability Information</CardTitle>
+              <CardDescription>
+                Learner&apos;s Functional Difficulties Characteristics
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4">
-                <div className="grid lg:grid-cols-3 sm:grid-cols-1 gap-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="state">State</Label>
-                    <Input
-                      id="state"
-                      type="text"
-                      className="w-full"
-                      value={learner?.state10?.toString()}
-                      disabled
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="payam">Payam</Label>
-                    <Input
-                      id="payam"
-                      type="text"
-                      className="w-full"
-                      value={learner?.payam28?.toString()}
-                      disabled
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="county">County</Label>
-                    <Input
-                      id="county"
-                      type="text"
-                      className="w-full"
-                      value={learner?.county28?.toString()}
-                      disabled
-                    />
-                  </div>
-                </div>
-              </div>
+              <LearnerDifficulty
+                difficultySeeing={difficultySeeing}
+                setDifficultySeeing={setDifficultySeeing}
+                difficultyHearing={difficultyHearing}
+                setDifficultyHearing={setDifficultyHearing}
+                difficultyTalking={difficultyTalking}
+                setDifficultyTalking={setDifficultyTalking}
+                difficultySelfCare={difficultySelfCare}
+                setDifficultySelfCare={setDifficultySelfCare}
+                difficultyWalking={difficultyWalking}
+                setDifficultyWalking={setDifficultyWalking}
+                difficultyRecalling={difficultyRecalling}
+                setDifficultyRecalling={setDifficultyRecalling}
+              />
             </CardContent>
           </Card>
 
@@ -719,82 +1211,171 @@ const UpdateLearnerComponent = ({ learner }) => {
               </div>
             </CardContent>
           </Card>
+
+          <div className="grid md:grid-cols-2 grid-cols-1 gap-4">
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Pregnant/Nursing Information</CardTitle>
+                <CardDescription>
+                  Is learner Pregnant or Nursing (Optional)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid lg:grid-cols-4 sm:grid-cols-1 gap-2 place-items-center">
+                  <div className="space-y-2 col-span-3 w-full">
+                    <Textarea
+                      placeholder="Type more information."
+                      value={moreInformation}
+                      onChange={(e) => setMoreInformation(e.target.value)}
+                      disabled={gender === "M"}
+                    />
+                  </div>
+                  <div className="w-full">
+                    <RadioGroup
+                      value={selectedStatus}
+                      onValueChange={setSelectedStatus}
+                      disabled={gender === "M"}
+                      className="flex flex-col space-y-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="pregnant" id="pregnant" />
+                        <Label htmlFor="pregnant" className="font-normal">
+                          Pregnant
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="nursing" id="nursing" />
+                        <Label htmlFor="nursing" className="font-normal">
+                          Nursing
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Parent/Guardian Information</CardTitle>
+                <CardDescription>
+                  Details about the parent/guardian.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4">
+                  <div className="grid lg:grid-cols-2 sm:grid-cols-1 gap-2">
+                    <div className="flex flex-col gap-3">
+                      <Label htmlFor="country">Country</Label>
+
+                      <CountryDropdown
+                        value={country}
+                        onChange={(val) => setCountry(val)}
+                        className="bg-card  rounded-md p-2 w-full md:w-full border border-border"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <Label htmlFor="phone number">Phone Number</Label>
+                      <Input
+                        id="phone number"
+                        type="number"
+                        className="w-full"
+                        value={phoneNumber?.toString()}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         <div className="grid auto-rows-max items-start gap-4">
+          {/* Learner Location Information */}
           <Card>
             <CardHeader>
-              <CardTitle>Learner Disability Information</CardTitle>
-              <CardDescription>
-                Learner&apos;s Functional Difficulties Characteristics
-              </CardDescription>
+              <CardTitle>Learner Location Information</CardTitle>
+              <CardDescription>Learner Location Information</CardDescription>
             </CardHeader>
             <CardContent>
-              <LearnerDifficulty
-                difficultySeeing={difficultySeeing}
-                setDifficultySeeing={setDifficultySeeing}
-                difficultyHearing={difficultyHearing}
-                setDifficultyHearing={setDifficultyHearing}
-                difficultyTalking={difficultyTalking}
-                setDifficultyTalking={setDifficultyTalking}
-                difficultySelfCare={difficultySelfCare}
-                setDifficultySelfCare={setDifficultySelfCare}
-                difficultyWalking={difficultyWalking}
-                setDifficultyWalking={setDifficultyWalking}
-                difficultyRecalling={difficultyRecalling}
-                setDifficultyRecalling={setDifficultyRecalling}
-              />
-            </CardContent>
-          </Card>
+              <div className="grid gap-4">
+                <div className="grid lg:grid-cols-3 sm:grid-cols-1 gap-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="state">State</Label>
+                    <Input
+                      id="state"
+                      type="text"
+                      className="w-full"
+                      value={learner?.state10?.toString()}
+                      disabled
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="payam">Payam</Label>
+                    <Input
+                      id="payam"
+                      type="text"
+                      className="w-full"
+                      value={learner?.payam28?.toString()}
+                      disabled
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="county">County</Label>
+                    <Input
+                      id="county"
+                      type="text"
+                      className="w-full"
+                      value={learner?.county28?.toString()}
+                      disabled
+                    />
+                  </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Pregnant/Nursing Information</CardTitle>
-              <CardDescription>
-                Is learner Pregnant or Nursing (Optional)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid lg:grid-cols-4 sm:grid-cols-1 gap-2 place-items-center">
-                <div className="space-y-2 col-span-3 w-full">
-                  <Textarea
-                    placeholder="Type more information."
-                    value={moreInformation}
-                    onChange={(e) => setMoreInformation(e.target.value)}
-                    disabled={gender === "M" ? true : false}
-                  />
                 </div>
-                <div>
-                  <RadioGroup
-                    value={selectedStatus}
-                    onChange={(value) => setSelectedStatus(value.target.value)}
-                    color="primary"
-                    isDisabled={gender === "M" ? true : false}
-                  >
-                    <Radio value="pregnant">Pregnant</Radio>
-                    <Radio value="nursing">Nursing</Radio>
-                  </RadioGroup>
+                <div className="grid lg:grid-cols-2 sm:grid-cols-1 gap-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="School">School</Label>
+                    <Input
+                      id="School"
+                      type="text"
+                      className="w-full"
+                      value={learner?.school?.toString()}
+                      disabled
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="code">Code</Label>
+                    <Input
+                      id="code"
+                      type="text"
+                      className="w-full"
+                      value={learner?.code?.toString()}
+                      disabled
+                    />
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
+
           {/* droppout | promote  */}
           <Card>
             <CardHeader>
-              <CardTitle>Dropout | Promotion Information</CardTitle>
+              <CardTitle>Dropout | Promotion | Repeat Info</CardTitle>
               <CardDescription>
                 Details about the learner enrollment status.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4">
-                <div className="grid lg:grid-cols-2 sm:grid-cols-1 gap-2">
+                <div className="grid lg:grid-cols-3 sm:grid-cols-1 gap-3">
                   <div className="flex flex-col gap-3">
                     <Label htmlFor="dropout">Dropout</Label>
 
                     <Select onValueChange={(value) => setDropout(value)}>
-                      <SelectTrigger className="w-[180px]">
+                      <SelectTrigger className="w-[140px]" disabled={isLoading}>
                         <SelectValue placeholder={`${dropout}`} />
                       </SelectTrigger>
                       <SelectContent>
@@ -807,61 +1388,71 @@ const UpdateLearnerComponent = ({ learner }) => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex flex-col gap-3">
-                    <Label htmlFor="promotion">Promoted</Label>
-
-                    <Select onValueChange={(value) => setPromoted(value)}>
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder={`${promoted}`} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Promoted</SelectLabel>
-                          <SelectItem value="Yes" >Yes</SelectItem>
-                          <SelectItem value="No">No</SelectItem>
-
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </div>
+              
+                 
                 </div>
               </div>
             </CardContent>
+
           </Card>
 
+          {/* iee */}
           <Card>
             <CardHeader>
-              <CardTitle>Parent/Guardian Information</CardTitle>
-              <CardDescription>
-                Details about the parent/guardian.
-              </CardDescription>
+              <CardTitle>EiE Status</CardTitle>
+              <CardDescription>Emergency in Education Status</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4">
-                <div className="grid lg:grid-cols-2 sm:grid-cols-1 gap-2">
-                  <div className="flex flex-col gap-3">
-                    <Label htmlFor="country">Country</Label>
-
-                    <CountryDropdown
-                      value={country}
-                      onChange={(val) => setCountry(val)}
-                      className="bg-card  rounded-md p-2 w-full md:w-full border border-border"
-                    />
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Label className="text-base font-semibold">EiE Status</Label>
+                    <span className="text-sm text-muted-foreground">(required)</span>
                   </div>
-                  <div className="flex flex-col gap-3">
-                    <Label htmlFor="phone number">Phone Number</Label>
-                    <Input
-                      id="phone number"
-                      type="number"
-                      className="w-full"
-                      value={phoneNumber?.toString()}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                    />
-                  </div>
+                  <RadioGroup
+                    value={eieStatus}
+                    onValueChange={setEieStatus}
+                    className="grid grid-cols-2 gap-4 pt-2"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Host Community" id="host" />
+                      <Label htmlFor="host" className="font-normal">
+                        Host Community
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="IDP" id="idp" />
+                      <Label htmlFor="idp" className="font-normal">
+                        IDP
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Refugee" id="refugee" />
+                      <Label htmlFor="refugee" className="font-normal">
+                        Refugee
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Returnee" id="returnee" />
+                      <Label htmlFor="returnee" className="font-normal">
+                        Returnee
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="Foreign resident" id="foreign" />
+                      <Label htmlFor="foreign" className="font-normal">
+                        Foreign resident
+                      </Label>
+                    </div>
+                  </RadioGroup>
                 </div>
               </div>
             </CardContent>
           </Card>
+
+
+
+
         </div>
       </div>
 

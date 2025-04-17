@@ -6,6 +6,7 @@ import SchoolsTabs from "./tabs";
 import { base_url } from "@/app/utils/baseUrl";
 import { SchoolBreadcrumb } from "./components/school-breadcrumb";
 import Loading from "../loading";
+import DatabaseConnectionIssue from "./components/DatabaseConnectionIssue";
 import { FetchErrorDisplay } from "@/components/fetch-error-display";
 import { useIndexedSWR } from "@/lib/hooks/useIndexedSWR";
 
@@ -48,21 +49,33 @@ const Schools = () => {
     return <Loading />;
   }
 
+  // Check for DB connection errors in the data itself
+  const isDbConnectionIssue = [enrollmentData, genderData, schools, overallLearnerStats].some(
+    (d) =>
+      d &&
+      typeof d === 'object' &&
+      d.error &&
+      typeof d.error === 'string' &&
+      d.error.includes('ECONNREFUSED')
+  );
+  if (isDbConnectionIssue) {
+    return <DatabaseConnectionIssue />;
+  }
   return (
     <div className="bg-gradient-to-b from-primary/20 to-background p-2">
       <div className="mb-2 p-1">
         <SchoolBreadcrumb />
       </div>
       <AdvancedStatCards 
-        enrollmentData={enrollmentData || []} 
+        enrollmentData={enrollmentData === undefined || enrollmentData ===null  ? [] : enrollmentData} 
         schools={schools?.data || []} 
-        overallLearnerStats={overallLearnerStats || []}
+        overallLearnerStats={overallLearnerStats=== undefined || overallLearnerStats ===null  ? [] : overallLearnerStats}
       />
       <SchoolsTabs 
         genderData={genderData} 
         schools={schools?.data || []} 
-        enrollmentData={enrollmentData || []} 
-        overallLearnerStats={overallLearnerStats || []}
+        enrollmentData={enrollmentData === undefined || enrollmentData ===null  ? [] : enrollmentData} 
+        overallLearnerStats={overallLearnerStats === undefined || overallLearnerStats ===null  ? [] : overallLearnerStats}
       />
     </div>
   );
