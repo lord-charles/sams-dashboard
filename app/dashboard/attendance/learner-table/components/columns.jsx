@@ -2,38 +2,42 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
-import { Badge } from "@/components/ui/badge";
 
 const customIncludesStringFilter = (row, columnId, filterValue) => {
   const cellValue = row.getValue(columnId);
   return cellValue.toLowerCase().includes(filterValue.toLowerCase());
 };
 
+// Helper function for absent cell class
+const absentCellClass = (row) => row.original?.attendance?.absent ? "bg-red-100" : "";
+
 export const columns = [
-  // {
-  //   id: "select",
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={
-  //         table.getIsAllPageRowsSelected() ||
-  //         (table.getIsSomePageRowsSelected() && "indeterminate")
-  //       }
-  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //       aria-label="Select all"
-  //       className="translate-y-[2px]"
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       aria-label="Select row"
-  //       className="translate-y-[2px]"
-  //     />
-  //   ),
-  //   enableSorting: false,
-  //   enableHiding: false,
-  // },
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+        className="translate-y-[2px]"
+      />
+    ),
+    cell: ({ row }) => (
+      <div className={absentCellClass(row)}>
+        <Checkbox
+          checked={row.getIsSelected() || row.original?.attendance?.absent}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+          className="translate-y-[2px]"
+        />
+      </div>
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     id: "combinedName",
     header: "Name",
@@ -151,44 +155,21 @@ export const columns = [
     ),
     cell: ({ row }) => <div>{row.getValue("class")}</div>,
   },
-  {
-    accessorKey: "isPromoted",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Promoted" />
-    ),
-    cell: ({ row }) => (
-      
-      <Badge variant={row.getValue("isPromoted") === "Yes" ? "default" : "secondary"}>
-        {row.getValue("isPromoted")}
-      </Badge>
-    ),
-  },
 
-  {
-    accessorKey: "hasDisability",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="LWD" />
-    ),
-    cell: ({ row }) => {
-      const disabilityValue = row.original.hasDisability;
-      return (
-        <Badge variant={disabilityValue === "Yes" ? "destructive" : "default"}>
-          {disabilityValue}
-        </Badge>
-      );
-    },
-  },
-  {
-    accessorKey: "isDroppedOut",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Dropped" />
-    ),
-    cell: ({ row }) => (
-      <Badge variant={row.getValue("isDroppedOut") === "Yes" ? "destructive" : "default"}>
-        {row.getValue("isDroppedOut")}
-      </Badge>
-    ),
-  },
+  // {
+  //   accessorKey: "hasDisability",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="LWD" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const disabilityValue = row.original.hasDisability;
+  //     return (
+  //       <Badge variant={disabilityValue === "Yes" ? "destructive" : "default"}>
+  //         {disabilityValue}
+  //       </Badge>
+  //     );
+  //   },
+  // },
   {
     accessorKey: "actions",
     cell: ({ row }) => <DataTableRowActions row={row} />,

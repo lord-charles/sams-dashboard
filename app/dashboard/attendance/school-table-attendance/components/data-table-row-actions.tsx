@@ -15,13 +15,16 @@ import {
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-
 interface DataTableRowActionsProps<TData> {
   row: Row<any>;
+  setShowLearners: (show: boolean) => void;
+  setCode: (code: string) => void;
 }
 
 export function DataTableRowActions<TData>({
   row,
+  setShowLearners,
+  setCode,
 }: DataTableRowActionsProps<TData>) {
   const item = row.original;
   const router = useRouter();
@@ -37,33 +40,14 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem
-          onClick={() => {
-            router.push(`/dashboard/schools/${item?._id}`);
-          }}
+
+        <DropdownMenuItem onClick={() => {
+          setCode(item?.code),
+            setTimeout(() => setShowLearners(true), 200)
+        }}
         >
-          View School
-          <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Link
-            href={{
-              pathname: "/dashboard/learners",
-              query: {
-                state: item?.state10,
-                payam: item?.payam28,
-                county: item?.county28,
-                code: item?.code,
-                school: item?.schoolName,
-                education: item?.schoolType,
-              },
-            }}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View Learners
-          </Link>
+
+          View Learners
           <DropdownMenuShortcut>⌘L</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -88,34 +72,9 @@ export function DataTableRowActions<TData>({
               New Learner
             </Button>
           </Link>
-          <DropdownMenuShortcut>⌘L</DropdownMenuShortcut>
+          <DropdownMenuShortcut>⌘N</DropdownMenuShortcut>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Link
-            href={{
-              pathname: "/dashboard/teachers",
-              query: {
-                state: item?.state10,
-                payam: item?.payam28,
-                county: item?.county28,
-                code: item?.code,
-                school: item?.schoolName,
-                education: item?.schoolType,
-              },
-            }}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View Teachers
-          </Link>
-          <DropdownMenuShortcut>⌘T</DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="stext-red-500">
-          Delete
-          <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-        </DropdownMenuItem>
+      
       </DropdownMenuContent>
     </DropdownMenu>
   );

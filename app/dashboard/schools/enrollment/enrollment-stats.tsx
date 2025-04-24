@@ -28,7 +28,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { cn } from "@/lib/utils"
 import SchoolEnrollmentTable from "./school-table-enrollment/schools"
 
-// Define the data types based on the provided JSON
 interface EnrollmentStatus {
   year?: number
   isComplete: boolean
@@ -68,18 +67,24 @@ interface SchoolData {
 
 // School type explanations
 const schoolTypeExplanations = {
-  PRI: "Primary School",
-  SEC: "Secondary School",
-  ALP: "Accelerated Learning Program",
-  ECD: "Early Childhood Development",
+  PRI: "Primary",
+  SEC: "Secondary",
+  ALP: "ALP",
+  ECD: "ECD",
+  CGS: "CGS",
+  ASP: "ASP",
+  TTI: "TTI",
 }
 
 // Grade level explanations
 const gradeLevelExplanations = {
   P: "Primary",
   S: "Secondary",
-  ALP: "Accelerated Learning Program",
-  ECD: "Early Childhood Development",
+  ALP: "ALP",
+  ECD: "ECD",
+  CGS: "CGS",
+  ASP: "ASP",
+  TTI: "TTI",
 }
 
 // Combobox component for filters
@@ -165,7 +170,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
   const [payam, setPayam] = useState<string | null>(null)
   const [schoolType, setSchoolType] = useState<string | null>(null)
   const [schoolOwnership, setSchoolOwnership] = useState<string | null>(null)
-  const [code, setCode] = useState<string | null>(null)
+  const [code] = useState<string | null>(null)
   const [selectedSchool, setSelectedSchool] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState("enrollment")
 
@@ -215,11 +220,6 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
     [allSchools],
   )
 
-  const uniqueSchoolOwnerships = useMemo(
-    () => Array.from(new Set(allSchools.map((school) => school.schoolOwnerShip))).sort(),
-    [allSchools],
-  )
-
   const uniqueSchools = useMemo(() => {
     const schools = allSchools
       .filter(
@@ -257,25 +257,30 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
   )
 
   const schoolOwnershipOptions = useMemo(
-    () => uniqueSchoolOwnerships.map((ownership) => ({ value: ownership, label: ownership })),
-    [uniqueSchoolOwnerships],
-  )
+  () => [
+    { value: "Community", label: "Community" },
+    { value: "Faith-Based", label: "Faith-Based" },
+    { value: "Private", label: "Private" },
+    { value: "Public", label: "Public" }
+  ],
+  []
+)
 
 
   // Apply filters to the data
   const filteredSchoolData = useMemo(
-    () =>
-      schoolsData.filter(
-        (school) =>
-          (!state || school.state10 === state) &&
-          (!county || school.county28 === county) &&
-          (!payam || school.payam28 === payam) &&
-          (!schoolType || school.schoolType === schoolType) &&
-          (!code || school.code === code) &&
-          (!selectedSchool || school._id === selectedSchool),
-      ),
-    [allSchools, state, county, payam, schoolType, code, selectedSchool],
-  )
+  () =>
+    schoolsData.filter((school) =>
+      (!state || school.state10 === state) &&
+      (!county || school.county28 === county) &&
+      (!payam || school.payam28 === payam) &&
+      (!schoolType || school.schoolType === schoolType) &&
+      (!schoolOwnership || (school.schoolOwnerShip || "").trim().toLowerCase() === schoolOwnership.toLowerCase()) &&
+      (!code || school.code === code) &&
+      (!selectedSchool || school._id === selectedSchool)
+    ),
+  [allSchools, state, county, payam, schoolType, schoolOwnership, code, selectedSchool],
+)
 
   // Filter schools that have started enrollment for the current year
   const schoolsWithStartedEnrollment = filteredSchoolData.filter((school) =>
@@ -326,29 +331,32 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
   const startedPercentOfTotal = Math.round((totalStartedEnrollment / totalSchoolsInCountry) * 100)
   const completedPercentOfTotal = Math.round((completedEnrollment / totalSchoolsInCountry) * 100)
 
-  // Ownership stats
-  const ownershipStats = uniqueSchoolOwnerships.map((ownerType) => {
-    const schoolsOfType = schoolsWithStartedEnrollment.filter((school) => school.schoolOwnerShip === ownerType)
+  // Fixed set of ownership types
+  const fixedSchoolOwnerships = ["Community", "Faith-Based", "Private", "Public"];
 
-    const totalOfType = schoolsOfType.length
+  // Ownership stats
+  const ownershipStats = fixedSchoolOwnerships.map((ownerType) => {
+    const schoolsOfType = schoolsWithStartedEnrollment.filter((school) => (school.schoolOwnerShip || "").trim().toLowerCase() === ownerType.toLowerCase());
+
+    const totalOfType = schoolsOfType.length;
 
     const completedOfType = schoolsOfType.filter((school) =>
       school.isEnrollmentComplete.some((status) => status.year === currentYear && status.learnerEnrollmentComplete === true),
-    ).length
+    ).length;
 
-    const completionPercentage = totalOfType > 0 ? Math.round((completedOfType / totalOfType) * 100) : 0
+    const completionPercentage = totalOfType > 0 ? Math.round((completedOfType / totalOfType) * 100) : 0;
 
     // Calculate percentage of total schools of this type that have started enrollment
-    const totalSchoolsOfThisType = totalSchoolsByOwnership[ownerType as keyof typeof totalSchoolsByOwnership] || 0
+    const totalSchoolsOfThisType = totalSchoolsByOwnership[ownerType as keyof typeof totalSchoolsByOwnership] || 0;
     const startedPercentOfTypeTotal =
-      totalSchoolsOfThisType > 0 ? Math.round((totalOfType / totalSchoolsOfThisType) * 100) : 0
+      totalSchoolsOfThisType > 0 ? Math.round((totalOfType / totalSchoolsOfThisType) * 100) : 0;
 
     // Calculate percentage of total schools of this type that have completed enrollment
     const completedPercentOfTypeTotal =
-      totalSchoolsOfThisType > 0 ? Math.round((completedOfType / totalSchoolsOfThisType) * 100) : 0
+      totalSchoolsOfThisType > 0 ? Math.round((completedOfType / totalSchoolsOfThisType) * 100) : 0;
 
     // Calculate how many schools of this type still need to start enrollment
-    const remainingToStart = totalSchoolsOfThisType - totalOfType
+    const remainingToStart = totalSchoolsOfThisType - totalOfType;
 
     return {
       type: ownerType,
@@ -359,16 +367,15 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
       startedPercentOfTotal: startedPercentOfTypeTotal,
       completedPercentOfTotal: completedPercentOfTypeTotal,
       remainingToStart: remainingToStart,
-    }
-  })
+    };
+  });
 
-  // Color mapping for ownership types (dynamically generated)
-  const ownershipColors: Record<string, string> = {}
-  const colorOptions = ["bg-blue-500", "bg-purple-500", "bg-orange-500", "bg-teal-500", "bg-pink-500", "bg-indigo-500"]
-
-  uniqueSchoolOwnerships.forEach((type, index) => {
-    ownershipColors[type] = colorOptions[index % colorOptions.length]
-  })
+  // Color mapping for ownership types (fixed)
+  const ownershipColors: Record<string, string> = {};
+  const colorOptions = ["bg-blue-500", "bg-purple-500", "bg-orange-500", "bg-teal-500"];
+  fixedSchoolOwnerships.forEach((type, index) => {
+    ownershipColors[type] = colorOptions[index % colorOptions.length];
+  });
 
   // Calculate remaining schools to start enrollment
   const remainingToStartEnrollment = totalSchoolsInCountry - totalStartedEnrollment
@@ -515,8 +522,8 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
     <Card className="w-full p-2">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
         <div>
-          <h2 className="text-xl md:text-2xl font-bold">Enrollment Progress For {currentYear}</h2>
-          <p className="text-muted-foreground">Tracking enrollment and learner statistics nationwide</p>
+          <h2 className="text-xl md:text-2xl font-bold">Enrollment For {currentYear}</h2>
+          <p className="text-muted-foreground">Tracking enrollment Progress nationwide</p>
         </div>
 
         <div className="mt-4">

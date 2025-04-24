@@ -14,7 +14,7 @@ import EnrollmentStats from "./enrollment/enrollment-stats";
 
 
 
-const SchoolsTabs = ({ genderData, schools, enrollmentData,overallLearnerStats }) => {
+const SchoolsTabs = ({  schools, enrollmentData }) => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const initialTab = searchParams.get("tab") || "overview";
@@ -54,7 +54,7 @@ const SchoolsTabs = ({ genderData, schools, enrollmentData,overallLearnerStats }
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value="overview" className="space-y-4">
-                    <EnrollmentDashboard enrollmentData={genderData} overallLearnerStats={overallLearnerStats} 
+                    <EnrollmentDashboard 
                     schoolsData={enrollmentData}/>
                 </TabsContent>
                 <TabsContent value="schools" className="space-y-4">

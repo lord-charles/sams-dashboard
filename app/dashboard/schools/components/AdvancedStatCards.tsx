@@ -2,8 +2,7 @@
 
 import { useMemo } from "react"
 import { School, Building, ClipboardCheck, Unlock, BookOpen, Users } from "lucide-react"
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
@@ -112,11 +111,13 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
     }
 
     // Process each school
-    enrollmentData?.forEach((school) => {
+    enrollmentData?.filter(school => 
+      school.isEnrollmentComplete?.some(e => e.learnerEnrollmentComplete)
+    ).forEach((school) => {
       if (school.learnerStats) {
         // Process each grade
-        Object.entries(school.learnerStats).forEach(([_, data]: [string, any]) => {
-          // Add to total stats
+        Object.values(school.learnerStats).forEach((data: any) => {
+          // Add to total stats (using total numbers, not currentYear)
           stats.total.total += data?.total || 0
           stats.total.male += data?.male || 0
           stats.total.female += data?.female || 0
@@ -259,7 +260,7 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
             <p className="text-xs text-muted-foreground">Across all regions</p>
             <div className="flex items-center gap-1">
               <Users className="h-3 w-3 text-blue-600" />
-              <span className="text-xs font-medium">{overallLearnerStats?.overall?.total.toLocaleString()}</span>
+              <span className="text-xs font-medium">{learnerStats.total.total.toLocaleString()}</span>
             </div>
           </div>
 
@@ -267,11 +268,11 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="flex items-center gap-1">
                 <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                <span>M: {overallLearnerStats?.overall?.male.toLocaleString()}</span>
+                <span>M: {learnerStats.total.male.toLocaleString()}</span>
               </div>
               <div className="flex items-center gap-1 mt-1">
                 <div className="w-2 h-2 rounded-full bg-pink-500"></div>
-                <span>F: {overallLearnerStats?.overall?.female.toLocaleString()}</span>
+                <span>F: {learnerStats.total.female.toLocaleString()}</span>
               </div>
             </div>
 
@@ -279,15 +280,18 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
               <div className="flex justify-between text-xs">
                 <span>With Disability:</span>
                 <span className="font-medium">
-                  {overallLearnerStats?.overall?.withDisability.toLocaleString()} (
+                  {learnerStats.total.withDisability.toLocaleString()} (
                   {(
-                    ((overallLearnerStats?.overall?.withDisability || 0) / (overallLearnerStats?.overall?.total || 0)) *
+                    (learnerStats.total.withDisability / learnerStats.total.total) *
                     100
                   ).toFixed(1)}
                   %)
                 </span>
               </div>
-              <Progress value={disabilityPercentage} className="h-1.5 bg-blue-100 mt-1" />
+              <Progress 
+                value={(learnerStats.total.withDisability / learnerStats.total.total) * 100} 
+                className="h-1.5 bg-blue-100 mt-1" 
+              />
             </div>
 
             <div className="mt-2 pt-3 border-t">

@@ -14,7 +14,7 @@ import LearnersTable from "../learner-table/leaners";
 import { LearnerBreadcrumb } from "./learner-breadcrumb";
 import { NoLearnersYet } from "./no-learner";
 import { Backdrop } from "@mui/material";
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
     Select,
     SelectContent,
@@ -29,6 +29,8 @@ const currentYear = new Date().getFullYear();
 
 const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
     const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
     const [isLoading, setIsLoading] = useState(false);
     const [states, setStates] = useState(initialStates);
     const [counties, setCounties] = useState([]);
@@ -223,6 +225,24 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
         }
     };
 
+
+    const updateURL = (params) => {
+        const current = new URLSearchParams(Array.from(searchParams.entries()));
+
+        // Update or remove parameters
+        Object.entries(params).forEach(([key, value]) => {
+            if (value) {
+                current.set(key, value);
+            } else {
+                current.delete(key);
+            }
+        });
+
+        // Create the new URL
+        const search = current.toString();
+        const query = search ? `?${search}` : "";
+        router.push(`${pathname}${query}`);
+    };
     const fetchStatistics = async (params) => {
         setIsLoading(true);
         console.log("Fetching with year:", params.enrollmentYear);
@@ -300,7 +320,7 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
         }
         setIsLoading(false);
     };
-
+   
     const handleStateChange = (value) => {
         setSelectedState(value);
         setSelectedCounty("");
@@ -312,6 +332,12 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
         setStudents([]);
         fetchCounties(value);
         fetchStatistics({ state10: value, enrollmentYear: selectedYear });
+        updateURL({
+            state: value,
+            county: null,
+            payam: null,
+            code: null
+        });
     };
 
     const handleCountyChange = (value) => {
@@ -323,6 +349,12 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
         setStudents([]);
         fetchPayams(value);
         fetchStatistics({ state10: selectedState, county28: value, enrollmentYear: selectedYear });
+        updateURL({
+            state: selectedState,
+            county: value,
+            payam: null,
+            code: null
+        });
     };
 
     const handlePayamChange = (value) => {
@@ -332,6 +364,12 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
         setStudents([]);
         fetchSchools(value);
         fetchStatistics({ state10: selectedState, county28: selectedCounty, payam28: value, enrollmentYear: selectedYear });
+        updateURL({
+            state: selectedState,
+            county: selectedCounty,
+            payam: value,
+            code: null
+        });
     };
 
     const handleSchoolChange = (value) => {
@@ -339,6 +377,12 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
         setStudents([]);
         fetchStudents(value);
         fetchStatistics({ code: value, enrollmentYear: selectedYear });
+        updateURL({
+            state: selectedState,
+            county: selectedCounty,
+            payam: selectedPayam,
+            code: value
+        });
     };
 
      const ComboboxSelect = ({ options, value, onChange, placeholder }) => {

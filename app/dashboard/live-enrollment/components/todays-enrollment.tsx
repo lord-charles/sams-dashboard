@@ -227,9 +227,9 @@ export default function TodaysEnrollmentDataDisplay({
               </Popover>
             )}
 
-            <Button  disabled={isLoading}>
+            {/* <Button  disabled={isLoading}>
               {isLoading ? "Loading..." : "Refresh Data"}
-            </Button>
+            </Button> */}
           </div>
         </div>
 

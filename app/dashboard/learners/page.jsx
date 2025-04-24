@@ -27,16 +27,6 @@ const postFetcher = async (url, year) => {
     throw new Error('Failed to fetch data');
   }
 };
-
-const postFetcher2 = async (url, year) => {
-  try {
-    const response = await axios.post(url, { enrollmentYear: year });
-    return response.data;
-  } catch (error) {
-    throw new Error('Failed to fetch data');
-  }
-};
-
 // SWR configuration for better performance
 const swrConfig = {
   revalidateOnFocus: false, // Don't revalidate on window focus

@@ -10,53 +10,11 @@ import Loading from "../loading";
 import axios from "axios";
 import { base_url } from "@/app/utils/baseUrl";
 
-interface LearnerCountResponse {
-  count: number;
-}
 
 const LiveEnrollmentPage = () => {
-  const currentYear = new Date().getFullYear();
-
   // Fetch data using useIndexedSWR
   const { data: states, error: statesError } = useIndexedSWR(apiEndpoints.states);
   
-  const { data: totalLearnersData, error: totalLearnersError } = useIndexedSWR(
-    apiEndpoints.learners.total,
-    { method: 'POST', body: { enrollmentYear: currentYear } }
-  );
-  const [newLearnersData, setNewLearnersData] = useState<LearnerCountResponse | null>(null);
-  const [newLearnersError, setNewLearnersError] = useState(null);
-
-  useEffect(() => {
-    const fetchNewLearners = async () => {
-      try {
-        const response = await axios.post(`${base_url}data-set/getLearnerCountByLocation`, {
-          year: 2025
-        });
-        setNewLearnersData(response.data);
-      } catch (error: any) {
-        setNewLearnersError(error);
-      }
-    };
-
-    fetchNewLearners();
-  }, []);
-  
-  const { data: promotedLearnersData, error: promotedLearnersError } = useIndexedSWR(
-    apiEndpoints.learners.promoted,
-    { method: 'POST', body: { enrollmentYear: currentYear } }
-  );
-  
-  const { data: disabledLearnersData, error: disabledLearnersError } = useIndexedSWR(
-    apiEndpoints.learners.disabled,
-    { method: 'POST', body: { enrollmentYear: currentYear } }
-  );
-  
-  const { data: overallMaleFemaleStat, error: overallStatError } = useIndexedSWR(
-    apiEndpoints.learners.genderStats,
-    { method: 'POST', body: { enrollmentYear: currentYear } }
-  );
-
   const { data: todaysEnrollment, error: todaysEnrollmentError } = useIndexedSWR(
     apiEndpoints.learners.todaysEnrollment,
     { method: 'POST' }
@@ -67,11 +25,14 @@ const LiveEnrollmentPage = () => {
     { method: 'POST' }
   );
 
+    const { data: enrollmentData, error: enrollmentError } = useIndexedSWR(
+      `${base_url}school-data/enrollment/completed`
+    );
+
   // Handle errors
   const errors = [
-    statesError, totalLearnersError, newLearnersError, promotedLearnersError,
-    disabledLearnersError, overallStatError, todaysEnrollmentError,
-    enrollmentSummaryError
+    statesError, todaysEnrollmentError,
+    enrollmentSummaryError, enrollmentError
   ].filter(Boolean);
 
   if (errors.length > 0) {
@@ -79,37 +40,13 @@ const LiveEnrollmentPage = () => {
   }
 
   // Check if data is loading
-  if (!states || !totalLearnersData || !newLearnersData || !promotedLearnersData || 
-      !disabledLearnersData || !overallMaleFemaleStat || 
-      !todaysEnrollment || !enrollmentSummary) {
+  if (!states || !todaysEnrollment || !enrollmentSummary || !enrollmentData) {
     return <Loading />;
   }
 
-  // Calculate statistics
-  const totalStudents = overallMaleFemaleStat.totalMale + overallMaleFemaleStat.totalFemale;
-  const malePercentage = totalStudents ? (overallMaleFemaleStat.totalMale / totalStudents) * 100 : 0;
-  const femalePercentage = totalStudents ? (overallMaleFemaleStat.totalFemale / totalStudents) * 100 : 0;
 
-  const initialStatistics: LearnerStatistics = {
-    totalLearners: { total: totalLearnersData.count, current: totalLearnersData.count },
-    promotedLearners: { total: promotedLearnersData.count, current: promotedLearnersData.count },
-    disabledLearners: { total: disabledLearnersData.count, current: disabledLearnersData.count },
-    newLearners: { total: newLearnersData?.count, current: newLearnersData?.count },
-    droppedOutLearners: {
-      total: overallMaleFemaleStat.droppedOutMale + overallMaleFemaleStat.droppedOutFemale,
-      current: overallMaleFemaleStat.droppedOutMale + overallMaleFemaleStat.droppedOutFemale
-    },
-    averageAge: 0,
-    malePercentage: Number(malePercentage.toFixed(2)),
-    femalePercentage: Number(femalePercentage.toFixed(2)),
-    genderStats: {
-      totalMale: overallMaleFemaleStat.totalMale,
-      totalFemale: overallMaleFemaleStat.totalFemale,
-      totalMaleLwd: overallMaleFemaleStat.maleWithDisabilities,
-      totalFemaleLwd: overallMaleFemaleStat.femaleWithDisabilities,
-      droppedOutMale: overallMaleFemaleStat.droppedOutMale,
-      droppedOutFemale: overallMaleFemaleStat.droppedOutFemale
-    },
+
+  const initialStatistics = {
     todaysEnrollment: todaysEnrollment.data,
     enrollmentSummary: enrollmentSummary
   };
@@ -117,8 +54,9 @@ const LiveEnrollmentPage = () => {
   return (
     <div>
       <LiveEnrollmentModule 
-        initialStates={states}
-        initialStatistics={initialStatistics}
+        initialStates={states || []}
+        initialStatistics={initialStatistics || []}
+        enrollmentData={enrollmentData || []}
       />
     </div>
   );

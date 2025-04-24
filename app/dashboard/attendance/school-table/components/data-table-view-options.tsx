@@ -29,11 +29,11 @@ export function DataTableViewOptions<TData>({
       .rows.map((row) => row.original);
     const csvData = json2csv.parse(filteredData);
     const blob = new Blob([csvData], { type: "text/csv;charset=utf-8" });
-    saveAs(blob, "schools-enrollment.csv");
+    saveAs(blob, "schools.csv");
   };
 
   useEffect(() => {
-    const columnsToHide = ["combinedName", "payam28", "county28", "state10"];
+    const columnsToHide = ["combinedName", "schoolOwnerShip"];
     columnsToHide.forEach((columnId) => {
       const column = table.getColumn(columnId);
       if (column && column.getIsVisible()) {

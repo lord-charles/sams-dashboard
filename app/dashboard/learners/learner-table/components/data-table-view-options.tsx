@@ -27,11 +27,12 @@ export function DataTableViewOptions<TData>({
     const columnsToHide = [
       "combinedName",
       "education",
-      // "isPromoted",
+      "isPromoted",
       "school",
       "code",
       "dob",
-      // "isDroppedOut",
+      "isDroppedOut",
+      "hasDisability",
     ];
     columnsToHide.forEach((columnId) => {
       const column = table.getColumn(columnId);

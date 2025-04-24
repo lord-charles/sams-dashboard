@@ -13,10 +13,10 @@ import { useIndexedSWR } from "@/lib/hooks/useIndexedSWR";
 
 const Schools = () => {
   // SWR hooks with IndexedDB caching
-  const { data: genderData, error: genderError } = useIndexedSWR(
-    `${base_url}data-set/state/gender`,
-    { method: 'POST' }
-  );
+  // const { data: genderData, error: genderError } = useIndexedSWR(
+  //   `${base_url}data-set/state/gender`,
+  //   { method: 'POST' }
+  // );
 
   const { data: schools, error: schoolsError } = useIndexedSWR(
     `${base_url}school-data/schools`
@@ -31,7 +31,7 @@ const Schools = () => {
   );
 
   // Check for any errors
-  const errors = [genderError, schoolsError, enrollmentError, statsError].filter(Boolean);
+  const errors = [ schoolsError, enrollmentError, statsError].filter(Boolean);
 
   if (errors.length > 0) {
     return (
@@ -43,14 +43,14 @@ const Schools = () => {
   }
 
   // Check if all data is loaded
-  const isLoading = !genderData || !schools || !enrollmentData || !overallLearnerStats;
+  const isLoading = !schools || !enrollmentData || !overallLearnerStats;
 
   if (isLoading) {
     return <Loading />;
   }
 
   // Check for DB connection errors in the data itself
-  const isDbConnectionIssue = [enrollmentData, genderData, schools, overallLearnerStats].some(
+  const isDbConnectionIssue = [enrollmentData, schools, overallLearnerStats].some(
     (d) =>
       d &&
       typeof d === 'object' &&
@@ -72,10 +72,8 @@ const Schools = () => {
         overallLearnerStats={overallLearnerStats=== undefined || overallLearnerStats ===null  ? [] : overallLearnerStats}
       />
       <SchoolsTabs 
-        genderData={genderData} 
         schools={schools?.data || []} 
         enrollmentData={enrollmentData === undefined || enrollmentData ===null  ? [] : enrollmentData} 
-        overallLearnerStats={overallLearnerStats === undefined || overallLearnerStats ===null  ? [] : overallLearnerStats}
       />
     </div>
   );

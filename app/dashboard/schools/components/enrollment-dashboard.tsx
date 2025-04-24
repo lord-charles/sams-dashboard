@@ -37,13 +37,8 @@ import {
   Search,
   Percent,
   Info,
-  Calendar,
   BarChart2,
   PieChartIcon,
-  Share2,
-  Printer,
-  RefreshCw,
-  HelpCircle,
   SlidersHorizontal,
   Maximize2,
   Scale,
@@ -54,24 +49,41 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { motion, AnimatePresence } from "framer-motion"
 import { Tooltip as TooltipUI, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
-type OverallLearnerStats = {
-  overall: {
-    total: number
-    male: number
-    female: number
-    withDisability: number
-  }
-  bySchoolType: Array<{
-    schoolType: string
-    total: number
-    male: number
-    female: number
-    withDisability: number
+type SchoolData = {
+  _id: string
+  code: string
+  payam28: string
+  state10: string
+  county28: string
+  schoolName: string
+  schoolOwnerShip: string
+  schoolType: string
+  emisId: string
+  isEnrollmentComplete: Array<{
+    year: number
+    isComplete: boolean
+    completedBy: string
+    comments: string
+    percentageComplete: number
+    learnerEnrollmentComplete: boolean
   }>
+  learnerStats: {
+    [key: string]: {
+      total: number
+      male: number
+      female: number
+      withDisability: number
+      currentYear: {
+        total: number
+        male: number
+        female: number
+        withDisability: number
+      }
+    }
+  }
 }
 
-
-export default function EnrollmentDashboard({enrollmentData,overallLearnerStats,schoolsData}: {enrollmentData: any, overallLearnerStats: OverallLearnerStats, schoolsData: any}) {
+export default function EnrollmentDashboard({ schoolsData }: { schoolsData: SchoolData[] }) {
   const [sortConfig, setSortConfig] = useState({ key: "totalPupils", direction: "desc" })
   const [activeIndex, setActiveIndex] = useState(0)
   const [expandedState, setExpandedState] = useState(null)
@@ -81,28 +93,77 @@ export default function EnrollmentDashboard({enrollmentData,overallLearnerStats,
   const [showTrends, setShowTrends] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-// Calculate totals
-const calculateTotals = () => {
-  let totalPupils = 0
-  let totalFemale = 0
-  let totalMale = 0
 
-  enrollmentData.forEach((state: any) => {
-    totalPupils += state.totalPupils
-    totalFemale += state.totalFemale
-    totalMale += state.totalMale
-  })
+// Helper function to format school data by state
+const formatSchoolDataByState = (schools: SchoolData[]) => {
+  const stateData = new Map<string, { 
+    state: string,
+    totalPupils: number,
+    totalMale: number,
+    totalFemale: number,
+    totalWithDisability: number,
+    id: string
+  }>();
+
+  schools
+    .filter(school => school.isEnrollmentComplete.some(e => e.learnerEnrollmentComplete))
+    .forEach(school => {
+      const state = school.state10;
+      const totals = Object.values(school.learnerStats).reduce(
+        (acc, curr) => ({
+          total: acc.total + curr.total,
+          male: acc.male + curr.male,
+          female: acc.female + curr.female,
+          withDisability: acc.withDisability + curr.withDisability
+        }),
+        { total: 0, male: 0, female: 0, withDisability: 0 }
+      );
+
+      if (stateData.has(state)) {
+        const existing = stateData.get(state)!;
+        stateData.set(state, {
+          ...existing,
+          totalPupils: existing.totalPupils + totals.total,
+          totalMale: existing.totalMale + totals.male,
+          totalFemale: existing.totalFemale + totals.female,
+          totalWithDisability: existing.totalWithDisability + totals.withDisability
+        });
+      } else {
+        stateData.set(state, {
+          state,
+          totalPupils: totals.total,
+          totalMale: totals.male,
+          totalFemale: totals.female,
+          totalWithDisability: totals.withDisability,
+          id: state
+        });
+      }
+    });
+
+  return Array.from(stateData.values());
+};
+
+// Calculate overall totals
+const calculateTotals = (formattedData: ReturnType<typeof formatSchoolDataByState>) => {
+  const totals = formattedData.reduce(
+    (acc, state) => ({
+      totalPupils: acc.totalPupils + state.totalPupils,
+      totalMale: acc.totalMale + state.totalMale,
+      totalFemale: acc.totalFemale + state.totalFemale,
+      totalWithDisability: acc.totalWithDisability + state.totalWithDisability
+    }),
+    { totalPupils: 0, totalMale: 0, totalFemale: 0, totalWithDisability: 0 }
+  );
 
   return {
-    totalPupils,
-    totalFemale,
-    totalMale,
-    femalePercentage: (totalFemale / totalPupils) * 100,
-    malePercentage: (totalMale / totalPupils) * 100,
-  }
-}
+    ...totals,
+    femalePercentage: (totals.totalFemale / totals.totalPupils) * 100,
+    malePercentage: (totals.totalMale / totals.totalPupils) * 100,
+  };
+};
 
-const totals = calculateTotals()
+const formattedData = formatSchoolDataByState(schoolsData);
+const totals = calculateTotals(formattedData);
 
 // Custom tooltip for charts
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -160,18 +221,18 @@ const renderActiveShape = (props:any) => {
 
   // Sort data based on current sort configuration
   const sortedData = useMemo(() => {
-    const sortableData = [...enrollmentData]
-    sortableData.sort((a, b) => {
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === "asc" ? -1 : 1
+    const sortableData = [...formattedData]
+    sortableData?.sort((a: any, b: any) => {
+      if (a[sortConfig?.key] < b[sortConfig?.key]) {
+        return sortConfig?.direction === "asc" ? -1 : 1
       }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === "asc" ? 1 : -1
+      if (a[sortConfig?.key] > b[sortConfig?.key]) {
+        return sortConfig?.direction === "asc" ? 1 : -1
       }
       return 0
     })
     return sortableData
-  }, [sortConfig])
+  }, [formattedData, sortConfig])
 
   const filteredData = useMemo(() => {
     if (!filterValue) return sortedData
@@ -208,15 +269,20 @@ const renderActiveShape = (props:any) => {
   const pieData = [
     { name: "Male", value: totals.totalMale, fill: "#2563eb" },
     { name: "Female", value: totals.totalFemale, fill: "#ec4899" },
+    { name: "With Disability", value: totals.totalWithDisability, fill: "#9333ea" },
   ]
 
   // Prepare data for top 5 states chart
-  const top5States = sortedData.slice(0, 5).map((state) => ({
-    name: state.state,
-    male: state.totalMale,
-    female: state.totalFemale,
-    total: state.totalPupils,
-  }))
+  const top5States = sortedData
+    .sort((a, b) => b.totalPupils - a.totalPupils)
+    .slice(0, 5)
+    .map((state) => ({
+      name: state.state,
+      male: state.totalMale,
+      female: state.totalFemale,
+      total: state.totalPupils,
+      withDisability: state.totalWithDisability
+    }))
 
   // Toggle expanded state
   const toggleExpand = useCallback(
@@ -253,6 +319,7 @@ const renderActiveShape = (props:any) => {
         const malePercent = (state.totalMale / state.totalPupils) * 100
         const femalePercent = (state.totalFemale / state.totalPupils) * 100
         const genderGap = malePercent - femalePercent
+        const withDisabilityPercent = (state.totalWithDisability / state.totalPupils) * 100
 
         return {
           state: state.state,
@@ -260,6 +327,8 @@ const renderActiveShape = (props:any) => {
           totalPupils: state.totalPupils,
           malePercent,
           femalePercent,
+          withDisabilityPercent,
+          totalWithDisability: state.totalWithDisability
         }
       })
       .sort((a, b) => Math.abs(b.genderGap) - Math.abs(a.genderGap))
@@ -317,14 +386,14 @@ const renderActiveShape = (props:any) => {
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                       <div>
-                        <h2 className="text-2xl font-bold">{new Date().getFullYear()} Enrollment Projection</h2>
+                        <h2 className="text-2xl font-bold">{new Date().getFullYear()} Enrollment</h2>
                         <motion.p
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.2, duration: 0.5 }}
                           className="text-4xl font-bold mt-2 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent"
                         >
-                          {overallLearnerStats.overall.total.toLocaleString()}
+                          {totals.totalPupils.toLocaleString()}
                         </motion.p>
                         <p className="text-muted-foreground">Students across South Sudan</p>
                       </div>
@@ -338,10 +407,10 @@ const renderActiveShape = (props:any) => {
                         >
                           <div className="flex items-center gap-2 justify-center">
                             <UserRound className="h-5 w-5 text-primary" />
-                            <span className="text-lg font-semibold">{Math.round(overallLearnerStats.overall.male/overallLearnerStats.overall.total*100)}%</span>
+                            <span className="text-lg font-semibold">{Math.round(totals.malePercentage)}%</span>
                           </div>
                           <p className="text-sm text-muted-foreground">Male</p>
-                          <p className="text-lg font-medium">{overallLearnerStats.overall.male.toLocaleString()}</p>
+                          <p className="text-lg font-medium">{totals.totalMale.toLocaleString()}</p>
                         </motion.div>
                         <div className="h-16 w-px bg-border"></div>
                         <motion.div
@@ -352,10 +421,10 @@ const renderActiveShape = (props:any) => {
                         >
                           <div className="flex items-center gap-2 justify-center">
                             <UserRound className="h-5 w-5 text-rose-500" />
-                            <span className="text-lg font-semibold">{Math.round(overallLearnerStats.overall.female/overallLearnerStats.overall.total*100)}%</span>
+                            <span className="text-lg font-semibold">{Math.round(totals.femalePercentage)}%</span>
                           </div>
                           <p className="text-sm text-muted-foreground">Female</p>
-                          <p className="text-lg font-medium">{overallLearnerStats.overall.female.toLocaleString()}</p>
+                          <p className="text-lg font-medium">{totals.totalFemale.toLocaleString()}</p>
                         </motion.div>
                         <div className="h-16 w-px bg-border"></div>
                         <motion.div
@@ -366,10 +435,10 @@ const renderActiveShape = (props:any) => {
                         >
                           <div className="flex items-center gap-2 justify-center">
                             <UserRound className="h-5 w-5 text-purple-600" />
-                            <span className="text-lg font-semibold">{Math.round(overallLearnerStats.overall.withDisability/overallLearnerStats.overall.total*100)}%</span>
+                            <span className="text-lg font-semibold">{Math.round((totals.totalWithDisability / totals.totalPupils) * 100)}%</span>
                           </div>
                           <p className="text-sm text-muted-foreground">With Disability</p>
-                          <p className="text-lg font-medium">{overallLearnerStats.overall.withDisability.toLocaleString()}</p>
+                          <p className="text-lg font-medium">{totals.totalWithDisability.toLocaleString()}</p>
                         </motion.div>
                       </div>
                     </div>
@@ -382,21 +451,21 @@ const renderActiveShape = (props:any) => {
                     >
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: `${(overallLearnerStats.overall.male/overallLearnerStats.overall.total)*100}%` }}
+                        animate={{ width: `${totals.malePercentage}%` }}
                         transition={{ delay: 0.8, duration: 1 }}
                         className="h-full bg-primary"
                         style={{ float: "left" }}
                       ></motion.div>
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: `${(overallLearnerStats.overall.female/overallLearnerStats.overall.total)*100}%` }}
+                        animate={{ width: `${totals.femalePercentage}%` }}
                         transition={{ delay: 0.8, duration: 1 }}
                         className="h-full bg-rose-500"
                         style={{ float: "left" }}
                       ></motion.div>
                        <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: `${(overallLearnerStats.overall.withDisability/overallLearnerStats.overall.total)*100 + 10}%` }}
+                        animate={{ width: `${(totals.totalWithDisability / totals.totalPupils) * 100}%` }}
                         transition={{ delay: 0.8, duration: 1 }}
                         className="h-full bg-purple-600"
                         style={{ float: "left" }}
