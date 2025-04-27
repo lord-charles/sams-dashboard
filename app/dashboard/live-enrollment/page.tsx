@@ -1,14 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import LiveEnrollmentModule from "./components/live-enrollment";
 import { useIndexedSWR } from "@/lib/hooks/useIndexedSWR";
 import { apiEndpoints } from "@/lib/services/api.service";
-import type { LearnerStatistics } from "@/lib/types/dashboard";
 import { FetchErrorDisplay } from "@/components/fetch-error-display";
 import Loading from "../loading";
-import axios from "axios";
 import { base_url } from "@/app/utils/baseUrl";
+import DatabaseConnectionIssue from "../schools/components/DatabaseConnectionIssue";
 
 
 const LiveEnrollmentPage = () => {
@@ -42,6 +40,19 @@ const LiveEnrollmentPage = () => {
   // Check if data is loading
   if (!states || !todaysEnrollment || !enrollmentSummary || !enrollmentData) {
     return <Loading />;
+  }
+
+  // Check for DB connection issues
+  const isDbConnectionIssue = [todaysEnrollment, enrollmentSummary, enrollmentData].some(
+    (d) =>
+      d &&
+      typeof d === 'object' &&
+      d.error &&
+      typeof d.error === 'string' &&
+      d.error.includes('ECONNREFUSED')
+  );
+  if (isDbConnectionIssue) {
+    return <DatabaseConnectionIssue />;
   }
 
 

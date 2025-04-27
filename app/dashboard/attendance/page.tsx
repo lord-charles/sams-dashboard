@@ -7,6 +7,7 @@ import Loading from "../loading";
 import { FetchErrorDisplay } from "@/components/fetch-error-display";
 import AttendanceModuleClient from "./components/attendance-module";
 import { useIndexedSWR } from '@/lib/hooks/useIndexedSWR';
+import DatabaseConnectionIssue from '../schools/components/DatabaseConnectionIssue';
 
 
 // Fetcher functions with error handling
@@ -81,6 +82,20 @@ const AttendanceModule = () => {
   if (isLoading) {
     return <Loading />;
   }
+
+  // Check for DB connection issues
+  const isDbConnectionIssue = [states, statsData, schools, schoolsWithAttendance].some(
+    (d) =>
+      d &&
+      typeof d === 'object' &&
+      d.error &&
+      typeof d.error === 'string' &&
+      d.error.includes('ECONNREFUSED')
+  );
+  if (isDbConnectionIssue) {
+    return <DatabaseConnectionIssue />;
+  }
+
   return (
     <AttendanceModuleClient
       initialStates={states || []}

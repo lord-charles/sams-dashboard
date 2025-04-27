@@ -17,15 +17,19 @@ interface DataTableToolbarProps<TData> {
   table: Table<TData>;
   selectedIds?: string[];
   markStudentsAbsent?: (absenceReason: string) => void;
+  handlePresent?: (reason: string) => void;
 }
 
 export function DataTableToolbar<TData>({
   table,
   selectedIds = [],
   markStudentsAbsent,
+  handlePresent
 }: DataTableToolbarProps<TData>) {
-  const [open, setOpen] = useState(false);
+  const [openAbsent, setOpenAbsent] = useState(false);
+  const [openPresent, setOpenPresent] = useState(false);
   const [reason, setReason] = useState("");
+  const [presentReason, setPresentReason] = useState("");
   const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
@@ -68,12 +72,22 @@ export function DataTableToolbar<TData>({
       <Button
         variant="destructive"
         disabled={selectedIds.length === 0}
-        onClick={() => setOpen(true)}
+        onClick={() => setOpenAbsent(true)}
         className="h-7 mr-2"
       >
         Mark Absent
       </Button>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Button
+        variant="default"
+        disabled={selectedIds.length === 0}
+        onClick={() => setOpenPresent(true)}
+        className="h-7 mr-2"
+      >
+        Mark Present
+      </Button>
+
+      {/* Mark Absent Dialog */}
+      <Dialog open={openAbsent} onOpenChange={setOpenAbsent}>
         <DialogContent>
           <div className="flex flex-col gap-4">
             <Label className="font-semibold">Absence Reason</Label>
@@ -84,15 +98,47 @@ export function DataTableToolbar<TData>({
               placeholder="Enter reason for absence..."
             />
             <div className="flex gap-2 justify-end">
-              <Button onClick={() => setOpen(false)} variant="secondary">Cancel</Button>
+              <Button onClick={() => setOpenAbsent(false)} variant="secondary">Cancel</Button>
               <Button
                 onClick={() => {
                   if (markStudentsAbsent) markStudentsAbsent(reason);
-                  setOpen(false);
+                  setOpenAbsent(false);
                   setReason("");
                 }}
                 disabled={!reason.trim()}
                 variant="destructive"
+              >
+                Confirm
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Mark Present Dialog */}
+      <Dialog open={openPresent} onOpenChange={setOpenPresent}>
+        <DialogContent>
+          <div className="flex flex-col gap-4">
+            <Label className="font-semibold">Present Correction Reason</Label>
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700 p-3 rounded text-sm">
+              <strong>Disclaimer:</strong> This feature is intended <span className="font-semibold">only</span> for correcting mistakes where a learner was marked absent by error. The standard procedure is to mark only absent learners. However, this feature can be useful when you want to mark all learners as present.
+            </div>
+            <Textarea
+              className="border rounded p-2"
+              value={presentReason}
+              onChange={e => setPresentReason(e.target.value)}
+              placeholder="Enter reason for correcting or marking all learners as present..."
+            />
+            <div className="flex gap-2 justify-end">
+              <Button onClick={() => setOpenPresent(false)} variant="secondary">Cancel</Button>
+              <Button
+                onClick={() => {
+                  if (handlePresent) handlePresent(presentReason);
+                  setOpenPresent(false);
+                  setPresentReason("");
+                }}
+                disabled={!presentReason.trim()}
+                variant="default"
               >
                 Confirm
               </Button>

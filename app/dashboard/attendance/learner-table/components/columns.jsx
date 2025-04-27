@@ -28,7 +28,7 @@ export const columns = [
     cell: ({ row }) => (
       <div className={absentCellClass(row)}>
         <Checkbox
-          checked={row.getIsSelected() || row.original?.attendance?.absent}
+          checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
           className="translate-y-[2px]"

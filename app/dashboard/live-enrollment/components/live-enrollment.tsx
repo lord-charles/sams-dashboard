@@ -297,7 +297,7 @@ const LiveEnrollmentModule = ({
 
                 </TabsContent>
                 <TabsContent value="tab-2">
-                    <StatesDashboard data={statistics.enrollmentSummary} />
+                    <StatesDashboard data={statistics.enrollmentSummary} enrollmentData={enrollmentData}/>
                 </TabsContent>
             </Tabs>
 

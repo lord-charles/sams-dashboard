@@ -66,7 +66,7 @@ export interface learnerInterface {
   year?: number;
 }
 
-const LearnersTable = ({ learners, setShowLearners, setSelectedIds, selectedIds, markStudentsAbsent, setLearners }: { learners: learnerInterface[]; setShowLearners: (show: boolean) => void; setSelectedIds?: (ids: string[]) => void; selectedIds?: string[]; markStudentsAbsent?: (reason: string) => void; setLearners:any }) => {
+const LearnersTable = ({ learners, setShowLearners, setSelectedIds, selectedIds, markStudentsAbsent, handlePresent, setLearners }: { learners: learnerInterface[]; setShowLearners: (show: boolean) => void; setSelectedIds?: (ids: string[]) => void; selectedIds?: string[]; markStudentsAbsent?: (reason: string) => void; handlePresent?: (reason: string) => void; setLearners:any }) => {
 
   // Check if all learners have attendance unmarked
   const allAttendanceUnmarked = Array.isArray(learners) && learners.length > 0 && learners.every(l => !l.attendance || l.attendance === null || (Array.isArray(l.attendance) && l.attendance.length === 0));
@@ -120,6 +120,7 @@ const LearnersTable = ({ learners, setShowLearners, setSelectedIds, selectedIds,
           setSelectedIds={setSelectedIds}
           selectedIds={selectedIds}
           markStudentsAbsent={markStudentsAbsent}
+          handlePresent={handlePresent}
         />
       </div>
     </Card>

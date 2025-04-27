@@ -26,7 +26,10 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [absenceReason, setAbsenceReason] = useState<string | null>(null);
   const [classId, setClassId] = useState<string | null>(null);
-
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlTab = searchParams.get("tab") || "overview";
+  const [activeTab, setActiveTab] = useState(urlTab);
 
 
   function renderSchoolsContent() {
@@ -108,6 +111,7 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
                         setAbsenceReason(reason);
                         markStudentsAbsent(reason);
                       }}
+                      handlePresent={handlePresent}
                       setLearners={setLearners}
                     />
                   </TabsContent>
@@ -133,7 +137,8 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
             transition={{ duration: 0.2 }}
           >
             <SchoolsTableWithAttendance schools={schoolsWithAttendance || []} setShowLearners={setShowLearners} setCode={setCode} 
-                
+                date={date}
+                setDate={setDate}
                 />
           </motion.div>
         </AnimatePresence>
@@ -209,12 +214,7 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
     }
   }
 
-  // --- UI State for class tabs ---
-  // --- Tab state synced with URL ---
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const urlTab = searchParams.get("tab") || "overview";
-  const [activeTab, setActiveTab] = useState(urlTab);
+
 
   // Sync state to URL changes (e.g., browser navigation)
   React.useEffect(() => {
@@ -305,7 +305,6 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
 
   const markStudentsAbsent = async (reason: string) => {
     try {
-    console.log('reason', reason, classId, selectedIds, date);
     setIsLoading(true);
 
       const res = await axios.post(`${base_url}attendance/markAttendanceBulk`, {
@@ -350,6 +349,51 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
       setIsLoading(false);
     }
   };
+
+  const handlePresent = async () => {
+    try {
+      setIsLoading(true);
+
+      const res = await axios.post(
+        `${base_url}attendance/markPresentAttendance`,
+        {
+          studentIds: selectedIds,
+          date,
+        },
+      );
+
+      if (res.data?.success) {
+
+        const newDate = new Date(date);
+
+        newDate.setHours(newDate.getHours() + 3);
+
+        const res = await axios.post(
+          `${base_url}attendance/getStudentsAttendance`,
+          {
+            code,
+            isDroppedOut: false,
+            attendanceDate: newDate,
+          },
+        );
+
+        setLearners(res.data);
+        setDate(newDate);
+        setSelectedIds([]);
+
+        toast({
+          title: "Success",
+          description: "Attendance marked successfully",
+          variant: "success",
+        });
+      }
+    } catch (error:any) {
+      console.log(error.response.data);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
 
   return (

@@ -7,6 +7,7 @@ import { base_url } from "../../utils/baseUrl";
 import useSWR from 'swr';
 import Loading from "../loading";
 import { FetchErrorDisplay } from "@/components/fetch-error-display";
+import DatabaseConnectionIssue from "../schools/components/DatabaseConnectionIssue";
 
 
 // Fetcher functions with error handling
@@ -100,6 +101,7 @@ const LearnerModule = () => {
 
     );
   }
+  
 
   // Check if all data is loaded
   const isLoading = !states || !totalLearnersData || !promotedLearnersData || 
@@ -107,6 +109,19 @@ const LearnerModule = () => {
 
   if (isLoading) {
     return <Loading />;
+  }
+
+  // Check for DB connection issues
+  const isDbConnectionIssue = [totalLearnersData, promotedLearnersData, disabledLearnersData, newLearnersData, overallMaleFemaleStat].some(
+    (d) =>
+      d &&
+      typeof d === 'object' &&
+      d.error &&
+      typeof d.error === 'string' &&
+      d.error.includes('ECONNREFUSED')
+  );
+  if (isDbConnectionIssue) {
+    return <DatabaseConnectionIssue />;
   }
 
   // Calculate statistics once data is available

@@ -6,6 +6,7 @@ import { apiEndpoints } from "@/lib/services/api.service";
 import type { TeacherStatistics } from "@/lib/types/dashboard";
 import { FetchErrorDisplay } from "@/components/fetch-error-display";
 import Loading from '../loading';
+import DatabaseConnectionIssue from '../schools/components/DatabaseConnectionIssue';
 
 const TeacherPage = () => {
   // Fetch data using useIndexedSWR
@@ -50,6 +51,19 @@ const TeacherPage = () => {
   if (!states || !totalTeachers || !activeTeachers || 
       !inactiveTeachers || !newTeachers || !overallGenderStats) {
     return <Loading />;
+  }
+
+  // Check for DB connection issues
+  const isDbConnectionIssue = [totalTeachers, activeTeachers, inactiveTeachers, newTeachers, overallGenderStats].some(
+    (d) =>
+      d &&
+      typeof d === 'object' &&
+      d.error &&
+      typeof d.error === 'string' &&
+      d.error.includes('ECONNREFUSED')
+  );
+  if (isDbConnectionIssue) {
+    return <DatabaseConnectionIssue />;
   }
 
   // Calculate statistics

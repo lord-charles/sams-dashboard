@@ -205,7 +205,7 @@ const AttendanceModuleClient = ({ initialStates, statsData: initialStatsData, sc
     // Refetch stats when filters change
     React.useEffect(() => {
         // Only fetch if a state is selected
-        if (!selectedState) return;
+        // if (!selectedState) return;
         const params: Record<string, any> = {
             state: selectedState,
             county: selectedCounty,
