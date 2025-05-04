@@ -212,10 +212,6 @@ export default function SchoolsTable({
 
       <div className="space-y-2">
         <div className="bg-muted/50 rounded-lg">
-          <div className="mb-3">
-            <h3 className="font-medium text-sm text-muted-foreground">Filter Schools</h3>
-          </div>
-
           <div className="flex flex-wrap gap-4 items-center">
             <div className="flex flex-col sm:flex-row gap-3">
               <Popover>
