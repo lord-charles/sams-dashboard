@@ -115,6 +115,15 @@ export const columns = [
     ),
   },
   {
+    accessorKey: "attendanceDays",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Count" />
+    ),
+    cell: ({ row }) => (
+      <div>{row.getValue("attendanceDays")}</div>
+    ),
+  },
+  {
     accessorKey: "actions",
     cell: ({ row, table }) => {
       // Try to get setShowLearners from table.options.meta

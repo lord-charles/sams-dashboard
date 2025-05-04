@@ -31,13 +31,13 @@ const Schools = () => {
   );
 
   // Check for any errors
-  const errors = [ schoolsError, enrollmentError, statsError].filter(Boolean);
+  const errors = [schoolsError, enrollmentError, statsError].filter(Boolean);
 
   if (errors.length > 0) {
     return (
-      <FetchErrorDisplay 
-        error="Failed to load schools data. Please try again." 
-        retry={() => window.location.reload()} 
+      <FetchErrorDisplay
+        error="Failed to load schools data. Please try again."
+        retry={() => window.location.reload()}
       />
     );
   }
@@ -63,17 +63,15 @@ const Schools = () => {
   }
   return (
     <div className="bg-gradient-to-b from-primary/20 to-background p-2">
-      <div className="mb-2 p-1">
-        <SchoolBreadcrumb />
-      </div>
-      <AdvancedStatCards 
-        enrollmentData={enrollmentData === undefined || enrollmentData ===null  ? [] : enrollmentData} 
-        schools={schools?.data || []} 
-        overallLearnerStats={overallLearnerStats=== undefined || overallLearnerStats ===null  ? [] : overallLearnerStats}
+
+      <AdvancedStatCards
+        enrollmentData={enrollmentData === undefined || enrollmentData === null ? [] : enrollmentData}
+        schools={schools?.data || []}
+        overallLearnerStats={overallLearnerStats === undefined || overallLearnerStats === null ? [] : overallLearnerStats}
       />
-      <SchoolsTabs 
-        schools={schools?.data || []} 
-        enrollmentData={enrollmentData === undefined || enrollmentData ===null  ? [] : enrollmentData} 
+      <SchoolsTabs
+        schools={schools?.data || []}
+        enrollmentData={enrollmentData === undefined || enrollmentData === null ? [] : enrollmentData}
       />
     </div>
   );

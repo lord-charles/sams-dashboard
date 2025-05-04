@@ -42,10 +42,10 @@ const swrConfig = {
 
 const AttendanceModule = () => {
   const currentYear = new Date().getFullYear();
-  
+
   // SWR hooks with error handling
   const { data: states, error: statesError } = useSWR(
-    `${base_url}data-set/get/2023_data/state`, 
+    `${base_url}data-set/get/2023_data/state`,
     fetcher,
     swrConfig
   );
@@ -57,7 +57,8 @@ const AttendanceModule = () => {
   );
 
   const { data: schools, error: schoolsError } = useIndexedSWR(
-    `${base_url}school-data/schools`
+    `${base_url}attendance/allSchools`,
+    { method: 'POST' }
   );
 
   const { data: schoolsWithAttendance, error: schoolsWithAttendanceError } = useSWR(
@@ -66,9 +67,9 @@ const AttendanceModule = () => {
     swrConfig
   );
 
- 
+
   const errors = [statesError, statsDataError, schoolsError, schoolsWithAttendanceError]
-                .filter(Boolean);
+    .filter(Boolean);
 
   if (errors.length > 0) {
     return (
@@ -95,7 +96,6 @@ const AttendanceModule = () => {
   if (isDbConnectionIssue) {
     return <DatabaseConnectionIssue />;
   }
-
   return (
     <AttendanceModuleClient
       initialStates={states || []}

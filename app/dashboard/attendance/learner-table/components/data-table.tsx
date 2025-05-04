@@ -35,7 +35,8 @@ interface DataTableProps<TData, TValue> {
   setSelectedIds?: (ids: string[]) => void;
   selectedIds?: string[];
   markStudentsAbsent?: (reason: string) => void;
-  handlePresent?: (reason: string) => void;
+  handlePresent: () => void;
+  date: Date;
 }
 
 export function DataTable<TData, TValue>({
@@ -44,7 +45,8 @@ export function DataTable<TData, TValue>({
   setSelectedIds,
   selectedIds,
   markStudentsAbsent,
-  handlePresent
+  handlePresent,
+  date
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
 
@@ -91,7 +93,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <DataTableToolbar table={table} selectedIds={selectedIds} markStudentsAbsent={markStudentsAbsent} handlePresent={handlePresent}/>
+      <DataTableToolbar table={table} selectedIds={selectedIds} markStudentsAbsent={markStudentsAbsent} handlePresent={handlePresent} date={date} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -103,9 +105,9 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}

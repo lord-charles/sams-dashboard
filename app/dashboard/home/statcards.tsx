@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { School, Users, BarChart3, PieChart, Building2, ClipboardCheck } from "lucide-react"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
 
 type EnrollmentData = {
   _id: string
@@ -73,9 +74,10 @@ const attendanceData = [
   { state10: "WRP", average: 79, male: 81, female: 77 },
 ]
 
+
 // Simple Stat Card Component
 const StatCard = ({ icon, label, value, color = "bg-primary", description = '' }: { icon: React.ReactNode, label: string, value: string, color?: string, description?: string }) => (
-  <Card>
+  <Card className="border-t-4 border-t-primary shadow-md hover:shadow-lg transition-shadow">
     <CardContent className="p-6">
       <div className="flex items-center space-x-4">
         <div className={`rounded-full ${color}/15 p-3`}>{icon}</div>
@@ -126,6 +128,7 @@ export default function EducationStatsDashboard({ schoolsData, enrollmentData }:
       totalWithDisability,
     };
   }
+
 
   const calculateSchoolTotals = () => {
     let totalPrimary = 0
@@ -212,6 +215,35 @@ export default function EducationStatsDashboard({ schoolsData, enrollmentData }:
   const schoolTotals = calculateSchoolTotals()
   const classroomTotals = calculateClassroomTotals()
   const attendanceAverages = calculateAverageAttendance()
+
+  // Calculate learners with disability by gender
+  const calculateLearnerDisabilityTotals = () => {
+    let totalMale = 0;
+    let totalFemale = 0;
+    if (Array.isArray(enrollmentData)) {
+      for (const school of enrollmentData) {
+        if (school?.isEnrollmentComplete?.some((item) => item.learnerEnrollmentComplete === true)) {
+          const gradeStats = Object.values(school?.learnerStats || {});
+          for (const stats of gradeStats) {
+            const withDisability = stats?.withDisability || 0;
+            const male = stats?.male || 0;
+            const female = stats?.female || 0;
+            const total = male + female;
+            if (withDisability > 0 && total > 0) {
+              const maleProp = male / total;
+              const femaleProp = female / total;
+              totalMale += withDisability * maleProp;
+              totalFemale += withDisability * femaleProp;
+            }
+          }
+        }
+      }
+    }
+    // Round to nearest integer for display
+    return { totalMale: Math.round(totalMale), totalFemale: Math.round(totalFemale) };
+  };
+  const learnerDisabilityTotals = calculateLearnerDisabilityTotals();
+
   return (
     <div className="py-4">
       <div className="px-4">
@@ -222,42 +254,85 @@ export default function EducationStatsDashboard({ schoolsData, enrollmentData }:
           </p>
         </div>
 
-        <Tabs defaultValue="overview" className="w-full"> 
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 mb-8">
-            <TabsTrigger value="overview"  className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none">
-              <span className="flex items-center gap-2">
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 lg:mb-4 mb-20 transition-all duration-200 hover:bg-muted/80
+            data-[state=active]:bg-primary data-[state=active]:text-primary-foreground 
+            data-[state=active]:shadow-none flex-shrink-0">
+            <TabsTrigger
+              value="overview"
+              className="rounded-md py-2 px-3 transition-all duration-200 hover:bg-muted/80
+          data-[state=active]:bg-primary data-[state=active]:text-primary-foreground 
+          data-[state=active]:shadow-none flex-shrink-0"
+            >
+              <span className="flex items-center gap-2 justify-center">
                 <BarChart3 className="h-4 w-4" />
-                <span className="hidden sm:inline">Overview</span>
+                <span className="hidden sm:inline text-sm font-medium">Overview</span>
+                <span className="sm:hidden text-[10px] font-medium">Overview</span>
               </span>
             </TabsTrigger>
-            <TabsTrigger value="schools"  className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none">
-              <span className="flex items-center gap-2">
+
+            <TabsTrigger
+              value="schools"
+              className="rounded-md py-2 px-3 transition-all duration-200 hover:bg-muted/80
+          data-[state=active]:bg-primary data-[state=active]:text-primary-foreground 
+          data-[state=active]:shadow-none flex-shrink-0"
+            >
+              <span className="flex items-center gap-2 justify-center">
                 <School className="h-4 w-4" />
-                <span className="hidden sm:inline">Schools</span>
+                <span className="hidden sm:inline text-sm font-medium">Schools</span>
+                <span className="sm:hidden text-[10px] font-medium">Schools</span>
               </span>
             </TabsTrigger>
-            <TabsTrigger value="learners"  className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none">
-              <span className="flex items-center gap-2">
+
+            <TabsTrigger
+              value="learners"
+              className="rounded-md py-2 px-3 transition-all duration-200 hover:bg-muted/80
+          data-[state=active]:bg-primary data-[state=active]:text-primary-foreground 
+          data-[state=active]:shadow-none flex-shrink-0"
+            >
+              <span className="flex items-center gap-2 justify-center">
                 <Users className="h-4 w-4" />
-                <span className="hidden sm:inline">Learners</span>
+                <span className="hidden sm:inline text-sm font-medium">Learners</span>
+                <span className="sm:hidden text-[10px] font-medium">Learners</span>
               </span>
             </TabsTrigger>
-            <TabsTrigger value="classrooms"  className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none">
-              <span className="flex items-center gap-2">
+
+            <TabsTrigger
+              value="classrooms"
+              className="rounded-md py-2 px-3 transition-all duration-200 hover:bg-muted/80
+          data-[state=active]:bg-primary data-[state=active]:text-primary-foreground 
+          data-[state=active]:shadow-none flex-shrink-0"
+            >
+              <span className="flex items-center gap-2 justify-center">
                 <Building2 className="h-4 w-4" />
-                <span className="hidden sm:inline">Classrooms</span>
+                <span className="hidden sm:inline text-sm font-medium">Classrooms</span>
+                <span className="sm:hidden text-[10px] font-medium">Classrooms</span>
               </span>
             </TabsTrigger>
-            <TabsTrigger value="attendance"  className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none">
-              <span className="flex items-center gap-2">
+
+            <TabsTrigger
+              value="attendance"
+              className="rounded-md py-2 px-3 transition-all duration-200 hover:bg-muted/80
+          data-[state=active]:bg-primary data-[state=active]:text-primary-foreground 
+          data-[state=active]:shadow-none flex-shrink-0"
+            >
+              <span className="flex items-center gap-2 justify-center">
                 <ClipboardCheck className="h-4 w-4" />
-                <span className="hidden sm:inline">Attendance</span>
+                <span className="hidden sm:inline text-sm font-medium">Attendance</span>
+                <span className="sm:hidden text-[10px] font-medium">Attendance</span>
               </span>
             </TabsTrigger>
-            <TabsTrigger value="distribution"  className="rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-none">
-              <span className="flex items-center gap-2">
+
+            <TabsTrigger
+              value="distribution"
+              className="rounded-md py-2 px-3 transition-all duration-200 hover:bg-muted/80
+          data-[state=active]:bg-primary data-[state=active]:text-primary-foreground 
+          data-[state=active]:shadow-none flex-shrink-0"
+            >
+              <span className="flex items-center gap-2 justify-center">
                 <PieChart className="h-4 w-4" />
-                <span className="hidden sm:inline">Distribution</span>
+                <span className="hidden sm:inline text-sm font-medium">Distribution</span>
+                <span className="sm:hidden text-[10px] font-medium">Distribution</span>
               </span>
             </TabsTrigger>
           </TabsList>
@@ -294,97 +369,124 @@ export default function EducationStatsDashboard({ schoolsData, enrollmentData }:
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
+              <Card className="border-b-2 border-t-primary shadow-md hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <h3 className="text-lg font-semibold mb-4">Key Statistics</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                    <div className="space-y-8">
                       <div>
-                        <h4 className="text-sm font-medium mb-2">Gender Distribution</h4>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-xs">
-                            Male ({Math.round((learnerTotals.totalMale / learnerTotals.totalLearners) * 100)}%)
-                          </span>
-                          <span className="text-xs">{learnerTotals.totalMale.toLocaleString()}</span>
-                        </div>
-                        <Progress
-                          value={(learnerTotals.totalMale / learnerTotals.totalLearners) * 100}
-                          className="h-2"
-                        />
+                        <h4 className="text-sm font-semibold mb-3 text-primary">Gender Distribution</h4>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="flex items-center gap-1 text-xs"><Users className="h-4 w-4 text-blue-500" />Male ({Math.round((learnerTotals.totalMale / learnerTotals.totalLearners) * 100)}%)</span>
+                            <span className="text-xs font-medium">{learnerTotals.totalMale.toLocaleString()}</span>
+                          </div>
+                          <Progress value={(learnerTotals.totalMale / learnerTotals.totalLearners) * 100} className="h-2" />
 
-                        <div className="flex justify-between mb-1 mt-3">
-                          <span className="text-xs">
-                            Female ({Math.round((learnerTotals.totalFemale / learnerTotals.totalLearners) * 100)}%)
-                          </span>
-                          <span className="text-xs">{learnerTotals.totalFemale.toLocaleString()}</span>
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="flex items-center gap-1 text-xs"><Users className="h-4 w-4 text-rose-500" />Female ({Math.round((learnerTotals.totalFemale / learnerTotals.totalLearners) * 100)}%)</span>
+                            <span className="text-xs font-medium">{learnerTotals.totalFemale.toLocaleString()}</span>
+                          </div>
+                          <Progress value={(learnerTotals.totalFemale / learnerTotals.totalLearners) * 100} className="h-2 bg-muted [&>div]:bg-rose-500" />
                         </div>
-                        <Progress
-                          value={(learnerTotals.totalFemale / learnerTotals.totalLearners) * 100}
-                          className="h-2 bg-muted [&>div]:bg-rose-500"
-                        />
+                        <div className="flex justify-between items-center mt-2">
+                          <span className="flex items-center gap-1 text-xs font-semibold"><Users className="h-4 w-4 text-primary" />Total</span>
+                          <span className="text-xs font-semibold">{learnerTotals.totalLearners.toLocaleString()}</span>
+                        </div>
                       </div>
 
+                      {/* Learners with Disability (by gender) */}
                       <div>
-                        <h4 className="text-sm font-medium mb-2">New Enrollments</h4>
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-2xl font-bold">{learnerTotals.totalNew.toLocaleString()}</span>
-                          <span className="text-xs text-muted-foreground">
-                            ({Math.round((learnerTotals.totalNew / learnerTotals.totalLearners) * 100)}% of total)
-                          </span>
+                        <h4 className="text-sm font-semibold mb-3 text-primary">Learners with Disability</h4>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="flex items-center gap-1 text-xs"><Users className="h-4 w-4 text-blue-500" />Male ({learnerDisabilityTotals.totalMale > 0 ? Math.round((learnerDisabilityTotals.totalMale / learnerTotals.totalWithDisability) * 100) : 0}%)</span>
+                            <span className="text-xs font-medium">{learnerDisabilityTotals.totalMale.toLocaleString()}</span>
+                          </div>
+                          <Progress value={learnerDisabilityTotals.totalMale > 0 ? (learnerDisabilityTotals.totalMale / learnerTotals.totalWithDisability) * 100 : 0} className="h-2 bg-muted [&>div]:bg-blue-500" />
+
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="flex items-center gap-1 text-xs"><Users className="h-4 w-4 text-rose-500" />Female ({learnerDisabilityTotals.totalFemale > 0 ? Math.round((learnerDisabilityTotals.totalFemale / learnerTotals.totalWithDisability) * 100) : 0}%)</span>
+                            <span className="text-xs font-medium">{learnerDisabilityTotals.totalFemale.toLocaleString()}</span>
+                          </div>
+                          <Progress value={learnerDisabilityTotals.totalFemale > 0 ? (learnerDisabilityTotals.totalFemale / learnerTotals.totalWithDisability) * 100 : 0} className="h-2 bg-muted [&>div]:bg-pink-500" />
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="flex items-center gap-1 text-xs font-semibold"><Users className="h-4 w-4 text-emerald-500" />Total</span>
+                            <span className="text-xs font-semibold">{learnerTotals.totalWithDisability.toLocaleString()}</span>
+                          </div>
+                        </div>
+                      </div>
+
+
+                    </div>
+
+                    {/* Right: School & Classroom Types */}
+                    <div className="space-y-8">
+                      {/* School Types */}
+                      <div>
+                        <h4 className="text-sm font-semibold mb-3 text-primary">School Types</h4>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="flex items-center gap-1 text-xs"><School className="h-4 w-4 text-primary" />Primary</span>
+                            <span className="text-xs font-medium">{schoolTotals.totalPrimary.toLocaleString()}</span>
+                          </div>
+                          <Progress value={(schoolTotals.totalPrimary / schoolTotals.totalSchools) * 100} className="h-2" />
+
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="flex items-center gap-1 text-xs"><School className="h-4 w-4 text-emerald-500" />Secondary</span>
+                            <span className="text-xs font-medium">{schoolTotals.totalSecondary.toLocaleString()}</span>
+                          </div>
+                          <Progress value={(schoolTotals.totalSecondary / schoolTotals.totalSchools) * 100} className="h-2 bg-muted [&>div]:bg-emerald-500" />
+
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="flex items-center gap-1 text-xs"><School className="h-4 w-4 text-amber-500" />ECD</span>
+                            <span className="text-xs font-medium">{schoolTotals.totalECD.toLocaleString()}</span>
+                          </div>
+                          <Progress value={(schoolTotals.totalECD / schoolTotals.totalSchools) * 100} className="h-2 bg-muted [&>div]:bg-amber-500" />
+
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="flex items-center gap-1 text-xs"><School className="h-4 w-4 text-purple-500" />ALP</span>
+                            <span className="text-xs font-medium">{schoolTotals.totalALP.toLocaleString()}</span>
+                          </div>
+                          <Progress value={(schoolTotals.totalALP / schoolTotals.totalSchools) * 100} className="h-2 bg-muted [&>div]:bg-purple-500" />
+
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="flex items-center gap-1 text-xs"><School className="h-4 w-4 text-pink-500" />ASP</span>
+                            <span className="text-xs font-medium">{schoolTotals.totalASP.toLocaleString()}</span>
+                          </div>
+                          <Progress value={(schoolTotals.totalASP / schoolTotals.totalSchools) * 100} className="h-2 bg-muted [&>div]:bg-pink-500" />
+
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="flex items-center gap-1 text-xs"><School className="h-4 w-4 text-sky-500" />CGS</span>
+                            <span className="text-xs font-medium">{schoolTotals.totalCGS.toLocaleString()}</span>
+                          </div>
+                          <Progress value={(schoolTotals.totalCGS / schoolTotals.totalSchools) * 100} className="h-2 bg-muted [&>div]:bg-sky-500" />
+
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="flex items-center gap-1 text-xs"><School className="h-4 w-4 text-teal-500" />TTI</span>
+                            <span className="text-xs font-medium">{schoolTotals.totalTTI.toLocaleString()}</span>
+                          </div>
+                          <Progress value={(schoolTotals.totalTTI / schoolTotals.totalSchools) * 100} className="h-2 bg-muted [&>div]:bg-teal-500" />
                         </div>
                       </div>
                     </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="text-sm font-medium mb-2">School Types</h4>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-xs">Primary</span>
-                          <span className="text-xs">{schoolTotals.totalPrimary.toLocaleString()}</span>
-                        </div>
-                        <Progress
-                          value={(schoolTotals.totalPrimary / schoolTotals.totalSchools) * 100}
-                          className="h-2"
-                        />
-
-                        <div className="flex justify-between mb-1 mt-3">
-                          <span className="text-xs">Secondary</span>
-                          <span className="text-xs">{schoolTotals.totalSecondary.toLocaleString()}</span>
-                        </div>
-                        <Progress
-                          value={(schoolTotals.totalSecondary / schoolTotals.totalSchools) * 100}
-                          className="h-2 bg-muted [&>div]:bg-emerald-500"
-                        />
-                      </div>
-
-                      <div>
-                        <h4 className="text-sm font-medium mb-2">Classroom Types</h4>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-xs">Permanent</span>
-                          <span className="text-xs">{classroomTotals.totalPermanent.toLocaleString()}</span>
-                        </div>
-                        <Progress
-                          value={(classroomTotals.totalPermanent / classroomTotals.totalClassrooms) * 100}
-                          className="h-2 bg-muted [&>div]:bg-cyan-500"
-                        />
-
-                        <div className="flex justify-between mb-1 mt-3">
-                          <span className="text-xs">Temporary</span>
-                          <span className="text-xs">{classroomTotals.totalTemporary.toLocaleString()}</span>
-                        </div>
-                        <Progress
-                          value={(classroomTotals.totalTemporary / classroomTotals.totalClassrooms) * 100}
-                          className="h-2 bg-muted [&>div]:bg-amber-500"
-                        />
-                      </div>
+                  </div>
+                  <Separator className="my-2 bg-primary" orientation="horizontal" />
+                  {/* New Enrollments */}
+                  <div className="flex items-center space-x-4">
+                    <h4 className="text-lg font-semibold text-primary">New Enrollments</h4>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold">{learnerTotals.totalNew.toLocaleString()}</span>
+                      <span className="text-xs text-muted-foreground">({Math.round((learnerTotals.totalNew / learnerTotals.totalLearners) * 100)}% of total)</span>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border-b-2 border-t-primary shadow-md hover:shadow-lg transition-shadow">
+
                 <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Top 5 States by Enrollment</h3>
+                  <h3 className="text-lg font-semibold mb-4">Top 6 States by Enrollment</h3>
                   <div className="space-y-4">
                     {enrollmentData
                       // Group schools by state and calculate totals
@@ -417,7 +519,7 @@ export default function EducationStatsDashboard({ schoolsData, enrollmentData }:
                       }, [])
                       .filter((state: any) => state.state10 !== "State X")
                       .sort((a: any, b: any) => (b.male + b.female) - (a.male + a.female))
-                      .slice(0, 5)
+                      .slice(0, 6)
                       .map((state: any, index: any) => {
                         const total = state.male + state.female;
                         const percentage = (total / learnerTotals.totalLearners) * 100;
@@ -462,11 +564,11 @@ export default function EducationStatsDashboard({ schoolsData, enrollmentData }:
                   <div className="mt-4 md:mt-0 flex flex-wrap gap-3">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-primary"></div>
-                      <span className="text-sm">Primary: {schoolTotals.totalPrimary}</span>
+                      <span className="text-sm">PRI: {schoolTotals.totalPrimary}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-                      <span className="text-sm">Secondary: {schoolTotals.totalSecondary}</span>
+                      <span className="text-sm">SEC: {schoolTotals.totalSecondary}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-amber-500"></div>
@@ -476,6 +578,18 @@ export default function EducationStatsDashboard({ schoolsData, enrollmentData }:
                       <div className="w-3 h-3 rounded-full bg-purple-500"></div>
                       <span className="text-sm">ALP: {schoolTotals.totalALP}</span>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-pink-500"></div>
+                      <span className="text-sm">ASP: {schoolTotals.totalASP}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-sky-500"></div>
+                      <span className="text-sm">CGS: {schoolTotals.totalCGS}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-teal-500"></div>
+                      <span className="text-sm">TTI: {schoolTotals.totalTTI}</span>
+                    </div>
                   </div>
                 </div>
 
@@ -483,12 +597,13 @@ export default function EducationStatsDashboard({ schoolsData, enrollmentData }:
                   <TableHeader>
                     <TableRow>
                       <TableHead>State</TableHead>
-                      <TableHead className="text-right">Primary</TableHead>
-                      <TableHead className="text-right">Secondary</TableHead>
+                      <TableHead className="text-right">PRI</TableHead>
+                      <TableHead className="text-right">SEC</TableHead>
                       <TableHead className="text-right">ECD</TableHead>
                       <TableHead className="text-right">ALP</TableHead>
                       <TableHead className="text-right">ASP</TableHead>
                       <TableHead className="text-right">CGS</TableHead>
+                      <TableHead className="text-right">TTI</TableHead>
                       <TableHead className="text-right">Total</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -504,6 +619,7 @@ export default function EducationStatsDashboard({ schoolsData, enrollmentData }:
                           <TableCell className="text-right">{state.ALP}</TableCell>
                           <TableCell className="text-right">{state.ASP}</TableCell>
                           <TableCell className="text-right">{state.CGS}</TableCell>
+                          <TableCell className="text-right">{state.TTI}</TableCell>
                           <TableCell className="text-right font-semibold">{total}</TableCell>
                         </TableRow>
                       )
@@ -516,6 +632,7 @@ export default function EducationStatsDashboard({ schoolsData, enrollmentData }:
                       <TableCell className="text-right font-bold">{schoolTotals.totalALP}</TableCell>
                       <TableCell className="text-right font-bold">{schoolTotals.totalASP}</TableCell>
                       <TableCell className="text-right font-bold">{schoolTotals.totalCGS}</TableCell>
+                      <TableCell className="text-right font-bold">{schoolTotals.totalTTI}</TableCell>
                       <TableCell className="text-right font-bold">{schoolTotals.totalSchools}</TableCell>
                     </TableRow>
                   </TableBody>
@@ -539,12 +656,16 @@ export default function EducationStatsDashboard({ schoolsData, enrollmentData }:
                       <span className="text-sm">Male: {learnerTotals.totalMale.toLocaleString()}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-rose-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-purple-500"></div>
                       <span className="text-sm">Female: {learnerTotals.totalFemale.toLocaleString()}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-amber-500"></div>
                       <span className="text-sm">New: {learnerTotals.totalNew.toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                      <span className="text-sm">LWD: {learnerTotals.totalWithDisability.toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
@@ -562,13 +683,13 @@ export default function EducationStatsDashboard({ schoolsData, enrollmentData }:
                   </TableHeader>
                   <TableBody>
                     {[
-                      "AAA", "CES", "EES", "JGL", "LKS", "NBG", "PAA", 
+                      "AAA", "CES", "EES", "JGL", "LKS", "NBG", "PAA",
                       "RAA", "UNS", "UTY", "WBG", "WES", "WRP"
                     ].map((stateCode) => {
                       // Get all schools for this state with complete enrollment
                       const stateSchools = enrollmentData.filter(
-                        school => school.state10 === stateCode && 
-                        school.isEnrollmentComplete?.some(item => item.learnerEnrollmentComplete === true)
+                        school => school.state10 === stateCode &&
+                          school.isEnrollmentComplete?.some(item => item.learnerEnrollmentComplete === true)
                       );
 
                       // Calculate state totals
@@ -899,13 +1020,13 @@ export default function EducationStatsDashboard({ schoolsData, enrollmentData }:
                   <h3 className="text-xl font-semibold mb-6">Gender Distribution by State</h3>
                   <div className="space-y-6">
                     {[
-                      "AAA", "CES", "EES", "JGL", "LKS", "NBG", "PAA", 
+                      "AAA", "CES", "EES", "JGL", "LKS", "NBG", "PAA",
                       "RAA", "UNS", "UTY", "WBG", "WES", "WRP"
                     ].map((stateCode) => {
                       // Get all schools for this state with complete enrollment
                       const stateSchools = enrollmentData.filter(
-                        school => school.state10 === stateCode && 
-                        school.isEnrollmentComplete?.some(item => item.learnerEnrollmentComplete === true)
+                        school => school.state10 === stateCode &&
+                          school.isEnrollmentComplete?.some(item => item.learnerEnrollmentComplete === true)
                       );
 
                       // Calculate state totals

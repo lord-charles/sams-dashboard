@@ -9,6 +9,19 @@ import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { DataTableViewOptions } from "./data-table-view-options";
 import { statesCountyPayams } from "../data/states-county-payams";
 
+const percentageCompleteOptions = [
+  { value: "10", label: "< 10%" },
+  { value: "20", label: "< 20%" },
+  { value: "30", label: "< 30%" },
+  { value: "40", label: "< 40%" },
+  { value: "50", label: "< 50%" },
+  { value: "60", label: "< 60%" },
+  { value: "70", label: "< 70%" },
+  { value: "80", label: "< 80%" },
+  { value: "90", label: "< 90%" },
+  { value: "100", label: "< 100%" },
+];
+
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
 }
@@ -100,6 +113,13 @@ export function DataTableToolbar<TData>({
             column={table?.getColumn("payam28")}
             title="Payam"
             options={filteredPayams}
+          />
+        )}
+        {table.getColumn("percentageComplete") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("percentageComplete")}
+            title="% Complete"
+            options={percentageCompleteOptions}
           />
         )}
         {isFiltered && (

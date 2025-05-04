@@ -121,7 +121,7 @@ function FilterCombobox({ options, value, onChange, placeholder, disabled = fals
           const option = options.find(opt => opt.value === value)
           if (!option) return 0
           const label = option.label.toLowerCase()
-          
+
           // Check if search matches start of school name
           if (label.startsWith(normalizedSearch)) return 1
           // Check if search is found anywhere in school name or value
@@ -163,7 +163,7 @@ function FilterCombobox({ options, value, onChange, placeholder, disabled = fals
   )
 }
 
-export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools: SchoolData[] ,schoolsData:SchoolData[]}) {
+export default function EnrollmentStats({ allSchools, schoolsData }: { allSchools: SchoolData[], schoolsData: SchoolData[] }) {
   // State for filters
   const [state, setState] = useState<string | null>(null)
   const [county, setCounty] = useState<string | null>(null)
@@ -202,8 +202,8 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
   const uniqueCounties = useMemo(() => {
     const counties = state
       ? Array.from(new Set(
-          allSchools.filter((school) => !state || school.state10 === state).map((school) => school.county28),
-        ))
+        allSchools.filter((school) => !state || school.state10 === state).map((school) => school.county28),
+      ))
       : Array.from(new Set(allSchools.map((school) => school.county28)))
     return counties.sort()
   }, [allSchools, state])
@@ -257,34 +257,35 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
   )
 
   const schoolOwnershipOptions = useMemo(
-  () => [
-    { value: "Community", label: "Community" },
-    { value: "Faith-Based", label: "Faith-Based" },
-    { value: "Private", label: "Private" },
-    { value: "Public", label: "Public" }
-  ],
-  []
-)
+    () => [
+      { value: "Community", label: "Community" },
+      { value: "Faith-Based", label: "Faith-Based" },
+      { value: "Private", label: "Private" },
+      { value: "Public", label: "Public" }
+    ],
+    []
+  )
 
 
   // Apply filters to the data
   const filteredSchoolData = useMemo(
-  () =>
-    schoolsData.filter((school) =>
-      (!state || school.state10 === state) &&
-      (!county || school.county28 === county) &&
-      (!payam || school.payam28 === payam) &&
-      (!schoolType || school.schoolType === schoolType) &&
-      (!schoolOwnership || (school.schoolOwnerShip || "").trim().toLowerCase() === schoolOwnership.toLowerCase()) &&
-      (!code || school.code === code) &&
-      (!selectedSchool || school._id === selectedSchool)
-    ),
-  [allSchools, state, county, payam, schoolType, schoolOwnership, code, selectedSchool],
-)
+    () =>
+      schoolsData.filter((school) =>
+        (!state || school.state10 === state) &&
+        (!county || school.county28 === county) &&
+        (!payam || school.payam28 === payam) &&
+        (!schoolType || school.schoolType === schoolType) &&
+        (!schoolOwnership || (school.schoolOwnerShip || "").trim().toLowerCase() === schoolOwnership.toLowerCase()) &&
+        (!code || school.code === code) &&
+        (!selectedSchool || school._id === selectedSchool)
+      ),
+    [allSchools, state, county, payam, schoolType, schoolOwnership, code, selectedSchool],
+  )
 
   // Filter schools that have started enrollment for the current year
   const schoolsWithStartedEnrollment = filteredSchoolData.filter((school) =>
     school.isEnrollmentComplete.some((status) => status.year === currentYear),
+
   )
 
   // Calculate key metrics
@@ -301,7 +302,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
 
   // Completion rate (percentage of schools that completed enrollment out of those that started)
   const completionRate =
-    totalStartedEnrollment > 0 ? Math.round((completedEnrollment / totalStartedEnrollment) * 100) : 0
+    totalStartedEnrollment > 0 ? ((completedEnrollment / totalStartedEnrollment) * 100).toFixed(2) : 0
 
   // Schools with low completion percentage (below 30%)
   const lowCompletionSchools = schoolsWithStartedEnrollment.filter((school) => {
@@ -1165,7 +1166,7 @@ export default function EnrollmentStats({ allSchools,schoolsData }: { allSchools
                     <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${disabilityPercentage}%` }} />
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Current year:{" "}
+                    Current year ({currentYear}):{" "}
                     <span className="font-medium">
                       {learnerStats.total.currentYear.withDisability.toLocaleString()}
                     </span>{" "}

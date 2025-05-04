@@ -12,6 +12,7 @@ const customIncludesStringFilter = (row, columnId, filterValue) => {
   return cellValue.toLowerCase().includes(filterValue.toLowerCase());
 };
 
+
 const enrollmentStatusColor = (percentage) => {
   if (percentage === 100) return "success";
   if (percentage >= 75) return "default";
@@ -93,6 +94,45 @@ export const columns = [
     cell: ({ row }) => <div>{row.getValue("state10")}</div>,
   },
   {
+    accessorKey: "percentageComplete",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="% Complete" />
+    ),
+    cell: ({ row }) => {
+      // Support both top-level and nested data fallback
+      let value = row.getValue("percentageComplete");
+      if (typeof value !== "number") {
+        // fallback: try to extract from isEnrollmentComplete[0]
+        const enrollmentArr = row.original.isEnrollmentComplete;
+        if (Array.isArray(enrollmentArr) && enrollmentArr[0] && typeof enrollmentArr[0].percentageComplete === "number") {
+          value = enrollmentArr[0].percentageComplete;
+        } else {
+          value = undefined;
+        }
+      }
+      return (
+        <span className="font-mono">
+          {typeof value === "number" ? `${value}%` : "-"}
+        </span>
+      );
+    },
+    enableColumnFilter: true,
+    filterFn: (row, columnId, filterValue) => {
+      // Support both top-level and nested data fallback
+      let value = row.getValue(columnId);
+      if (typeof value !== "number") {
+        const enrollmentArr = row.original.isEnrollmentComplete;
+        if (Array.isArray(enrollmentArr) && enrollmentArr[0] && typeof enrollmentArr[0].percentageComplete === "number") {
+          value = enrollmentArr[0].percentageComplete;
+        } else {
+          value = undefined;
+        }
+      }
+      const threshold = Number(filterValue);
+      return typeof value === "number" && value < threshold;
+    },
+  },
+  {
     accessorKey: "isEnrollmentComplete",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Enrollment Status" />
@@ -100,7 +140,7 @@ export const columns = [
     cell: ({ row }) => {
       const latestEnrollment = row.original.isEnrollmentComplete?.[0];
       if (!latestEnrollment) return null;
-      
+
       return (
         <div className="space-y-1">
           <TooltipProvider>
@@ -108,9 +148,9 @@ export const columns = [
               <TooltipTrigger asChild>
                 <div className="flex items-center gap-2">
                   <Badge
-                    variant={latestEnrollment.isComplete ? "success" : "destructive"}
+                    variant={(latestEnrollment.isComplete && latestEnrollment.percentageComplete === 100) ? "success" : "destructive"}
                   >
-                    {latestEnrollment.isComplete ? "Complete" : "Incomplete"}
+                    {(latestEnrollment.isComplete && latestEnrollment.percentageComplete === 100) ? "Complete" : "Incomplete"}
                   </Badge>
                   {latestEnrollment.percentageComplete && (
                     <Progress
@@ -154,6 +194,19 @@ export const columns = [
         </div>
       );
     },
+  },
+  {
+    id: "details",
+    header: "Details",
+    cell: ({ row }) => {
+      const school = row.original;
+      // Lazy import to avoid SSR issues if needed
+      const Dialog = require("./SchoolEnrollmentDialog");
+      return <Dialog.SchoolEnrollmentDialog school={school} />;
+    },
+    enableSorting: false,
+    enableHiding: false,
+    size: 0,
   },
   {
     accessorKey: "action",

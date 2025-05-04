@@ -6,7 +6,6 @@ import { Card, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
-// Define proper types for our data
 type LearnerStats = {
   total: number
   male: number
@@ -22,12 +21,6 @@ type SchoolEnrollmentStatus = {
   percentageCompleted: number
 }
 
-type SchoolType = {
-  public: number
-  private: number
-  faithBased: number
-  other: number
-}
 
 type OverallLearnerStats = {
   overall: {
@@ -85,16 +78,16 @@ interface SchoolStatCardsProps {
 }
 
 
-  // Map school type codes to readable names
-  const schoolTypeNames: Record<string, string> = {
-    PRI: "PRI",
-    SEC: "SEC",
-    ECD: "ECD",
-    ALP: "ALP",
-    CGS: "CGS",
-    ASP: "ASP",
-    TTI: "TTI",
-  }
+// Map school type codes to readable names
+const schoolTypeNames: Record<string, string> = {
+  PRI: "PRI",
+  SEC: "SEC",
+  ECD: "ECD",
+  ALP: "ALP",
+  CGS: "CGS",
+  ASP: "ASP",
+  TTI: "TTI",
+}
 
 export default function SchoolStatCards({ enrollmentData, schools, overallLearnerStats }: SchoolStatCardsProps) {
   const currentYear = new Date().getFullYear()
@@ -111,7 +104,7 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
     }
 
     // Process each school
-    enrollmentData?.filter(school => 
+    enrollmentData?.filter(school =>
       school.isEnrollmentComplete?.some(e => e.learnerEnrollmentComplete)
     ).forEach((school) => {
       if (school.learnerStats) {
@@ -142,9 +135,9 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
     enrollmentData?.forEach((school) => {
       const currentYearEnrollment = school.isEnrollmentComplete?.find((item) => item.year === currentYear)
 
-      if (currentYearEnrollment?.isComplete) {
-        status.started++
-      }
+      // if (currentYearEnrollment?.isComplete) {
+      status.started++
+      // }
 
       if (currentYearEnrollment?.learnerEnrollmentComplete) {
         status.completed++
@@ -221,27 +214,45 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
 
   const ownershipCounts = countSchoolsByOwnership(schools)
 
-  // Process school type data for the new card
+  // Process school type data for the new card (from enrollmentData)
   const schoolTypeData = useMemo(() => {
-    if (!overallLearnerStats?.bySchoolType) return []
+    // Initialize aggregation object
+    const typeAgg: Record<string, { total: number; male: number; female: number; withDisability: number }> = {};
+    let totalLearners = 0;
 
-    // Filter only the specified school types
-    const validSchoolTypes = overallLearnerStats.bySchoolType.filter(
-      (type) => schoolTypeNames[type?.schoolType]
-    )
+    Object.keys(schoolTypeNames).forEach(type => {
+      typeAgg[type] = { total: 0, male: 0, female: 0, withDisability: 0 };
+    });
 
-    // Sort by total learners
-    const sortedSchoolTypes = validSchoolTypes.sort((a, b) => b.total - a.total)
 
-    // Calculate percentages
-    const totalLearners = overallLearnerStats.overall.total || 1
-    return sortedSchoolTypes.map((type) => ({
-      ...type,
-      percentage: (type.total / totalLearners) * 100,
-      malePercentage: (type.male / type.total) * 100,
-      femalePercentage: (type.female / type.total) * 100,
-    }))
-  }, [overallLearnerStats])
+    enrollmentData?.forEach(school => {
+      const type = school.schoolType;
+      if (schoolTypeNames[type] && school.learnerStats) {
+        Object.values(school.learnerStats).forEach((data: any) => {
+          typeAgg[type].total += data?.total || 0;
+          typeAgg[type].male += data?.male || 0;
+          typeAgg[type].female += data?.female || 0;
+          typeAgg[type].withDisability += data?.withDisability || 0;
+          totalLearners += data?.total || 0;
+        });
+      }
+    });
+
+    // Convert to array and calculate percentages
+    return Object.entries(typeAgg)
+      .filter(([_type, agg]) => agg.total > 0)
+      .map(([type, agg]) => ({
+        schoolType: type,
+        total: agg.total,
+        male: agg.male,
+        female: agg.female,
+        withDisability: agg.withDisability,
+        percentage: totalLearners > 0 ? (agg.total / totalLearners) * 100 : 0,
+        malePercentage: agg.total > 0 ? (agg.male / agg.total) * 100 : 0,
+        femalePercentage: agg.total > 0 ? (agg.female / agg.total) * 100 : 0,
+      }))
+      .sort((a, b) => b.total - a.total);
+  }, [enrollmentData]);
 
 
   return (
@@ -288,9 +299,9 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
                   %)
                 </span>
               </div>
-              <Progress 
-                value={(learnerStats.total.withDisability / learnerStats.total.total) * 100} 
-                className="h-1.5 bg-blue-100 mt-1" 
+              <Progress
+                value={(learnerStats.total.withDisability / learnerStats.total.total) * 100}
+                className="h-1.5 bg-blue-100 mt-1"
               />
             </div>
 
@@ -328,13 +339,13 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
       <TooltipProvider>
         <Card className="border-t-4 border-t-teal-600 shadow-md hover:shadow-lg transition-shadow">
           <div className="flex flex-row items-center justify-between space-y-0 pb-2 p-3">
-            <CardTitle className="text-sm font-medium">7 School Types</CardTitle>
+            <CardTitle className="text-sm font-medium">{schoolTypeData?.length || 7} School Types</CardTitle>
             <div className="h-10 w-10 rounded-full bg-teal-100 flex items-center justify-center">
               <BookOpen className="h-5 w-5 text-teal-600" />
             </div>
           </div>
           <div className="pb-2 px-3">
-          
+
 
             <div className="mt-1 space-y-1">
               {schoolTypeData.map((type, index) => (
@@ -369,7 +380,7 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
               ))}
             </div>
 
-        
+
           </div>
         </Card>
       </TooltipProvider>

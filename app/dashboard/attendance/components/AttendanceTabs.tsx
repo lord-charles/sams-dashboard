@@ -12,8 +12,6 @@ import { Backdrop } from "@mui/material";
 import { Spinner } from "@nextui-org/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
-
-
 import { useRouter, useSearchParams } from "next/navigation";
 import SchoolsTableWithAttendance from "../school-table-attendance/schools";
 
@@ -67,6 +65,9 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
               learners={learners}
               setShowLearners={setShowLearners}
               setLearners={setLearners}
+              date={date}
+              setDate={setDate}
+              handlePresent={handlePresent}
             />
           </motion.div>
         </AnimatePresence>
@@ -113,6 +114,8 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
                       }}
                       handlePresent={handlePresent}
                       setLearners={setLearners}
+                      date={date}
+                      setDate={setDate}
                     />
                   </TabsContent>
                 ))}
@@ -136,10 +139,9 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
           >
-            <SchoolsTableWithAttendance schools={schoolsWithAttendance || []} setShowLearners={setShowLearners} setCode={setCode} 
-                date={date}
-                setDate={setDate}
-                />
+            <SchoolsTableWithAttendance schools={schoolsWithAttendance || []} setShowLearners={setShowLearners} setCode={setCode}
+
+            />
           </motion.div>
         </AnimatePresence>
       );
@@ -158,6 +160,9 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
               learners={learners}
               setShowLearners={setShowLearners}
               setLearners={setLearners}
+              date={date}
+              handlePresent={handlePresent}
+              setDate={setDate}
             />
           </motion.div>
         </AnimatePresence>
@@ -198,11 +203,11 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
                       setShowLearners={setShowLearners}
                       setSelectedIds={setSelectedIds}
                       selectedIds={selectedIds}
-                      markStudentsAbsent={(reason) => {
-                        setAbsenceReason(reason);
-                        markStudentsAbsent(reason);
-                      }}
+                      markStudentsAbsent={markStudentsAbsent}
+                      handlePresent={handlePresent}
                       setLearners={setLearners}
+                      date={date}
+                      setDate={setDate}
                     />
                   </TabsContent>
                 ))}
@@ -254,10 +259,10 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
           attendanceDate: newDate,
         }
       );
-    setLearners(response.data);
+      setLearners(response.data);
     } catch (error) {
       // Optionally handle error
-    setLearners([]);
+      setLearners([]);
       console.error("Failed to fetch learners", error);
     } finally {
       setIsLoading(false);
@@ -305,12 +310,12 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
 
   const markStudentsAbsent = async (reason: string) => {
     try {
-    setIsLoading(true);
+      setIsLoading(true);
 
       const res = await axios.post(`${base_url}attendance/markAttendanceBulk`, {
         studentIds: selectedIds,
         date,
-        absenceReason:reason,
+        absenceReason: reason,
         classId,
         code
       });
@@ -341,9 +346,9 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
           variant: "success",
         });
 
-    
+
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.log(error.response.data);
     } finally {
       setIsLoading(false);
@@ -352,6 +357,7 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
 
   const handlePresent = async () => {
     try {
+      console.log("handlePresent");
       setIsLoading(true);
 
       const res = await axios.post(
@@ -387,7 +393,7 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
           variant: "success",
         });
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.log(error.response.data);
     } finally {
       setIsLoading(false);
@@ -438,7 +444,7 @@ export default function AttendanceTabs({ statsData, schoolsData, schoolsWithAtte
           </div>
         </TabsContent>
         <TabsContent value="schools-with-attendance">
-        <div className="flex-1">
+          <div className="flex-1">
             <Backdrop
               sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
               open={isLoading}

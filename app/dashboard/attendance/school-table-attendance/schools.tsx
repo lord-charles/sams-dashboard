@@ -1,11 +1,22 @@
-import { columns } from "./components/columns";
-import { DataTable } from "./components/data-table";
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
-import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import { PlusCircle, Calendar as CalendarIcon, FilterX } from "lucide-react";
+import { CardDescription, CardTitle } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import * as React from "react";
+import { format } from "date-fns";
+import { Backdrop } from "@mui/material";
+import { Spinner } from "@nextui-org/react";
+import axios from "axios";
+import { base_url } from "@/app/utils/baseUrl";
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { DataTable } from "./components/data-table";
+import { columns } from "./components/columns";
 
 export type schoolInterface = {
   payam28: string;
@@ -108,108 +119,205 @@ export type schoolDataInterface = {
   _id: string;
 };
 
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { base_url } from "@/app/utils/baseUrl";
-import { Spinner } from "@nextui-org/react";
-import { Backdrop } from "@mui/material";
 
 export default function SchoolsTableWithAttendance({
-  schools: initialSchools,
+  schools,
   setShowLearners,
-  setCode,
-  date,
-  setDate
+  setCode
 }: {
   schools: schoolInterface[];
   setShowLearners: (show: boolean) => void;
   setCode: any
-  date: Date
-  setDate: (date: Date) => void
 }) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { toast } = useToast();
 
-  const [schools, setSchools] = useState<schoolInterface[]>(initialSchools || []);
-  const [loading, setLoading] = useState(false);
+  const [date, setDate] = React.useState<Date | undefined>(undefined);
+  const [range, setRange] = React.useState<{ from: Date | undefined; to: Date | undefined }>({ from: undefined, to: undefined });
+  const [loading, setLoading] = React.useState(false);
+  const [filteredSchools, setFilteredSchools] = React.useState<schoolInterface[]>(schools);
 
+  console.log(filteredSchools)
 
-  const handleDateChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newDate = new Date(e.target.value);
-    setDate(newDate);
+  const fetchSchools = async (params: any) => {
     setLoading(true);
     try {
-      const res = await axios.post(`${base_url}attendance/schoolsWithAttendance`, {
-        date: newDate
-      });
-      setSchools(Array.isArray(res.data) ? res.data : []);
+      const res = await axios.post(`${base_url}attendance/schoolsWithAttendance`, params);
+      setFilteredSchools(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      toast({
-        title: "Error",
-        description: "Could not fetch schools for this date",
-        variant: "destructive"
-      });
-      setSchools([]);
+      toast({ title: "Error", description: "Failed to fetch schools.", variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
 
+  React.useEffect(() => {
+    if (date) {
+      fetchSchools({ date: format(date, "yyyy-MM-dd") });
+    } else if (range.from && range.to) {
+      fetchSchools({ from: format(range.from, "yyyy-MM-dd"), to: format(range.to, "yyyy-MM-dd") });
+    } else {
+      setFilteredSchools(schools);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date, range.from, range.to, schools]);
+
+  const resetFilters = () => {
+    setDate(undefined);
+    setRange({ from: undefined, to: undefined });
+    setFilteredSchools(schools);
+  };
+
+  const isFiltered = !!date || !!(range.from && range.to);
+
   return (
-    <Card className="p-2">
+    <div className="shadow-md border-t-4 border-t-primary p-2 rounded-md">
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={loading}
       >
         <Spinner color="primary" size="lg" />
       </Backdrop>
-      <div className="hidden h-full flex-1 flex-col space-y-4 md:flex">
-        <div className="flex items-center justify-between">
-          <div className="space-y-2">
-            <CardTitle>Schools</CardTitle>
-            <CardDescription>Here&apos;s a list of schools with attendance today.</CardDescription>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div>
-              <input
-                type="date"
-                value={date ? date.toISOString().split('T')[0] : ''}
-                onChange={handleDateChange}
-                className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white dark:bg-neutral-900 text-sm shadow-sm transition-colors duration-150"
-              />
 
+      <div className="pb-2">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <div>
+            <CardTitle className="text-2xl font-bold tracking-tight">Schools Attendance</CardTitle>
+            <CardDescription className="text-muted-foreground mt-1">
+              View schools with attendance for a specific date or date range
+            </CardDescription>
+          </div>
+
+          <Button
+            className="bg-primary hover:bg-primary/90 text-white font-semibold self-start sm:self-center transition-all"
+            onClick={() => {
+              status === "authenticated" &&
+                session?.user?.userType === "SuperAdmin"
+                ? router.push("/dashboard/schools/new")
+                : toast({
+                  title: "Access Denied",
+                  description: "You do not have permission to add a new school",
+                  variant: "destructive",
+                });
+            }}
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            New School
+          </Button>
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="space-y-2">
+        <div className="bg-muted/50 rounded-lg">
+          <div className="mb-3">
+            <h3 className="font-medium text-sm text-muted-foreground">Filter Schools by Attendance</h3>
+          </div>
+
+          <div className="flex flex-wrap gap-4 items-center">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-[220px] justify-start text-left font-normal",
+                      date && "border-primary/50 bg-primary/5"
+                    )}
+                    disabled={!!range.from || !!range.to}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, "PPP") : <span>Select specific date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="p-0 w-auto">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={d => {
+                      setDate(d);
+                      setRange({ from: undefined, to: undefined });
+                    }}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-[260px] justify-start text-left font-normal",
+                      range.from && range.to && "border-primary/50 bg-primary/5"
+                    )}
+                    disabled={!!date}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {range.from && range.to
+                      ? `${format(range.from, "PPP")} - ${format(range.to, "PPP")}`
+                      : <span>Select date range</span>
+                    }
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="p-0 w-auto">
+                  <Calendar
+                    mode="range"
+                    selected={range}
+                    onSelect={r => {
+                      setRange(r as any);
+                      setDate(undefined);
+                    }}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+
+              {isFiltered && (
+                <Button
+                  variant="outline"
+                  onClick={resetFilters}
+                  className="self-end"
+                >
+                  <FilterX className="h-4 w-4 mr-2" />
+                  Reset Filters
+                </Button>
+              )}
             </div>
-            <Button
-              className={`text-white font-semibold`}
-              onClick={() => {
-                status === "authenticated" &&
-                  session?.user?.userType === "SuperAdmin"
-                  ? router.push("/dashboard/schools/new")
-                  : toast({
-                    title: "Error",
-                    description:
-                      "You do not have permission to add a new school",
-                    variant: "destructive",
-                  });
-              }}
-            >
-              <PlusCircle className="mr-2 h-4 w-4" />
-              New School
-            </Button>
+
+            <div className="ml-auto flex items-center">
+              <Badge variant="outline" className="bg-purple-100 text-purple-800 hover:bg-purple-100">
+                <div className="h-2 w-2 rounded-full bg-purple-500 mr-2"></div>
+                <span className="text-xs">Count (Attendance days count)</span>
+              </Badge>
+            </div>
           </div>
         </div>
-        {loading ? (
-          <div className="w-full flex justify-center py-10 text-muted-foreground">Loading schools...</div>
-        ) : (
+
+        <div className="rounded-md border p-1">
           <DataTable
-            data={Array.isArray(schools) ? schools : []}
+            data={Array.isArray(filteredSchools) ? filteredSchools : []}
             columns={columns}
             setShowLearners={setShowLearners}
             setCode={setCode}
           />
+        </div>
+
+        {filteredSchools.length === 0 && !loading && (
+          <div className="flex flex-col items-center justify-center py-10 text-center">
+            <p className="text-muted-foreground mb-2">No schools found matching your criteria</p>
+            {isFiltered && (
+              <Button variant="outline" onClick={resetFilters} size="sm">
+                Clear filters
+              </Button>
+            )}
+          </div>
         )}
       </div>
-    </Card>
+    </div>
   );
 }

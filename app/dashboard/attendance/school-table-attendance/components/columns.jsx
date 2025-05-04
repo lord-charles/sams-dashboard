@@ -1,7 +1,7 @@
 "use client";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
-import {  UserX, UserCheck, Accessibility, CalendarDays, MapPin, School2 } from "lucide-react";
+import { UserX, UserCheck, Accessibility, CalendarDays, MapPin, School2 } from "lucide-react";
 
 
 const customIncludesStringFilter = (row, columnId, filterValue) => {
@@ -150,6 +150,14 @@ export const columns = [
       </div>
     ),
   },
+  {
+    accessorKey: "reportCount",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Count" />
+    ),
+    cell: ({ row }) => <div>{row.getValue("reportCount")}</div>,
+  },
+
   {
     accessorKey: "actions",
     cell: ({ row, table }) => {
