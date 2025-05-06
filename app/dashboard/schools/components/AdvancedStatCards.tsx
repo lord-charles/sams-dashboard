@@ -89,8 +89,24 @@ const schoolTypeNames: Record<string, string> = {
   TTI: "TTI",
 }
 
-export default function SchoolStatCards({ enrollmentData, schools, overallLearnerStats }: SchoolStatCardsProps) {
+export default function SchoolStatCards({ enrollmentData, schools }: SchoolStatCardsProps) {
   const currentYear = new Date().getFullYear()
+
+  // Only schools with schoolStatus.isOpen === "open"
+  const openSchools = Array.isArray(schools)
+    ? schools.filter(
+      (school) =>
+        school.schoolStatus && school.schoolStatus.isOpen === "open"
+    )
+    : [];
+
+  const closedSchools = Array.isArray(schools)
+    ? schools.filter(
+      (school) =>
+        school.schoolStatus && school.schoolStatus.isOpen === "closed"
+    )
+    : [];
+
 
   // Calculate learner statistics
   const learnerStats = useMemo(() => {
@@ -125,7 +141,7 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
   // Calculate enrollment status for current year
   const enrollmentStatus = useMemo(() => {
     const status: SchoolEnrollmentStatus = {
-      total: schools?.length || 0,
+      total: openSchools?.length || 0,
       started: 0,
       completed: 0,
       percentageStarted: 0,
@@ -197,7 +213,7 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
     }
 
     // Iterate through each school
-    schools?.forEach((school: any) => {
+    openSchools?.forEach((school: any) => {
       const ownership = school.schoolOwnerShip
 
       // If ownership type exists in our counts object, increment it
@@ -212,7 +228,7 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
     return counts
   }
 
-  const ownershipCounts = countSchoolsByOwnership(schools)
+  const ownershipCounts = countSchoolsByOwnership(openSchools)
 
   // Process school type data for the new card (from enrollmentData)
   const schoolTypeData = useMemo(() => {
@@ -266,7 +282,7 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
           </div>
         </div>
         <div className="pb-2 px-3">
-          <div className="text-3xl font-bold">{schools?.length.toLocaleString()}</div>
+          <div className="text-3xl font-bold">{openSchools?.length.toLocaleString()}</div>
           <div className="flex justify-between items-center mt-1">
             <p className="text-xs text-muted-foreground">Across all regions</p>
             <div className="flex items-center gap-1">
@@ -465,17 +481,17 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
         <div className="flex flex-row items-center justify-between space-y-0 pb-2 p-3">
           <CardTitle className="text-sm font-medium">School Status</CardTitle>
           <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center">
-            <Unlock className="h-5 w-5 text-amber-600" />
+            <Unlock className="Progressh-5 w-5 text-amber-600" />
           </div>
         </div>
         <div className="pb-2 px-3">
           <div className="flex justify-between">
             <div>
-              <div className="text-3xl font-bold">{schoolStatusData.opened}</div>
+              <div className="text-3xl font-bold">8</div>
               <p className="text-xs text-muted-foreground">Newly Opened</p>
             </div>
             <div className="text-right">
-              <div className="text-3xl font-bold">{schoolStatusData.closed}</div>
+              <div className="text-3xl font-bold">{closedSchools?.length}</div>
               <p className="text-xs text-muted-foreground">Closed</p>
             </div>
           </div>
@@ -495,10 +511,10 @@ export default function SchoolStatCards({ enrollmentData, schools, overallLearne
             <div>
               <div className="flex justify-between text-xs mb-1">
                 <span>Closed Schools</span>
-                <span className="text-red-600">↓ {Math.abs(schoolStatusData.closedPercentChange)}%</span>
+                <span className="text-red-600">{((closedSchools?.length || 100) / (schools?.length || 100) * 100).toFixed(1)}%</span>
               </div>
               <Progress
-                value={(schoolStatusData.closed / (schools?.length || 100)) * 100}
+                value={(closedSchools?.length || 100) / (schools?.length || 100) * 100}
                 className="h-1.5 bg-red-100"
               />
             </div>

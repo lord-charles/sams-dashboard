@@ -30,6 +30,8 @@ interface StateData {
 export default function StateSummary({ data }: { data: StateData }) {
   const [searchTerm, setSearchTerm] = useState("")
   // Calculate totals
+  const currentYear = new Date().getFullYear().toString();
+
   const totals = useMemo(() => {
     if (!data?.state10Details) return { enrolled: 0, dropped: 0, schools: 0 }
 
@@ -70,11 +72,16 @@ export default function StateSummary({ data }: { data: StateData }) {
     return Math.max(...Object.values(data.stats))
   }, [data])
 
-  // Calculate retention rate
-  const retentionRate = useMemo(() => {
-    if (totals.enrolled === 0) return 0
-    return ((totals.enrolled - totals.dropped) / totals.enrolled) * 100
-  }, [totals])
+
+  // Calculate retention rate using stats data (current year and previous year)
+  const retentionRateStats = useMemo(() => {
+    if (!data?.stats) return 0;
+    const prevYear = (new Date().getFullYear() - 1).toString();
+    const currentYearEnrolled = data.stats[currentYear] || 0;
+    const prevYearEnrolled = data.stats[prevYear] || 0;
+    if (prevYearEnrolled === 0 || currentYearEnrolled === 0) return 0;
+    return (currentYearEnrolled / prevYearEnrolled) * 100;
+  }, [data]);
 
   if (!data) {
     return (
@@ -112,7 +119,7 @@ export default function StateSummary({ data }: { data: StateData }) {
                     <Users className="h-4 w-4" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold">{totals.enrolled.toLocaleString()}</div>
+                <div className="text-2xl font-bold">{data.stats[currentYear].toLocaleString()}</div>
                 <div className="text-xs text-muted-foreground mt-1">Students across all programs</div>
               </div>
 
@@ -136,9 +143,15 @@ export default function StateSummary({ data }: { data: StateData }) {
                     <TrendingUp className="h-4 w-4" />
                   </div>
                 </div>
-                <div className="text-2xl font-bold">{retentionRate.toFixed(1)}%</div>
+                <div className="text-2xl font-bold">{retentionRateStats.toFixed(1)}%</div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  {totals.enrolled - totals.dropped} students retained
+                  {(() => {
+                    const currentYear = new Date().getFullYear().toString();
+                    const prevYear = (new Date().getFullYear() - 1).toString();
+                    const currentYearEnrolled = data.stats?.[currentYear] || 0;
+                    const prevYearEnrolled = data.stats?.[prevYear] || 0;
+                    return `${currentYearEnrolled} enrolled vs ${prevYearEnrolled} last year`;
+                  })()}
                 </div>
               </div>
             </div>
@@ -181,7 +194,7 @@ export default function StateSummary({ data }: { data: StateData }) {
           </CardContent>
         </Card>
 
- 
+
       </div>
 
       {/* Detailed Breakdown */}
@@ -267,15 +280,14 @@ export default function StateSummary({ data }: { data: StateData }) {
                         </TableCell>
                         <TableCell className="text-right">
                           <div
-                            className={`text-sm font-medium ${
-                              retentionRate > 90
-                                ? "text-green-500"
-                                : retentionRate > 75
-                                  ? "text-amber-500"
-                                  : "text-destructive"
-                            }`}
+                            className={`text-sm font-medium ${Math.max(0, retentionRate) > 90
+                              ? "text-green-500"
+                              : Math.max(0, retentionRate) > 75
+                                ? "text-amber-500"
+                                : "text-destructive"
+                              }`}
                           >
-                            {retentionRate.toFixed(1)}%
+                            {Math.max(0, retentionRate).toFixed(1)}%
                           </div>
                         </TableCell>
                       </TableRow>
@@ -307,4 +319,3 @@ export default function StateSummary({ data }: { data: StateData }) {
     </div>
   )
 }
-

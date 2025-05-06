@@ -88,16 +88,21 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
   const [isSearching, setIsSearching] = useState(false)
   const [selectedResultIndex, setSelectedResultIndex] = useState(-1)
   const [schoolsCount, setSchoolsCount] = useState("0")
-  const [navigationState, setNavigationState] = useState<{[key: string]: boolean}>({})
+  const [navigationState, setNavigationState] = useState<{ [key: string]: boolean }>({})
   const searchInputRef = useRef<HTMLInputElement>(null)
   const searchResultsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const storedTotalSchools = localStorage.getItem('totalSchools')
-    if (storedTotalSchools) {
-      setSchoolsCount(storedTotalSchools)
-    }
-  }, [])
+    const updateSchoolsCount = () => {
+      const storedTotalSchools = localStorage.getItem('totalSchools');
+      if (storedTotalSchools) {
+        setSchoolsCount(storedTotalSchools);
+      }
+    };
+    updateSchoolsCount(); // Run once immediately
+    const interval = setInterval(updateSchoolsCount, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const navigationItems: NavigationItem[] = [
     {
@@ -224,14 +229,14 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
     if (query.trim().length > 0) {
       setIsSearching(true)
       const results: SearchResult[] = []
-      
+
       // Search through navigation and resource items
       navigationItems.forEach(item => searchItem(item, results))
       resourceItems.forEach(item => {
         const { external, ...rest } = item
         searchItem({ ...rest, children: undefined }, results)
       })
-      
+
       setSearchResults(results)
       setSelectedResultIndex(-1)
     } else {
@@ -244,7 +249,7 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
   const searchItem = (item: NavigationItem, results: SearchResult[], parentTitle?: string) => {
     const normalizedQuery = searchQuery.toLowerCase().trim()
     const matchesTitle = item.title.toLowerCase().includes(normalizedQuery)
-    const matchesKeywords = item.keywords?.some((keyword: string) => 
+    const matchesKeywords = item.keywords?.some((keyword: string) =>
       keyword.toLowerCase().includes(normalizedQuery)
     )
 
@@ -346,8 +351,8 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
             <div className="flex items-center gap-3">
               <Image priority width={80} height={80} src="/img/mogei.png" className="object-contain" alt="Mogei logo" />
               <div className="font-bold text-xl xxxs:ml-4 md:text-3xl mt-5"> <Badge variant="default" className="px-4 py-2 text-lg font-semibold mb-4 bg-primary-500">
-              SAMS
-            </Badge></div>
+                SAMS
+              </Badge></div>
             </div>
             <SidebarTrigger className="md:hidden">
               <Menu className="h-5 w-5" />
@@ -356,7 +361,7 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
 
 
           {/* <div className="py-1 px-2 relative"> */}
-            {/* <div className="relative">
+          {/* <div className="relative">
               <Input
                 ref={searchInputRef}
                 placeholder="Search..."
@@ -371,7 +376,7 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
               </kbd>
             </div> */}
 
-            {/* Search Results Dropdown
+          {/* Search Results Dropdown
             {isSearching && (
               <div
                 ref={searchResultsRef}
@@ -386,7 +391,7 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
             )} */}
           {/* </div> */}
 
-          
+
         </SidebarHeader>
 
         <SidebarContent className="px-2">
@@ -405,9 +410,9 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
                         isActive={pathname === item.path}
                         className="h-11 font-medium transition-all hover:bg-primary/10 data-[active=true]:bg-primary/20 data-[active=true]:text-primary data-[active=true]:font-semibold rounded-md group"
                       >
-                          
+
                         <Link href={item.path || "#"} >
-                        {pathname === item.path && (
+                          {pathname === item.path && (
                             <div className="absolute left-0 top-0 bottom-0 w-[5px] bg-primary rounded-l-full" />
                           )}
                           <div
@@ -449,11 +454,11 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
                             <item.icon className="h-4 w-4 text-primary" />
                           </div>
                           <span className="truncate text-md">{item.title}</span>
-                          <ChevronDown 
+                          <ChevronDown
                             className={cn(
                               "ml-auto h-4 w-4 shrink-0 opacity-50 transition-transform duration-200",
                               navigationState[item.id] ? "rotate-180" : ""
-                            )} 
+                            )}
                           />
                         </SidebarMenuButton>
                         {navigationState[item.id] && (
@@ -549,7 +554,7 @@ export function SidebarWrapper({ children }: SidebarWrapperProps) {
         </SidebarContent>
 
         <SidebarFooter className="border-t border-border/40 mt-auto">
-        <UserBanner />
+          <UserBanner />
 
         </SidebarFooter>
         <SidebarRail />

@@ -13,8 +13,8 @@ const Home = ({ schoolStats, enrollmentData }: { schoolStats: any; enrollmentDat
       {/* <DirectGrantsSection />
       <PupilAgeDistribution />
       <ProjectStatus /> */}
-      <EducationStatsDashboard  schoolsData={schoolStats} enrollmentData={enrollmentData} />
-      <Testimonials schoolsData={schoolStats}/>
+      <EducationStatsDashboard schoolsData={schoolStats} enrollmentData={enrollmentData} />
+      <Testimonials schoolsData={schoolStats} />
 
       <SouthSudanMap />
       <Footer />

@@ -61,13 +61,13 @@ const Schools = () => {
   if (isDbConnectionIssue) {
     return <DatabaseConnectionIssue />;
   }
+
   return (
     <div className="bg-gradient-to-b from-primary/20 to-background p-2">
 
       <AdvancedStatCards
         enrollmentData={enrollmentData === undefined || enrollmentData === null ? [] : enrollmentData}
         schools={schools?.data || []}
-        overallLearnerStats={overallLearnerStats === undefined || overallLearnerStats === null ? [] : overallLearnerStats}
       />
       <SchoolsTabs
         schools={schools?.data || []}
