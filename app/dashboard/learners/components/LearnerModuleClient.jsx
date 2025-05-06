@@ -320,7 +320,7 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
         }
         setIsLoading(false);
     };
-   
+
     const handleStateChange = (value) => {
         setSelectedState(value);
         setSelectedCounty("");
@@ -385,7 +385,7 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
         });
     };
 
-     const ComboboxSelect = ({ options, value, onChange, placeholder }) => {
+    const ComboboxSelect = ({ options, value, onChange, placeholder }) => {
         const [open, setOpen] = React.useState(false)
 
         return (
@@ -438,11 +438,11 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
     return (
         <div className="p-4 space-y-0 bg-gradient-to-b from-primary/20 to-background">
             <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={isLoading}
-      >
-        <Spinner color="primary" size="lg" />
-        </Backdrop>
+                sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={isLoading}
+            >
+                <Spinner color="primary" size="lg" />
+            </Backdrop>
             <div className="flex items-center justify-between">
 
                 <LearnerBreadcrumb />
@@ -520,32 +520,37 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
                         total={statistics.totalLearners.total}
                         current={statistics.totalLearners.current}
                         icon={<Users className="h-8 w-8 text-blue-500" />}
+                        blurred={schools.length === 0}
                     />
                     <StatCard
                         title="Promoted Learners"
                         total={statistics.promotedLearners.total}
                         current={statistics.promotedLearners.current}
                         icon={<UserCheck className="h-8 w-8 text-green-500" />}
+                        blurred={schools.length === 0}
                     />
                     <StatCard
                         title="Learners with Disabilities"
                         total={statistics.genderStats.totallwd}
                         current={statistics.genderStats?.maleLwd + statistics.genderStats?.femaleLwd}
                         icon={<UserMinus className="h-8 w-8 text-yellow-500" />}
+                        blurred={schools.length === 0}
                     />
                     <StatCard
                         title="New Learners"
                         total={statistics.newLearners.total}
                         current={statistics.newLearners.current}
                         icon={<UserPlus className="h-8 w-8 text-purple-500" />}
+                        blurred={schools.length === 0}
                     />
                     <StatCard
                         title="Dropped Out"
                         total={statistics.droppedOutLearners.total}
                         current={statistics.droppedOutLearners.current}
                         icon={<School className="h-8 w-8 text-red-500" />}
+                        blurred={schools.length === 0}
                     />
-                    <StatCard title="Average Age" value={`${statistics.averageAge} years`} icon={<GraduationCap className="h-8 w-8 text-indigo-500" />} />
+                    <StatCard title="Average Age" value={`${statistics.averageAge} years`} icon={<GraduationCap className="h-8 w-8 text-indigo-500" />} blurred={schools.length === 0} />
                     <StatCard
                         title="Male Learners"
                         value={`${statistics.genderStats?.malePercentage}%`}
@@ -554,6 +559,7 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
                             `With Disabilities: ${statistics.genderStats?.maleLwdPercentage}% (${statistics.genderStats?.maleLwd?.toLocaleString()})`
                         ]}
                         icon={<Users className="h-8 w-8 text-blue-500" />}
+                        blurred={schools.length === 0}
                     />
 
                     <StatCard
@@ -564,6 +570,7 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
                             `With Disabilities: ${statistics.genderStats?.femaleLwdPercentage}% (${statistics.genderStats?.femaleLwd?.toLocaleString()})`
                         ]}
                         icon={<Users className="h-8 w-8 text-pink-500" />}
+                        blurred={schools.length === 0}
                     />
                 </div>
 
@@ -583,12 +590,12 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
 
             </div>
 
-            
+
         </div>
     );
 };
 
-const StatCard = ({ title, total, current, value, subtext, icon }) => (
+const StatCard = ({ title, total, current, value, subtext, icon, blurred }) => (
     <Card className="bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">{title}</CardTitle>
@@ -597,7 +604,7 @@ const StatCard = ({ title, total, current, value, subtext, icon }) => (
         <CardContent>
             {total !== undefined && current !== undefined ? (
                 <>
-                    <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <div className={`text-2xl font-bold text-gray-900 dark:text-white ${blurred ? 'blur-sm opacity-5 select-none' : ''}`}>
                         {current.toLocaleString()}
                     </div>
                     {/* <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -606,15 +613,15 @@ const StatCard = ({ title, total, current, value, subtext, icon }) => (
                 </>
             ) : (
                 <>
-                    <div className="text-2xl font-bold text-gray-900 dark:text-white">{value}</div>
+                    <div className={`text-2xl font-bold text-gray-900 dark:text-white ${blurred ? 'blur-sm opacity-5 select-none' : ''}`}>{value}</div>
                     {Array.isArray(subtext) ? (
                         subtext.map((text, index) => (
-                            <p key={index} className="text-xs text-gray-500 dark:text-gray-400">
+                            <p key={index} className={`text-xs text-gray-500 dark:text-gray-400 ${blurred ? 'blur-[2px] opacity-5 select-none' : ''}`}>
                                 {text}
                             </p>
                         ))
                     ) : (
-                        subtext && <p className="text-xs text-gray-500 dark:text-gray-400">{subtext}</p>
+                        subtext && <p className={`text-xs text-gray-500 dark:text-gray-400 ${blurred ? 'blur-[2px] opacity-5 select-none' : ''}`}>{subtext}</p>
                     )}
                 </>
             )}
