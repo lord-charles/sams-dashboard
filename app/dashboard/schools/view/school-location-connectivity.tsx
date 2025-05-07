@@ -490,7 +490,7 @@ export function SchoolLocationConnectivity({ schoolInfo }: SchoolLocationConnect
         <CardContent>
           {locationData.radioCoverage.stations.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {locationData.radioCoverage.stations.map((station, index) => (
+              {locationData.radioCoverage.stations.map((station: any, index: number) => (
                 <div
                   key={index}
                   className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-md"
