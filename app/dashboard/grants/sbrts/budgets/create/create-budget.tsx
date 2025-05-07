@@ -10,8 +10,7 @@ import MetaDataCollection from "./meta";
 import { useSchoolInfo } from "@/hooks/useSchoolInfo";
 import General from "./general";
 import Review from "./review";
-import { CreateBudgetBreadcrumb } from "./breadcrumb";
-import { CreativeCommons, Edit3, MapPin } from "lucide-react";
+import { CreativeCommons, Edit3, MapPin, School } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Tooltip,
@@ -89,14 +88,20 @@ function CreateBudgetData({
   }
 
   return (
-    <div className="space-y-0 p-4 bg-gradient-to-b from-primary/20 to-background">
+    <div className="p-2 bg-gradient-to-b from-primary/20 to-background">
       <Toaster />
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
-        <div className="flex flex-col space-y-4 md:flex-row md:justify-between md:items-center">
-          <CreateBudgetBreadcrumb
-            schoolName={schoolInfo?.schoolName}
-            code={schoolInfo?.code}
-          />
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-2 mb-3">
+        <div className="flex flex-col space-y-2 md:flex-row md:justify-between md:items-center">
+
+          <div className="flex flex-col space-y-1">
+            <div className="flex items-center gap-3">
+              <School className="h-8 w-8 text-primary" />
+              <h1 className="text-2xl font-extrabold leading-tight ">
+                {schoolInfo?.schoolName}
+              </h1>
+            </div>
+          </div>
+
           <div className="flex items-center space-x-2">
             <Badge
               variant={
@@ -164,12 +169,34 @@ function CreateBudgetData({
         onValueChange={handleTabChange}
         className="w-full pt-2"
       >
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="general">General</TabsTrigger>
-          <TabsTrigger value="meta">Meta</TabsTrigger>
-          <TabsTrigger value="revenue">Revenue</TabsTrigger>
-          <TabsTrigger value="budget">Budget</TabsTrigger>
-          <TabsTrigger value="review">Review</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 lg:grid-cols-5 lg:mb-4 mb-20 transition-all duration-200 hover:bg-muted/80
+            data-[state=active]:bg-primary data-[state=active]:text-primary-foreground 
+            data-[state=active]:shadow-none flex-shrink-0">
+          <TabsTrigger
+            className="rounded-md py-2 px-3 transition-all duration-200 hover:bg-muted/80
+          data-[state=active]:bg-primary data-[state=active]:text-primary-foreground 
+          data-[state=active]:shadow-none flex-shrink-0"
+            value="general">General</TabsTrigger>
+          <TabsTrigger
+            className="rounded-md py-2 px-3 transition-all duration-200 hover:bg-muted/80
+          data-[state=active]:bg-primary data-[state=active]:text-primary-foreground 
+          data-[state=active]:shadow-none flex-shrink-0"
+            value="meta">Meta</TabsTrigger>
+          <TabsTrigger
+            className="rounded-md py-2 px-3 transition-all duration-200 hover:bg-muted/80
+          data-[state=active]:bg-primary data-[state=active]:text-primary-foreground 
+          data-[state=active]:shadow-none flex-shrink-0"
+            value="revenue">Revenue</TabsTrigger>
+          <TabsTrigger
+            className="rounded-md py-2 px-3 transition-all duration-200 hover:bg-muted/80
+          data-[state=active]:bg-primary data-[state=active]:text-primary-foreground 
+          data-[state=active]:shadow-none flex-shrink-0"
+            value="budget">Budget</TabsTrigger>
+          <TabsTrigger
+            className="rounded-md py-2 px-3 transition-all duration-200 hover:bg-muted/80
+          data-[state=active]:bg-primary data-[state=active]:text-primary-foreground 
+          data-[state=active]:shadow-none flex-shrink-0"
+            value="review">Review</TabsTrigger>
         </TabsList>
         <TabsContent value="general">
           <General info={schoolInfo} />

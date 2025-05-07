@@ -31,22 +31,8 @@ export default function General({ info }: { info: any }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="mb-2 bg-gradient-to-r from-primary to-primary-foreground p-4 rounded-lg shadow-lg">
-        <div className="flex flex-col space-y-2">
-          <div className="flex items-center gap-3">
-            <School className="h-8 w-8 text-white" />
-            <h1 className="text-3xl font-extrabold leading-tight text-white">
-              {info?.schoolName}
-            </h1>
-          </div>
-          <p className="text-lg text-white/90 font-medium ml-11">
-            Annual Budget Planning • Financial Year{" "}
-            {new Date().getFullYear() + 1}
-          </p>
-        </div>
-      </div>
+    <Card className="min-h-screen p-3 bg-transparent">
+
 
       {/* Content Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -148,7 +134,7 @@ export default function General({ info }: { info: any }) {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </Card>
   );
 }
 

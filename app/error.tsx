@@ -342,10 +342,10 @@ export default function ErrorDisplay({
                   : description}
               </p>
 
-              <div className="mt-2 p-3 bg-muted/50 rounded-md text-sm font-medium break-words" role="alert">
+              {/* <div className="mt-2 p-3 bg-muted/50 rounded-md text-sm font-medium break-words" role="alert">
                 <span className="text-muted-foreground font-normal">Error: </span>
                 <span className={severity === "critical" ? "text-red-600" : "text-foreground"}>{errorMessage}</span>
-              </div>
+              </div> */}
             </div>
 
             {/* Retry Counter with Time Window */}

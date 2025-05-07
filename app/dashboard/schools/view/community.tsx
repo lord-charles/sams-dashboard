@@ -20,11 +20,11 @@ import { base_url } from "@/app/utils/baseUrl";
 
 import axios from "axios";
 
-import LearnersTable from "../../learners/learner-table/leaners";
+import LearnersTable from "./learner-table/leaners";
 
 import { TableSkeleton } from "@/components/skeletons/table-loading";
 
-import TeachersTable from "../../teachers/teacher-table/teachers";
+import TeachersTable from "./teacher-table/teachers";
 
 import NoTeachersAvailable from "./NoTeachersAvailable";
 
@@ -39,6 +39,7 @@ import {
   Legend,
 
 } from "recharts";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Stats {
   totalFemale: number;
@@ -123,7 +124,18 @@ export default function Community({
 
   const [activeTab, setActiveTab] = useState("learners");
 
-  console.log(stats);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Get tab from URL or default to "overview"
+  const tab2 = searchParams.get("tab2") || "learners";
+
+  // Update URL when tab changes
+  const handleTabChange = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab2", value);
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
 
   const fetchData = async (code: string) => {
     try {
@@ -191,10 +203,11 @@ export default function Community({
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
+
   return (
     <div className=" space-y-8">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList  className="h-auto gap-2 rounded-none border-b border-border bg-transparent px-0 py-1 text-foreground">
+      <Tabs value={tab2} onValueChange={handleTabChange}>
+        <TabsList className="h-auto gap-2 rounded-none border-b border-border bg-transparent px-0 py-1 text-foreground">
           <TabsTrigger className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent" value="learners">Learners</TabsTrigger>
 
           <TabsTrigger className="relative after:absolute after:inset-x-0 after:bottom-0 after:-mb-1 after:h-0.5 hover:bg-accent hover:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:after:bg-primary data-[state=active]:hover:bg-accent" value="teachers">Teachers</TabsTrigger>
@@ -210,8 +223,7 @@ export default function Community({
               icon={<Users className="h-4 w-4 text-muted-foreground" />}
               description="Total enrolled learners"
               subtext={[
-                `With Disabilities: ${
-                  stats.maleWithDisabilities + stats.femaleWithDisabilities
+                `With Disabilities: ${stats.maleWithDisabilities + stats.femaleWithDisabilities
                 } learners`,
                 `${calculatePercentage(
                   stats.maleWithDisabilities + stats.femaleWithDisabilities,
@@ -394,30 +406,30 @@ export default function Community({
             </CardHeader>
 
             <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-      <PieChart>
-        <Pie
-          data={[
-            { name: "Teachers", value: dummySchoolData.staffing.teachers },
-            { name: "Admin", value: dummySchoolData.staffing.adminStaff },
-            { name: "Support", value: dummySchoolData.staffing.supportStaff },
-          ]}
-          cx="50%"
-          cy="50%"
-          labelLine={false}
-          outerRadius={80}
-          fill="#8884d8"
-          dataKey="value"
-          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-        >
-          {Object.values(dummySchoolData.staffing).map((_, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-          ))}
-        </Pie>
-        <Tooltip />
-        <Legend />
-      </PieChart>
-    </ResponsiveContainer>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={[
+                      { name: "Teachers", value: dummySchoolData.staffing.teachers },
+                      { name: "Admin", value: dummySchoolData.staffing.adminStaff },
+                      { name: "Support", value: dummySchoolData.staffing.supportStaff },
+                    ]}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {Object.values(dummySchoolData.staffing).map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
         </TabsContent>
