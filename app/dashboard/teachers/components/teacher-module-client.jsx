@@ -14,11 +14,27 @@ import TeachersTable from "../teacher-table/teachers";
 import { TeacherBreadcrumb } from "./teacher-breadcrumb";
 import { NoTeachersYet } from "./no-teachers";
 import { Backdrop } from "@mui/material";
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Spinner } from "@nextui-org/react";
 
 const TeacherModuleClient = ({ initialStates, initialStatistics }) => {
     const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+
+    const updateURL = (params) => {
+        const current = new URLSearchParams(Array.from(searchParams.entries()));
+        Object.entries(params).forEach(([key, value]) => {
+            if (value) {
+                current.set(key, value);
+            } else {
+                current.delete(key);
+            }
+        });
+        const search = current.toString();
+        const query = search ? `?${search}` : "";
+        router.push(`${pathname}${query}`);
+    };
     const [isLoading, setIsLoading] = useState(false);
     const [states, setStates] = useState(initialStates);
     const [counties, setCounties] = useState([]);
@@ -209,6 +225,12 @@ const TeacherModuleClient = ({ initialStates, initialStatistics }) => {
         setTeachers([]);
         fetchCounties(value);
         fetchStatistics({ state10: value });
+        updateURL({
+            state: value,
+            county: null,
+            payam: null,
+            code: null
+        });
     };
 
     const handleCountyChange = (value) => {
@@ -220,6 +242,12 @@ const TeacherModuleClient = ({ initialStates, initialStatistics }) => {
         setTeachers([]);
         fetchPayams(value);
         fetchStatistics({ state10: selectedState, county28: value });
+        updateURL({
+            state: selectedState,
+            county: value,
+            payam: null,
+            code: null
+        });
     };
 
     const handlePayamChange = (value) => {
@@ -229,6 +257,12 @@ const TeacherModuleClient = ({ initialStates, initialStatistics }) => {
         setTeachers([]);
         fetchSchools(value);
         fetchStatistics({ state10: selectedState, county28: selectedCounty, payam28: value });
+        updateURL({
+            state: selectedState,
+            county: selectedCounty,
+            payam: value,
+            code: null
+        });
     };
 
     const handleSchoolChange = (value) => {
@@ -236,6 +270,12 @@ const TeacherModuleClient = ({ initialStates, initialStatistics }) => {
         setTeachers([]);
         fetchTeachers(value);
         fetchStatistics({ code: value });
+        updateURL({
+            state: selectedState,
+            county: selectedCounty,
+            payam: selectedPayam,
+            code: value
+        });
     };
 
     const ComboboxSelect = ({ options, value, onChange, placeholder }) => {
@@ -357,15 +397,13 @@ const TeacherModuleClient = ({ initialStates, initialStatistics }) => {
     }, []); // Run only once on component mount
 
     return (
-        <div className="p-4 space-y-6 bg-gradient-to-b from-primary/20 to-background">
-             <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={isLoading}
-      >
-        <Spinner color="primary" size="lg" />
-        </Backdrop>
-            <TeacherBreadcrumb />
-
+        <div className="p-2 space-y-2 bg-gradient-to-b from-primary/20 to-background">
+            <Backdrop
+                sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={isLoading}
+            >
+                <Spinner color="primary" size="lg" />
+            </Backdrop>
             <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <ComboboxSelect
@@ -410,13 +448,13 @@ const TeacherModuleClient = ({ initialStates, initialStatistics }) => {
                     <StatCard
                         title="Active Teachers"
                         total={statistics.activeTeachers.total}
-                        current={statistics.activeTeachers.current}
+                        current={statistics.activeTeachers.total}
                         icon={<UserCheck className="h-8 w-8 text-green-500" />}
                     />
                     <StatCard
                         title="Inactive Teachers"
                         total={statistics.inactiveTeachers.total}
-                        current={statistics.inactiveTeachers.current}
+                        current={statistics.inactiveTeachers.total}
                         icon={<UserMinus className="h-8 w-8 text-yellow-500" />}
                     />
                     <StatCard
@@ -465,7 +503,7 @@ const TeacherModuleClient = ({ initialStates, initialStatistics }) => {
                 )}
             </div>
 
-    
+
         </div>
     );
 };

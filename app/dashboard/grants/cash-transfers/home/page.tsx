@@ -58,26 +58,21 @@ async function getInitialData(year: number) {
 export default async function DashboardPage({ params }: PageProps) {
   const currentYear = new Date().getFullYear().toString();
   const year = params.year || currentYear;
-  // const { states, statCardData, uniqueSchools } = await getInitialData(
-  //   parseInt(year)
-  // );
+  const { states, statCardData, uniqueSchools } = await getInitialData(
+    parseInt(year)
+  );
 
   return (
     <DashboardProvider initialYear={year} initialSchoolType="PRI">
-      {/* <div className="flex min-h-screen flex-col bg-gradient-to-b from-primary/20 to-background">
-        <div className="flex h-10 items-center px-4">
-          <CTBreadcrumb />
-        </div>
-        <div className="grid gap-2 px-4">
-          <DashboardHeader />
-          <CtDashboard
-            initialStates={states}
-            initialStatCardData={statCardData}
-            initialUniqueSchools={uniqueSchools?.data || []}
-          />
-        </div>
-      </div> */}
-      <UnderConstruction/>
+      <div className="px-2 min-h-screen bg-gradient-to-b from-primary/20 to-background">
+        <DashboardHeader />
+        <CtDashboard
+          initialStates={states || []}
+          initialStatCardData={statCardData}
+          initialUniqueSchools={uniqueSchools?.data || []}
+        />
+      </div>
+      {/* <UnderConstruction/> */}
     </DashboardProvider>
   );
 }

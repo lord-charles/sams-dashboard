@@ -20,19 +20,19 @@ export const apiEndpoints = {
   },
   teachers: {
     total: `${base_url}user/getTeacherCountByLocation`,
-    active: `${base_url}user/getTeacherCountByLocation`,
-    inactive: `${base_url}user/getTeacherCountByLocation`,
+    active: `${base_url}user/getTeachersStatusCountByLocation`,
+    inactive: `${base_url}user/getTeachersStatusCountByLocation`,
     genderStats: `${base_url}user/overallMaleFemaleStat`
   }
 };
 
 export async function fetchApi<T>(
-  url: string, 
+  url: string,
   method: 'GET' | 'POST' = 'GET',
   params: Record<string, any> = {}
 ): Promise<ApiResponse<T>> {
   try {
-    const response = method === 'POST' 
+    const response = method === 'POST'
       ? await axios.post(url, { ...params, enrollmentYear: currentYear })
       : await axios.get(url);
 

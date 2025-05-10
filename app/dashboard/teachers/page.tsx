@@ -11,27 +11,27 @@ import DatabaseConnectionIssue from '../schools/components/DatabaseConnectionIss
 const TeacherPage = () => {
   // Fetch data using useIndexedSWR
   const { data: states, error: statesError } = useIndexedSWR(apiEndpoints.states);
-  
+
   const { data: totalTeachers, error: totalTeachersError } = useIndexedSWR(
     apiEndpoints.teachers.total,
     { method: 'POST' }
   );
-  
+
   const { data: activeTeachers, error: activeTeachersError } = useIndexedSWR(
     apiEndpoints.teachers.active,
     { method: 'POST', body: { isDroppedOut: false } }
   );
-  
+
   const { data: inactiveTeachers, error: inactiveTeachersError } = useIndexedSWR(
     apiEndpoints.teachers.inactive,
     { method: 'POST', body: { isDroppedOut: true } }
   );
-  
+
   const { data: newTeachers, error: newTeachersError } = useIndexedSWR(
     apiEndpoints.teachers.total,
-    { method: 'POST', body: { year: new Date().getFullYear() } }
+    { method: 'POST', body: { year: "2022" } }
   );
-  
+
   const { data: overallGenderStats, error: genderStatsError } = useIndexedSWR(
     apiEndpoints.teachers.genderStats,
     { method: 'POST' }
@@ -48,8 +48,8 @@ const TeacherPage = () => {
   }
 
   // Check if data is loading
-  if (!states || !totalTeachers || !activeTeachers || 
-      !inactiveTeachers || !newTeachers || !overallGenderStats) {
+  if (!states || !totalTeachers || !activeTeachers ||
+    !inactiveTeachers || !newTeachers || !overallGenderStats) {
     return <Loading />;
   }
 
@@ -66,6 +66,7 @@ const TeacherPage = () => {
     return <DatabaseConnectionIssue />;
   }
 
+  console.log(overallGenderStats)
   // Calculate statistics
   const totalTeachersCount = overallGenderStats.totalMale + overallGenderStats.totalFemale;
   const malePercentage = totalTeachersCount ? (overallGenderStats.totalMale / totalTeachersCount) * 100 : 0;
@@ -73,10 +74,10 @@ const TeacherPage = () => {
 
   const initialStatistics: TeacherStatistics = {
     totalTeachers: { total: totalTeachers.count, current: totalTeachers.count },
-    activeTeachers: { total: activeTeachers.count, current: activeTeachers.count },
-    inactiveTeachers: { total: inactiveTeachers.count, current: inactiveTeachers.count },
+    activeTeachers: { total: activeTeachers.data.activeCount, current: activeTeachers.activeCount },
+    inactiveTeachers: { total: inactiveTeachers.data.inactiveCount, current: inactiveTeachers.inactiveCount },
     newTeachers: { total: newTeachers.count, current: newTeachers.count },
-    droppedOutTeachers: inactiveTeachers.count,
+    droppedOutTeachers: inactiveTeachers.data.droppedOutCount,
     averageAge: 0,
     malePercentage: Number(malePercentage.toFixed(2)),
     femalePercentage: Number(femalePercentage.toFixed(2)),

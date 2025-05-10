@@ -185,7 +185,7 @@ export default function SchoolsTableWithAttendance({
           <div>
             <CardTitle className="text-2xl font-bold tracking-tight">Schools Attendance</CardTitle>
             <CardDescription className="text-muted-foreground mt-1">
-              View schools with attendance for a specific date or date range
+              View schools with attendance for a specific date or date range. Default is today.
             </CardDescription>
           </div>
 

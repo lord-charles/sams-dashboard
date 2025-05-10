@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Backdrop } from "@mui/material";
+import { Spinner } from "@nextui-org/react";
 
 export default function CtDashboard({
   initialStates,
@@ -245,8 +246,8 @@ export default function CtDashboard({
           >
             {value
               ? options.find(
-                  (option: { value: string }) => option.value === value
-                )?.label
+                (option: { value: string }) => option.value === value
+              )?.label
               : placeholder}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
@@ -292,7 +293,10 @@ export default function CtDashboard({
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
+      <Backdrop open={isLoading} className="">
+        <Spinner />
+      </Backdrop>
       <div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
           <ComboboxSelect
@@ -337,7 +341,7 @@ export default function CtDashboard({
             placeholder="Select Tranche"
           />
         </div>
-        <StatsCards data={statCardData} />
+        <StatsCards data={statCardData || {}} />
       </div>
 
       <DashboardTabs
@@ -345,12 +349,7 @@ export default function CtDashboard({
         selectedTranche={selectedTranche}
         selectedYear={selectedYear}
       />
-      <Backdrop open={isLoading} className="bg-black/50">
-        <Button disabled className="bg-white text-blue-600">
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Loading...
-        </Button>
-      </Backdrop>
+
     </div>
   );
 }

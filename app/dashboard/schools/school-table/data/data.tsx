@@ -47,6 +47,16 @@ export const schoolTypes = [
     label: "ASP",
     icon: CheckCircledIcon,
   },
+  {
+    value: "TTI",
+    label: "TTI",
+    icon: CheckCircledIcon,
+  },
+  {
+    value: "CGS",
+    label: "CGS",
+    icon: CheckCircledIcon,
+  },
 ];
 
 export const states = [

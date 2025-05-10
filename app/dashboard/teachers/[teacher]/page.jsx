@@ -1,46 +1,46 @@
 import React from "react";
 import axios from "axios";
 import { base_url } from "@/app/utils/baseUrl";
-import UpdateLearnerComponent from "@/app/dashboard/learners/components/update-learner";
+import UpdateTeacherComponent from "../components/update-teacher-component";
 
-async function fetchLearnerData(learnerId) {
+async function fetchTeacherData(teacherId) {
   try {
     const response = await axios.get(
-      `${base_url}data-set/2023_data/students/${learnerId}`
+      `${base_url}user/users/get/${teacherId}`
     );
     return response.data;
   } catch (error) {
-    console.error("Error fetching learner details:", error);
+    console.error("Error fetching teacher details:", error);
     return null;
   }
 }
 
 export async function generateMetadata({ params }) {
-  const learner = await fetchLearnerData(params.learner);
+  const teacher = await fetchTeacherData(params.teacher);
 
-  if (!learner) {
+  if (!teacher) {
     return {
-      title: `SAMS | Learner Not Found`,
-      description: "SAMS - Learner Details Unavailable",
+      title: `SAMS | Teacher Not Found`,
+      description: "SAMS - Teacher Details Unavailable",
     };
   }
 
   return {
-    title: `SAMS | ${learner.firstName} - Details`,
-    description: `Details and information about ${learner.firstName}.`,
+    title: `SAMS | ${teacher.firstName} - Details`,
+    description: `Details and information about ${teacher.firstName}.`,
   };
 }
 
-export default async function LearnerDetails({ params }) {
-  const learner = await fetchLearnerData(params.learner);
+export default async function TeacherDetails({ params }) {
+  const teacher = await fetchTeacherData(params.teacher);
 
-  if (!learner) {
-    return <div>Learner not found</div>;
+  if (!teacher) {
+    return <div>Teacher not found</div>;
   }
+
   return (
     <div>
-      {/* Pass the fetched learner data to the UpdateLearnerComponent */}
-      <UpdateLearnerComponent learner={learner} />
+      <UpdateTeacherComponent teacher={teacher} />
     </div>
   );
 }

@@ -39,7 +39,7 @@ export function StatsCards({ data }: StatsCardsProps) {
           <School className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{data.totalSchools.value.toLocaleString()}</div>
+          <div className="text-2xl font-bold">{data?.totalSchools?.value.toLocaleString() || 0}</div>
         </CardContent>
       </Card>
       <Card>
@@ -48,10 +48,10 @@ export function StatsCards({ data }: StatsCardsProps) {
           <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{data.totalLearners.value.toLocaleString()}</div>
+          <div className="text-2xl font-bold">{data?.totalLearners?.value.toLocaleString() || 0}</div>
           <div className="flex items-center justify-between">
             <p className="text-xs text-muted-foreground">
-              ({data.totalLearners.male.toLocaleString()} M, {data.totalLearners.female.toLocaleString()} F)
+              ({data?.totalLearners?.male?.toLocaleString() || 0} M, {data?.totalLearners?.female?.toLocaleString() || 0} F)
             </p>
           </div>
         </CardContent>
@@ -64,7 +64,7 @@ export function StatsCards({ data }: StatsCardsProps) {
           <DollarSign className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{data.totalAmountDisbursed.value.toLocaleString()} {data.totalAmountDisbursed.currency}</div>
+          <div className="text-2xl font-bold">{data?.totalAmountDisbursed?.value?.toLocaleString() || 0} {data?.totalAmountDisbursed?.currency || "SSP"}</div>
         </CardContent>
       </Card>
       <Card>
@@ -75,7 +75,7 @@ export function StatsCards({ data }: StatsCardsProps) {
           <CheckCircle className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{data.accountabilityRate.value}{data.accountabilityRate.unit}</div>
+          <div className="text-2xl font-bold">{data?.accountabilityRate?.value || 0}{data?.accountabilityRate?.unit || "%"}</div>
         </CardContent>
       </Card>
 
@@ -87,13 +87,13 @@ export function StatsCards({ data }: StatsCardsProps) {
           <Accessibility className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{data.learnersWithDisabilities.value.toLocaleString()}</div>
+          <div className="text-2xl font-bold">{data?.learnersWithDisabilities?.value?.toLocaleString() || 0}</div>
           <div className="flex items-center justify-between">
             <p className="text-xs text-muted-foreground">
-              {data.learnersWithDisabilities.percentageOfTotalLearners}% of total learners
+              {data?.learnersWithDisabilities?.percentageOfTotalLearners || 0}% of total learners
             </p>
             <p className="text-xs text-muted-foreground">
-              ({data.learnersWithDisabilities.male.toLocaleString()} M, {data.learnersWithDisabilities.female.toLocaleString()} F)
+              ({data?.learnersWithDisabilities?.male?.toLocaleString() || 0} M, {data?.learnersWithDisabilities?.female?.toLocaleString() || 0} F)
             </p>
           </div>
         </CardContent>
@@ -106,7 +106,7 @@ export function StatsCards({ data }: StatsCardsProps) {
           <BookOpen className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{data.averageAttendance.value}{data.averageAttendance.unit}</div>
+          <div className="text-2xl font-bold">{data?.averageAttendance?.value || 0}{data?.averageAttendance?.unit || "%"}</div>
         </CardContent>
       </Card>
       <Card>
@@ -115,9 +115,9 @@ export function StatsCards({ data }: StatsCardsProps) {
           <Building className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{data.publicSchools.value.toLocaleString()}</div>
+          <div className="text-2xl font-bold">{data?.publicSchools?.value?.toLocaleString() || 0}</div>
           <p className="text-xs text-muted-foreground">
-            {data.publicSchools.percentageOfTotalSchools}% of total schools
+            {data?.publicSchools?.percentageOfTotalSchools || 0}% of total schools
           </p>
         </CardContent>
       </Card>
@@ -127,10 +127,10 @@ export function StatsCards({ data }: StatsCardsProps) {
           <Calendar className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">Tranche {data.latestTranche.trancheNumber}</div>
-          {data.latestTranche.startDate && (
+          <div className="text-2xl font-bold">Tranche {data?.latestTranche?.trancheNumber || 0}</div>
+          {data?.latestTranche?.startDate && (
             <p className="text-xs text-muted-foreground">
-              Started: {new Date(data.latestTranche.startDate).toLocaleDateString()}
+              Started: {new Date(data?.latestTranche?.startDate).toLocaleDateString()}
             </p>
           )}
         </CardContent>
