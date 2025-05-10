@@ -116,29 +116,29 @@ export default function SchoolsTable({
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const {toast} = useToast();
+  const { toast } = useToast();
 
   return (
     <Card className="p-2">
       <div className="hidden h-full flex-1 flex-col space-y-4 md:flex">
         <div className="flex items-center justify-between">
-          <div className="space-y-2">
+          <div>
             <CardTitle>Schools</CardTitle>
-            <CardDescription>Here&apos;s a list of schools.</CardDescription>
+            <CardDescription>Here&apos;s a list of all schools.</CardDescription>
           </div>
           <div className="flex items-center space-x-2">
             <Button
               className={`text-white font-semibold`}
               onClick={() => {
                 status === "authenticated" &&
-                session?.user?.userType === "SuperAdmin"
+                  session?.user?.userType === "SuperAdmin"
                   ? router.push("/dashboard/schools/new")
                   : toast({
-                      title: "Error",
-                      description:
-                        "You do not have permission to add a new school",
-                      variant: "destructive",
-                    });
+                    title: "Error",
+                    description:
+                      "You do not have permission to add a new school",
+                    variant: "destructive",
+                  });
               }}
             >
               <PlusCircle className="mr-2 h-4 w-4" />

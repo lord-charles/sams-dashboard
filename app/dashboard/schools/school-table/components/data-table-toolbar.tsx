@@ -4,7 +4,7 @@ import { Cross2Icon } from "@radix-ui/react-icons";
 import { Table } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { schoolOwnership, schoolTypes, states } from "../data/data";
+import { schoolOwnership, schoolStatusOptions, schoolTypes, states } from "../data/data";
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { DataTableViewOptions } from "./data-table-view-options";
 import { statesCountyPayams } from "../data/states-county-payams";
@@ -16,42 +16,40 @@ interface DataTableToolbarProps<TData> {
 export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
-  // const [selectedState, setSelectedState] = useState(
-  //   table.getColumn("state10")?.getFilterValue() || ["CES"]
-  // );
+
   const selectedState = table.getColumn("state10")?.getFilterValue() || null;
   const selectedCounty = table.getColumn("county28")?.getFilterValue() || null;
 
   const filteredCounties =
     selectedState && Array.isArray(selectedState) && selectedState.length > 0
       ? statesCountyPayams
-          .find((state) => state.state10 === selectedState[0])
-          ?.counties.map((county) => ({
-            value: county.county28,
-            label: county.county28,
-          })) || []
+        .find((state) => state.state10 === selectedState[0])
+        ?.counties.map((county) => ({
+          value: county.county28,
+          label: county.county28,
+        })) || []
       : [];
 
   const filteredPayams =
     selectedCounty && Array.isArray(selectedCounty) && selectedCounty.length > 0
       ? statesCountyPayams
-          .find((state) =>
-            state.counties.some(
-              (county) => county.county28 === selectedCounty[0]
-            )
+        .find((state) =>
+          state.counties.some(
+            (county) => county.county28 === selectedCounty[0]
           )
-          ?.counties.find((county) => county.county28 === selectedCounty[0])
-          ?.payams.map((payam) => ({
-            value: payam,
-            label: payam,
-          })) || []
+        )
+        ?.counties.find((county) => county.county28 === selectedCounty[0])
+        ?.payams.map((payam) => ({
+          value: payam,
+          label: payam,
+        })) || []
       : [];
 
   const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
     <div className="flex items-center justify-between">
-      <div className="flex flex-1 items-center space-x-2">
+      <div className="flex flex-1 items-center space-x-2 overflow-x-auto">
         <Input
           placeholder="Filter schools | code | EMIS ID..."
           value={
@@ -80,12 +78,18 @@ export function DataTableToolbar<TData>({
             options={schoolOwnership}
           />
         )}
+        {table.getColumn("schoolStatus") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("schoolStatus")}
+            title="Status"
+            options={schoolStatusOptions}
+          />
+        )}
         {table.getColumn("state10") && (
           <DataTableFacetedFilter
             column={table?.getColumn("state10")}
             title="State"
             options={states}
-            // onChange={handleStateChange}
           />
         )}
         {selectedState && table.getColumn("county28") && (

@@ -61,7 +61,6 @@ const Schools = () => {
   if (isDbConnectionIssue) {
     return <DatabaseConnectionIssue />;
   }
-
   return (
     <div className="bg-gradient-to-b from-primary/20 to-background p-2">
 

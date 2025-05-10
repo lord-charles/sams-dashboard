@@ -106,6 +106,30 @@ export const columns = [
     cell: ({ row }) => <div>{row.getValue("schoolOwnerShip")}</div>,
   },
   {
+    id: "schoolStatus",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    accessorFn: row => row.schoolStatus?.isOpen,
+    filterFn: (row, columnId, filterValue) => {
+      const value = row.original?.schoolStatus?.isOpen;
+      return filterValue.includes(value);
+    },
+    cell: ({ row }) => {
+      const status = row.original?.schoolStatus?.isOpen;
+      const isOpen = status && status.toLowerCase() === "open";
+      return (
+        <span
+          className={`px-2 py-1 rounded text-xs font-semibold ${isOpen ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+        >
+          {status ? status.charAt(0).toUpperCase() + status.slice(1) : "Unknown"}
+        </span>
+      );
+    },
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
     accessorKey: "emisId",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="EMIS ID" />

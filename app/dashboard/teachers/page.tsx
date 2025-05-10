@@ -66,7 +66,6 @@ const TeacherPage = () => {
     return <DatabaseConnectionIssue />;
   }
 
-  console.log(overallGenderStats)
   // Calculate statistics
   const totalTeachersCount = overallGenderStats.totalMale + overallGenderStats.totalFemale;
   const malePercentage = totalTeachersCount ? (overallGenderStats.totalMale / totalTeachersCount) * 100 : 0;

@@ -5,6 +5,7 @@ import {
   CheckCircledIcon,
   StopwatchIcon,
 } from "@radix-ui/react-icons";
+import { BookOpenIcon, BookXIcon } from "lucide-react";
 
 export const labels = [
   {
@@ -132,5 +133,18 @@ export const schoolOwnership = [
   {
     value: "Community",
     label: "Community",
+  },
+];
+
+export const schoolStatusOptions = [
+  {
+    value: "open",
+    label: "Open",
+    icon: BookOpenIcon,
+  },
+  {
+    value: "closed",
+    label: "Closed",
+    icon: BookXIcon,
   },
 ];
