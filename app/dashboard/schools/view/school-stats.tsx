@@ -15,10 +15,8 @@ export default function SchoolStats({ schoolData, setIsModalOpen }: { schoolData
   const router = useRouter();
 
   const handleCreateBudget = () => {
-    // Store school info in localStorage or state management
     localStorage.setItem("selectedSchool", JSON.stringify(schoolData));
 
-    // Navigate to budget creation page
     router.push("/dashboard/grants/sbrts/budgets/create");
   }
 
@@ -57,7 +55,8 @@ export default function SchoolStats({ schoolData, setIsModalOpen }: { schoolData
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
         {/* Location Card */}
         <Card className="overflow-hidden border-gray-200 shadow-md">
-          <CardHeader className="bg-gradient-to-r from-primary/100 to-primary/90 pb-3">
+          <div className="bg-gradient-to-r from-primary/100 to-primary/90 p-3">
+
             <div className="flex items-center justify-between">
               <CardTitle className="text-white flex items-center gap-2 text-lg">
                 <MapPin className="h-5 w-5" />
@@ -68,7 +67,7 @@ export default function SchoolStats({ schoolData, setIsModalOpen }: { schoolData
               </Badge>
             </div>
             <CardDescription className="text-gray-100">Geographic Information</CardDescription>
-          </CardHeader>
+          </div>
           <CardContent className="pt-6">
             <div className="space-y-4">
               <div className="flex justify-between items-center">
@@ -97,19 +96,19 @@ export default function SchoolStats({ schoolData, setIsModalOpen }: { schoolData
 
         {/* School Identity Card */}
         <Card className="overflow-hidden border-gray-200 shadow-md">
-          <CardHeader className="bg-gradient-to-r from-primary/100 to-primary/90 pb-3">
+          <div className="bg-gradient-to-r from-primary/100 to-primary/90 p-3">
 
             <div className="flex items-center justify-between">
               <CardTitle className="text-white flex items-center gap-2 text-lg">
                 <School className="h-5 w-5" />
-                School Identity
+                Identity
               </CardTitle>
               <Badge variant="outline" className="bg-white/20 text-white border-white/30">
                 {schoolData.schoolType === "PRI" ? "Primary" : schoolData.schoolType}
               </Badge>
             </div>
             <CardDescription className="text-blue-100">Official Registration Information</CardDescription>
-          </CardHeader>
+          </div>
           <CardContent className="pt-6">
             <div className="space-y-4">
               <div className="flex justify-between items-center">
@@ -145,8 +144,7 @@ export default function SchoolStats({ schoolData, setIsModalOpen }: { schoolData
 
         {/* Operation Card */}
         <Card className="overflow-hidden border-gray-200 shadow-md">
-          <CardHeader className="bg-gradient-to-r from-primary/100 to-primary/90 pb-3">
-
+          <div className="bg-gradient-to-r from-primary/100 to-primary/90 p-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-white flex items-center gap-2 text-lg">
                 <Clock className="h-5 w-5" />
@@ -154,14 +152,14 @@ export default function SchoolStats({ schoolData, setIsModalOpen }: { schoolData
               </CardTitle>
               <Badge variant="outline" className="bg-white/20 text-white border-white/30">
                 {schoolData.operation.dayBoarding
-                  ? "Day & Boarding"
+                  ? "Boarding"
                   : schoolData.operation.boarding
                     ? "Boarding"
                     : "Day School"}
               </Badge>
             </div>
             <CardDescription className="text-green-100">Operational Details</CardDescription>
-          </CardHeader>
+          </div>
           <CardContent className="pt-6">
             <div className="space-y-4">
               <div className="flex justify-between items-center">
@@ -195,7 +193,7 @@ export default function SchoolStats({ schoolData, setIsModalOpen }: { schoolData
 
         {/* Academic Card */}
         <Card className="overflow-hidden border-gray-200 shadow-md">
-          <CardHeader className="bg-gradient-to-r from-primary/100 to-primary/90 pb-3">
+          <CardHeader className="bg-gradient-to-r from-primary/100 to-primary/90 p-3">
 
             <div className="flex items-center justify-between">
               <CardTitle className="text-white flex items-center gap-2 text-lg">
@@ -213,7 +211,7 @@ export default function SchoolStats({ schoolData, setIsModalOpen }: { schoolData
               <div>
                 <span className="text-sm font-medium text-gray-600 mb-2 block">Core Subjects</span>
                 <div className="flex flex-wrap gap-2">
-                  {schoolData.subjects.slice(0, 6).map((subject: string) => (
+                  {schoolData.subjects.slice(0, 5).map((subject: string) => (
                     <Badge key={subject} variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
                       {subject}
                     </Badge>

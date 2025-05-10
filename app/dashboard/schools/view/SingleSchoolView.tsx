@@ -1,60 +1,14 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Users,
-  Radio,
-  Calendar,
-  Building,
-  Utensils,
-  Wifi,
-  Droplet,
-  Zap,
-  MapPin,
-  AlertTriangle,
-  Compass,
-  Mountain,
-  Info,
-  IdCard,
-} from "lucide-react";
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  LineChart,
-  Line,
-
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
-} from "recharts";
-
 import { Separator } from "@/components/ui/separator";
-import { ViewSchoolBreadcrumb } from "../components/view-school-breadcrumb";
-import MapComponent from "./maps";
 import {
   Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
-
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Community from "./community";
 import BOG from "./bog";
 import { Overview } from "./overview";
-import Grants from "./grants";
 import { EnrollmentCompleteModal } from "../components/enrollment-complete-modal";
 import { useSession } from "next-auth/react";
 import { SchoolSubjects } from "./school-subjects";
@@ -189,12 +143,10 @@ export default function SingleSchoolView({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
-  // Get tab from URL or default to "overview"
   const tab = searchParams.get("tab") || "overview";
 
-  // Update URL when tab changes
   const handleTabChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("tab", value);
@@ -203,7 +155,6 @@ export default function SingleSchoolView({
 
   return (
     <Card className="bg-gradient-to-b from-primary/20 to-background p-1 rounded-none">
-      {/* statcards  */}
       <SchoolStats schoolData={schoolInfo} setIsModalOpen={setIsModalOpen} />
       <Separator className="mb-4" />
 
