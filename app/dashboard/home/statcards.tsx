@@ -339,7 +339,7 @@ export default function EducationStatsDashboard({ schoolsData, enrollmentData }:
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <StatCard
                 icon={<School className="h-5 w-5 text-primary" />}
                 label="Total Schools"
