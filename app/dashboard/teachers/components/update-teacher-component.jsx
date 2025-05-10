@@ -634,7 +634,7 @@ const UpdateTeacherComponent = ({ teacher, loggedInUser = '' }) => {
           <Card>
             <CardHeader>
               <CardTitle>Teacher Disability Information</CardTitle>
-              <CardDescription>Teacher's Functional Difficulties Characteristics</CardDescription>
+              <CardDescription>Teacher&lsquo;s Functional Difficulties Characteristics</CardDescription>
             </CardHeader>
             <CardContent>
               <TeacherDifficulty
@@ -733,7 +733,7 @@ const UpdateTeacherComponent = ({ teacher, loggedInUser = '' }) => {
           <Card>
             <CardHeader>
               <CardTitle>Status Information</CardTitle>
-              <CardDescription>Details about the teacher's current status.</CardDescription>
+              <CardDescription>Details about the teacher&lsquo;s current status.</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4">
