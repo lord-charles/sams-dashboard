@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react"; // Import useEffect from React
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { MixerHorizontalIcon } from "@radix-ui/react-icons";
 import { Table } from "@tanstack/react-table";
@@ -14,7 +15,6 @@ import {
 import { Download } from "lucide-react";
 import { saveAs } from "file-saver";
 import json2csv from "json2csv";
-import { useEffect } from "react";
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;
@@ -23,23 +23,16 @@ interface DataTableViewOptionsProps<TData> {
 export function DataTableViewOptions<TData>({
   table,
 }: DataTableViewOptionsProps<TData>) {
-  const handleExport = () => {
-    const filteredData = table
-      .getFilteredRowModel()
-      .rows.map((row) => row.original);
-    const csvData = json2csv.parse(filteredData);
-    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8" });
-    saveAs(blob, "schools.csv");
-  };
-
   useEffect(() => {
     const columnsToHide = [
       "combinedName",
-      "state10",
-      "county10",
-      "payam10",
-      "approved-amounts",
-      "date-accounted",
+      "education",
+      "isPromoted",
+      "school",
+      "code",
+      "dob",
+      "isDroppedOut",
+      "hasDisability",
     ];
     columnsToHide.forEach((columnId) => {
       const column = table.getColumn(columnId);
@@ -47,7 +40,19 @@ export function DataTableViewOptions<TData>({
         column.toggleVisibility(false); // Hide the column
       }
     });
+
+    // Log the filtered data to the console
   }, [table]);
+
+  const handleExport = () => {
+    const filteredData = table
+      .getFilteredRowModel()
+      .rows.map((row) => row.original);
+    const csvData = json2csv.parse(filteredData);
+    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8" });
+    saveAs(blob, "learners.csv");
+  };
+
   return (
     <div className="flex space-x-2 items-center">
       <div>

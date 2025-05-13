@@ -67,12 +67,11 @@ export interface learnerInterface {
 }
 
 const LearnersTable = ({ learners }: { learners: learnerInterface[] }) => {
-
   return (
     <Card className="p-2">
       <div className="hidden h-full flex-1 flex-col space-y-4 md:flex ">
         <div className="flex items-center justify-between space-y-2">
-          <div>
+          <div >
             <CardTitle>Learners</CardTitle>
             <CardDescription>Here&apos;s a list of learners.</CardDescription>
           </div>

@@ -19,7 +19,10 @@ const years = Array.from({ length: currentYear - 2014 + 1 }, (_, i) =>
 
 export function DashboardHeader() {
   const params = useParams();
-  const { selectedYear, setSelectedYear } = useContext(DashboardContext);
+  const {
+    selectedYear,
+    setSelectedYear,
+  } = useContext(DashboardContext);
   const router = useRouter();
 
   React.useEffect(() => {
@@ -31,20 +34,22 @@ export function DashboardHeader() {
     if (validYear !== selectedYear) {
       setSelectedYear(validYear);
       if (!yearFromUrl) {
-        router.push(`/dashboard/grants/cash-transfers/home/${validYear}`);
+        router.push(`/dashboard/grants/sbrts/home/${validYear}`);
       }
     }
   }, [params?.year, selectedYear, setSelectedYear, router]);
 
   const handleYearChange = (year: string) => {
     setSelectedYear(year);
-    router.push(`/dashboard/grants/cash-transfers/home/${year}`);
+    router.push(`/dashboard/grants/sbrts/home/${year}`);
   };
 
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-4">
-      <h1 className="text-3xl font-bold tracking-tight">Cash Transfers</h1>
-      <div className="flex space-x-4">
+    <div className="flex flex-col sm:flex-row justify-between items-center sm:space-y-0 sm:space-x-4">
+      <h1 className="text-2xl font-bold tracking-tight">Schools With Validated Learners ({new Date().getFullYear()})</h1>
+
+
+      <div className="flex ">
         <Select value={selectedYear} onValueChange={handleYearChange}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select Year" />

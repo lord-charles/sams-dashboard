@@ -2,8 +2,6 @@
 
 import React, { useState } from "react";
 import { StatsCards } from "./stats-cards";
-import { DashboardTabs } from "./dashboard-tabs";
-import { useSearchParams, usePathname } from "next/navigation";
 import { base_url } from "@/app/utils/baseUrl";
 import axios from "axios";
 import {
@@ -20,10 +18,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Backdrop } from "@mui/material";
 import { Spinner } from "@nextui-org/react";
+import SchoolsTable from "./schools-table/schools";
+import { usePathname } from "next/navigation";
 
 export default function CtDashboard({
   initialStates,
@@ -269,7 +269,7 @@ export default function CtDashboard({
                       setOpen(false);
                     }}
                   >
-                    {option.label}
+                    {option?.label || ""}
                     <Check
                       className={cn(
                         "ml-auto h-4 w-4",
@@ -344,11 +344,9 @@ export default function CtDashboard({
         <StatsCards data={statCardData || {}} />
       </div>
 
-      <DashboardTabs
-        schools={uniqueSchools}
-        selectedTranche={selectedTranche}
-        selectedYear={selectedYear}
-      />
+
+      <SchoolsTable schools={uniqueSchools} year={selectedYear} />
+
 
     </div>
   );

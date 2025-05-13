@@ -48,9 +48,10 @@ export function DashboardHeader() {
   };
 
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-4">
-      <h1 className="text-3xl font-bold tracking-tight">Capitation Grants</h1>
-      <div className="flex space-x-4">
+    <div className="flex flex-col sm:flex-row justify-between items-center sm:space-y-0 sm:space-x-4">
+      <h1 className="text-2xl font-bold tracking-tight">Capitation Grants</h1>
+
+      <div className="flex ">
         <Select value={selectedYear} onValueChange={handleYearChange}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select Year" />

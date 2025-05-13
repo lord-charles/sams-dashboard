@@ -13,6 +13,7 @@ import {
 import { Download } from "lucide-react";
 import { saveAs } from "file-saver";
 import json2csv from "json2csv";
+import { useEffect } from "react";
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>;
@@ -29,6 +30,22 @@ export function DataTableViewOptions<TData>({
     const blob = new Blob([csvData], { type: "text/csv;charset=utf-8" });
     saveAs(blob, "learners.csv");
   };
+
+  useEffect(() => {
+    const columnsToHide = [
+      "combinedName",
+      "approvedAmount",
+      "paidAmount",
+      "amountAccounted",
+      "dateAccounted",
+    ];
+    columnsToHide.forEach((columnId) => {
+      const column = table.getColumn(columnId);
+      if (column && column.getIsVisible()) {
+        column.toggleVisibility(false); // Hide the column
+      }
+    });
+  }, [table]);
 
   return (
     <div className="flex space-x-2 items-center">

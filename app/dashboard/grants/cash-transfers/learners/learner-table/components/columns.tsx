@@ -13,9 +13,8 @@ export const columns: ColumnDef<learnerInterface>[] = [
         name: { firstName: "", middleName: "", lastName: "" },
       };
       return (
-        `${learner.name.firstName} ${learner.name.middleName || ""} ${
-          learner.name.lastName
-        }`.trim() || "N/A"
+        `${learner.name.firstName} ${learner.name.middleName || ""} ${learner.name.lastName
+          }`.trim() || "N/A"
       );
     },
     filterFn: (row, id, value) => {
@@ -25,18 +24,26 @@ export const columns: ColumnDef<learnerInterface>[] = [
         classInfo: { class: "" },
         learnerUniqueID: "",
       };
-      const searchStr = `${learner.name.firstName} ${
-        learner.name.middleName || ""
-      } ${learner.name.lastName} ${learner.reference} ${
-        learner.classInfo.class
-      } ${learner.learnerUniqueID}`.toLowerCase();
+      const searchStr = `${learner.name.firstName} ${learner.name.middleName || ""
+        } ${learner.name.lastName} ${learner.reference} ${learner.classInfo.class
+        } ${learner.learnerUniqueID}`.toLowerCase();
       return searchStr.includes(value.toLowerCase());
     },
+  },
+  {
+    accessorKey: "names",
+    header: "Names",
+    cell: ({ row }) => row.original.learner?.name.firstName + " " + row.original.learner?.name.lastName || "N/A",
   },
   {
     accessorKey: "learner.learnerUniqueID",
     header: "Learner ID",
     cell: ({ row }) => row.original.learner?.learnerUniqueID || "N/A",
+  },
+  {
+    accessorKey: "CTEF",
+    header: "CTEF",
+    cell: ({ row }) => "N/A",
   },
   {
     accessorKey: "learner.reference",
@@ -52,8 +59,7 @@ export const columns: ColumnDef<learnerInterface>[] = [
         classStream: "",
       };
       return (
-        `${classInfo.class}${
-          classInfo.classStream ? ` (${classInfo.classStream})` : ""
+        `${classInfo.class}${classInfo.classStream ? ` (${classInfo.classStream})` : ""
         }` || "N/A"
       );
     },
@@ -79,9 +85,8 @@ export const columns: ColumnDef<learnerInterface>[] = [
       const amounts = row.original.amounts || {
         approved: { amount: 0, currency: "SSP" },
       };
-      return `${(amounts.approved?.amount || 0).toLocaleString()} ${
-        amounts.approved?.currency || "SSP"
-      }`;
+      return `${(amounts.approved?.amount || 0).toLocaleString()} ${amounts.approved?.currency || "SSP"
+        }`;
     },
   },
   {
@@ -92,9 +97,8 @@ export const columns: ColumnDef<learnerInterface>[] = [
         paid: { amount: 0, currency: "SSP" },
       };
       return amounts.paid
-        ? `${(amounts.paid.amount || 0).toLocaleString()} ${
-            amounts.paid.currency || "SSP"
-          }`
+        ? `${(amounts.paid.amount || 0).toLocaleString()} ${amounts.paid.currency || "SSP"
+        }`
         : "Not Paid";
     },
   },

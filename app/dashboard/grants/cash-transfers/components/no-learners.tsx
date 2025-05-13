@@ -60,11 +60,7 @@ export function NoLearners({
     visible: { opacity: 1, y: 0 },
   };
 
-  const handleTrancheChange = (tranche: number) => {
-    router.push(
-      `/dashboard/grants/cash-transfers/learners/${schoolCode}/${tranche}/${selectedYear}`
-    );
-  };
+
 
   return (
     <div className="px-4 py-6 bg-gradient-to-b from-primary/5 to-background ">

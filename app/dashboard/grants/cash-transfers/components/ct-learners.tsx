@@ -347,9 +347,8 @@ export function CtLearners({ data: initialData }: CtLearnersProps) {
                         {item.label}
                       </h4>
                       <p
-                        className={`text-lg font-semibold ${
-                          item.valueClassName || ""
-                        }`}
+                        className={`text-lg font-semibold ${item.valueClassName || ""
+                          }`}
                       >
                         {item.value || "Not Specified"}
                       </p>

@@ -5,7 +5,7 @@ import axios from "axios";
 import { base_url } from "@/app/utils/baseUrl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Users, UserCheck, UserMinus, UserPlus, School, GraduationCap, CalendarDays } from 'lucide-react';
+import { Users, UserCheck, UserMinus, UserPlus, School, GraduationCap, CalendarDays } from 'lucide-react';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -243,6 +243,7 @@ const LearnerModuleClient = ({ initialStates, initialStatistics }) => {
         const query = search ? `?${search}` : "";
         router.push(`${pathname}${query}`);
     };
+
     const fetchStatistics = async (params) => {
         setIsLoading(true);
         console.log("Fetching with year:", params.enrollmentYear);
