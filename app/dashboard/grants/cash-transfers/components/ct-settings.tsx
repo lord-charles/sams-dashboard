@@ -592,7 +592,7 @@ export default function CashTransferCriteriaSettings() {
                         </Table>
                     ) : (
                         <div className="text-center p-8 border border-dashed rounded-md text-muted-foreground">
-                            No criteria found. Click "Add New Criteria" to create one.
+                            No criteria found. Click &ldquo;Add New Criteria&ldquo; to create one.
                         </div>
                     )}
                 </CardContent>
