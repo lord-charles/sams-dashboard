@@ -17,93 +17,96 @@ const customIncludesStringFilter = (
 export const createColumns = (
   selectedYear: string
 ): ColumnDef<BudgetInterface>[] => [
-  {
-    accessorKey: "code",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="School Code" />
-    ),
-  },
-  {
-    id: "combinedName",
-    header: "Name",
-    accessorFn: (row) =>
-      `${row.school || ""} ${row.code || ""} 
+    {
+      accessorKey: "code",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Code" />
+      ),
+    },
+    {
+      id: "combinedName",
+      header: "Name",
+      accessorFn: (row) =>
+        `${row.school || ""} ${row.code || ""} 
       }`,
-    filterFn: customIncludesStringFilter,
-    enableHiding: true, // Allow this column to be hidden
-    enableSorting: false, // Prevent sorting if not needed
-    size: 0, // Set minimal size
-    cell: () => null, // This ensures nothing renders in the cell
-  },
-  {
-    accessorKey: "school",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="School" />
-    ),
-  },
-  {
-    accessorKey: "state10",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="State" />
-    ),
-  },
-  {
-    accessorKey: "county28",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="County" />
-    ),
-  },
-  {
-    accessorKey: "payam28",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Payam" />
-    ),
-  },
-  {
-    accessorKey: "year",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Year" />
-    ),
-  },
-  {
-    accessorKey: "budget.submittedAmount",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Total Budget" />
-    ),
-    cell: ({ row }) => {
-      const amount = row?.original?.budget?.submittedAmount;
-      return <div>{`SSP ${amount?.toLocaleString()}`}</div>;
+      filterFn: customIncludesStringFilter,
+      enableHiding: true, // Allow this column to be hidden
+      enableSorting: false, // Prevent sorting if not needed
+      size: 0, // Set minimal size
+      cell: () => null, // This ensures nothing renders in the cell
     },
-  },
-  {
-    accessorKey: "schoolType",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="School Type" />
-    ),
-    cell: ({ row }) => <div>{row.getValue("schoolType")}</div>,
-  },
-  {
-    accessorKey: "ownership",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="School OwnerShip" />
-    ),
-    cell: ({ row }) => <div>{row.getValue("ownership")}</div>,
-  },
-  {
-    accessorKey: "budget.meta.preparation.preparedBy",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Prepared By" />
-    ),
-    cell: ({ row }) => {
-      const amount = row?.original;
-      console.log(amount);
-      return <div>{`Test User`}</div>;
+    {
+      accessorKey: "school",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="School" />
+      ),
     },
-  },
-  {
-    accessorKey: "actions",
-    cell: ({ row }) => (
-      <DataTableRowActions row={row} selectedYear={selectedYear} />
-    ),
-  },
-];
+    {
+      id: "state10",
+      accessorKey: "state10",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="State" />
+      ),
+    },
+    {
+      id: "county28",
+      accessorKey: "county28",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="County" />
+      ),
+    },
+    {
+      id: "payam28",
+      accessorKey: "payam28",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Payam" />
+      ),
+    },
+    {
+      id: "year",
+      accessorKey: "year",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Year" />
+      ),
+    },
+    {
+      accessorKey: "schoolType",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Type" />
+      ),
+      cell: ({ row }) => <div>{row.getValue("schoolType")}</div>,
+    },
+    {
+      accessorKey: "ownership",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Ownership" />
+      ),
+      cell: ({ row }) => <div>{row.getValue("ownership")}</div>,
+    },
+    {
+      accessorKey: "submittedAmount",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Budget (SSP)" />
+      ),
+      cell: ({ row }) => {
+        const amount = row?.original?.submittedAmount;
+        return <div>{`${amount?.toLocaleString()}`}</div>;
+      },
+    },
+    {
+      accessorKey: "preparedBy",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Prepared By" />
+      ),
+      cell: ({ row }) => {
+        const preparedBy = row?.original?.preparedBy;
+        return <div>{preparedBy || "N/A"}</div>;
+      },
+    },
+    {
+      accessorKey: "actions",
+      cell: ({ row }) => (
+        <DataTableRowActions row={row} selectedYear={selectedYear} />
+      ),
+    },
+  ];

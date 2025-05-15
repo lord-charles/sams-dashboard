@@ -2,13 +2,14 @@
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PanelsTopLeft, Box, House } from "lucide-react";
+import { PanelsTopLeft, Box, House, Settings } from "lucide-react";
 import CtDashboard from "../components/ct-dashboard";
 import OverviewDashboard from "../components/tabs/overview";
 import EligibleDashboard from "../components/tabs/eligible";
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { DashboardHeader } from "../components/dashboard-header";
+import CashTransferCriteriaSettings from "../components/ct-settings";
 
 function CT({
     initialStates,
@@ -71,6 +72,18 @@ function CT({
                         />
                         Validated
                     </TabsTrigger>
+                    <TabsTrigger
+                        value="settings"
+                        className="relative overflow-hidden rounded-none border border-border py-2 after:pointer-events-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 first:rounded-s last:rounded-e data-[state=active]:bg-muted data-[state=active]:after:bg-primary"
+                    >
+                        <Settings
+                            className="-ms-0.5 me-1.5 opacity-60"
+                            size={16}
+                            strokeWidth={2}
+                            aria-hidden="true"
+                        />
+                        Settings
+                    </TabsTrigger>
                 </TabsList>
                 <ScrollBar orientation="horizontal" />
             </ScrollArea>
@@ -91,6 +104,9 @@ function CT({
                     initialStatCardData={initialStatCardData}
                     initialUniqueSchools={initialUniqueSchools || []}
                 />
+            </TabsContent>
+            <TabsContent value="settings">
+                <CashTransferCriteriaSettings />
             </TabsContent>
         </Tabs>
     );

@@ -62,7 +62,7 @@ const Schools = () => {
     return <DatabaseConnectionIssue />;
   }
   return (
-    <div className="bg-gradient-to-b from-primary/20 to-background p-2">
+    <div className="bg-gradient-to-b from-primary/20 to-background p-1">
 
       <AdvancedStatCards
         enrollmentData={enrollmentData === undefined || enrollmentData === null ? [] : enrollmentData}

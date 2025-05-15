@@ -34,6 +34,7 @@ export function DashboardTabs({ budgets }: { budgets: any }) {
       </TabsList>
       <TabsContent value="budget" className="space-y-4">
         <BudgetTab budgets={budgets} />
+
       </TabsContent>
       <TabsContent value="eligibility" className="space-y-4">
         <EligibilityTab />

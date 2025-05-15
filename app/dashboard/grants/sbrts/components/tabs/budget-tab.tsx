@@ -13,7 +13,7 @@ export function BudgetTab({ budgets }: { budgets: any }) {
   };
 
   return (
-    <Card>
+    <Card >
       {budgets.length === 0 ? (
         <NoBudgets
           selectedYear={selectedYear}

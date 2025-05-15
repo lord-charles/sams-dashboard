@@ -26,26 +26,26 @@ export function DataTableToolbar<TData>({
   const filteredCounties =
     selectedState && Array.isArray(selectedState) && selectedState.length > 0
       ? statesCountyPayams
-          .find((state) => state.state10 === selectedState[0])
-          ?.counties.map((county) => ({
-            value: county.county28,
-            label: county.county28,
-          })) || []
+        .find((state) => state.state10 === selectedState[0])
+        ?.counties.map((county) => ({
+          value: county.county28,
+          label: county.county28,
+        })) || []
       : [];
 
   const filteredPayams =
     selectedCounty && Array.isArray(selectedCounty) && selectedCounty.length > 0
       ? statesCountyPayams
-          .find((state) =>
-            state.counties.some(
-              (county) => county.county28 === selectedCounty[0]
-            )
+        .find((state) =>
+          state.counties.some(
+            (county) => county.county28 === selectedCounty[0]
           )
-          ?.counties.find((county) => county.county28 === selectedCounty[0])
-          ?.payams.map((payam) => ({
-            value: payam,
-            label: payam,
-          })) || []
+        )
+        ?.counties.find((county) => county.county28 === selectedCounty[0])
+        ?.payams.map((payam) => ({
+          value: payam,
+          label: payam,
+        })) || []
       : [];
 
   const isFiltered = table.getState().columnFilters.length > 0;
@@ -65,26 +65,26 @@ export function DataTableToolbar<TData>({
               combinedColumn.setFilterValue(value);
             }
           }}
-          className="h-8 w-[150px] lg:w-[350px]"
+          className="h-8 w-[150px] lg:w-[200px]"
         />
         {table.getColumn("schoolType") && (
           <DataTableFacetedFilter
             column={table?.getColumn("schoolType")}
-            title="School Type"
+            title="Type"
             options={schoolTypes}
           />
         )}
         {table.getColumn("ownership") && (
           <DataTableFacetedFilter
             column={table?.getColumn("ownership")}
-            title="OwnerShip"
+            title="Ownership"
             options={schoolOwnership}
           />
         )}
         {table.getColumn("approvalStatus") && (
           <DataTableFacetedFilter
             column={table?.getColumn("approvalStatus")}
-            title="Approval Status"
+            title="Status"
             options={[
               { value: "Approved", label: "Approved" },
               { value: "Pending", label: "Pending" },
@@ -108,7 +108,7 @@ export function DataTableToolbar<TData>({
             column={table?.getColumn("state10")}
             title="State"
             options={states}
-            // onChange={handleStateChange}
+          // onChange={handleStateChange}
           />
         )}
         {selectedState && table.getColumn("county28") && (

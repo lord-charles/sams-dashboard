@@ -33,7 +33,7 @@ export function DataTableViewOptions<TData>({
   };
 
   useEffect(() => {
-    const columnsToHide = ["combinedName"];
+    const columnsToHide = ["combinedName", "state10", "county28", "payam28", "year"];
     columnsToHide.forEach((columnId) => {
       const column = table.getColumn(columnId);
       if (column && column.getIsVisible()) {

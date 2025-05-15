@@ -2,8 +2,7 @@
 import { createColumns } from "./components/columns";
 import { DataTable } from "./components/data-table";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, RefreshCw } from "lucide-react";
-import { useThemeContext } from "@/lib/themeContext";
+import { PlusCircle } from "lucide-react";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 
 export type BudgetInterface = {
@@ -59,9 +58,12 @@ export type BudgetInterface = {
     submittedAmount?: number;
     preparedBy?: string;
     reviewedBy?: string;
-    reviewDate?: string; // Use Date type if you prefer working with Date objects
+    reviewDate?: string;
     previousYearLedgerAccountedFor?: boolean;
   };
+  preparedBy?: string;
+
+  submittedAmount?: number;
   revenues?: Array<{
     type?: string;
     category?: string;
@@ -81,11 +83,9 @@ export default function BudgetTable({
   selectedYear: string;
   selectedSchoolType: string;
 }) {
-  const { themeColor } = useThemeContext();
-
   return (
-    <Card className="p-4">
-      <div className="hidden h-full flex-1 flex-col space-y-8 md:flex">
+    <Card className="p-2 ">
+      <div className="hidden h-full flex-1 flex-col space-y-2 md:flex">
         <div className="flex items-center justify-between space-y-2">
           <div>
             <CardTitle>Budget Overview - {selectedYear}</CardTitle>
@@ -95,10 +95,7 @@ export default function BudgetTable({
           </div>
           <div className="flex items-center space-x-2">
             <Button
-              className={`${
-                themeColor === "Slate" ||
-                (themeColor === "Default" && "dark:text-black text-white")
-              } text-white font-semibold`}
+              className={`text-white font-semibold`}
             >
               <PlusCircle className="mr-2 h-4 w-4" />
               New Budget

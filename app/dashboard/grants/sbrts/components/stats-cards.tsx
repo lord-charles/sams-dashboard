@@ -14,7 +14,6 @@ import { DashboardContext } from "../contexts/dashboard-context";
 export function StatsCards() {
   const { selectedYear, selectedSchoolType } = useContext(DashboardContext);
 
-  // In a real application, you would fetch this data based on the selected year and school type
   const stats = {
     totalSchools: 529,
     schoolsApproved: 256,

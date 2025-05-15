@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { SbrtBreadcrumb } from "../components/breadcrumb";
 import { DashboardHeader } from "../components/dashboard-header";
 import { StatsCards } from "../components/stats-cards";
 import { DashboardTabs } from "../components/dashboard-tabs";
@@ -28,15 +27,10 @@ export default async function DashboardPage({ params }: PageProps) {
 
   return (
     <DashboardProvider initialYear={year} initialSchoolType="SBRTS">
-      <div className="flex min-h-screen flex-col bg-gradient-to-b from-primary/20 to-background">
-        <div className="container flex h-10 items-center px-4">
-          <SbrtBreadcrumb />
-        </div>
-        <div className="grid gap-6 px-4">
-          <DashboardHeader />
-          <StatsCards />
-          <DashboardTabs budgets={data} />
-        </div>
+      <div className="flex min-h-screen flex-col bg-gradient-to-b from-primary/20 to-background p-1 gap-2">
+        <DashboardHeader />
+        <StatsCards />
+        <DashboardTabs budgets={data} />
       </div>
     </DashboardProvider>
   );

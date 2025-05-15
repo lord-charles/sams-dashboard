@@ -27,6 +27,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import SchoolEnrollmentTable from "./school-table-enrollment/schools"
+import RegistrationPeriodManager from "./registration-period-manager"
 
 interface EnrollmentStatus {
   year?: number
@@ -549,19 +550,24 @@ export default function EnrollmentStats({ allSchools, schoolsData }: { allSchool
 
       {/* Filters Section */}
       <Card className="mb-4">
-        <div className="p-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-md font-medium flex items-center">
-              <Filter className="h-4 w-4 mr-2" />
-              Filters
-            </CardTitle>
-            {(state || county || payam || schoolType || schoolOwnership || selectedSchool) && (
-              <Button variant="ghost" size="sm" onClick={resetFilters} className="h-8 px-2">
-                <X className="h-4 w-4 mr-1" /> Clear All
-              </Button>
-            )}
+        <div className="p-3 flex justify-between items-center">
+          <div>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-md font-medium flex items-center">
+                <Filter className="h-4 w-4 mr-2" />
+                Filters
+              </CardTitle>
+              {(state || county || payam || schoolType || schoolOwnership || selectedSchool) && (
+                <Button variant="ghost" size="sm" onClick={resetFilters} className="h-8 px-2">
+                  <X className="h-4 w-4 mr-1" /> Clear All
+                </Button>
+              )}
+            </div>
+            <CardDescription>Filter data by location, school type, and ownership</CardDescription>
           </div>
-          <CardDescription>Filter data by location, school type, and ownership</CardDescription>
+          <RegistrationPeriodManager />
+
+
         </div>
         <div className="px-3 pb-3">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -627,7 +633,6 @@ export default function EnrollmentStats({ allSchools, schoolsData }: { allSchool
               />
             </div>
           </div>
-
           {/* Active Filters */}
           {(state || county || payam || schoolType || schoolOwnership || selectedSchool) && (
             <div className="flex flex-wrap gap-2 mt-4">
@@ -712,9 +717,8 @@ export default function EnrollmentStats({ allSchools, schoolsData }: { allSchool
                   <div className="flex items-center justify-between mt-2">
                     <div className="flex items-center">
                       <div className="h-2 w-2 rounded-full bg-purple-500 mr-2"></div>
-                      <p className="text-xs text-muted-foreground">Schools in the enrollment process</p>
+                      <p className="text-xs font-medium">{startedPercentOfTotal}% of total process</p>
                     </div>
-                    <p className="text-xs font-medium">{startedPercentOfTotal}% of total</p>
                   </div>
                   <div className="mt-3 h-2 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                     <div className="h-full bg-purple-500 rounded-full" style={{ width: `${startedPercentOfTotal}%` }} />
